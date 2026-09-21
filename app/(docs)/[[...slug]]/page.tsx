@@ -54,7 +54,8 @@ export async function generateMetadata(props: PageProps<'/[[...slug]]'>): Promis
   if (!page) notFound();
 
   return {
-    title: page.data.title,
+    // The home page title is the site name, so skip the "| Auto Tournament" suffix.
+    title: page.slugs.length === 0 ? { absolute: "Auto Tournament docs" } : page.data.title,
     description: page.data.description,
     openGraph: {
       images: getPageImageUrl(page).url,
