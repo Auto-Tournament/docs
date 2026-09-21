@@ -1,0 +1,118 @@
+---
+title: Managing servers
+description: Start, stop and watch servers, and add or remove them.
+icon: Server
+---
+
+Run `sudo csm` to do all of this from the menu. The commands below do the same from the shell. Leave out the server number to act on all servers.
+
+## Start, stop and restart
+
+```bash
+sudo csm status          # show all servers
+sudo csm start           # start all servers
+sudo csm start 2         # start server 2
+sudo csm stop            # stop all servers
+sudo csm stop 2
+sudo csm restart
+sudo csm restart 2
+```
+
+Restart a server after you change a config file or update the game.
+
+## Console and logs
+
+Each server runs in its own tmux session. Server `N` is the session `cs2-N`.
+
+```bash
+sudo csm attach 1        # open the console of server 1
+sudo csm logs 1 200      # last 200 log lines of server 1
+sudo csm logs 1          # the whole log
+sudo csm logs-file 1     # print the path of the log file
+sudo csm list-sessions   # list the tmux sessions
+```
+
+In the console, press `Ctrl+B`, then `D` to leave. The server keeps running. Do not press `Ctrl+C`, it stops the server.
+
+The log files are in `/home/cs2servermanager/logs/`, one per server.
+
+## Run a server in the foreground
+
+If a server stops right after it starts, run it in the foreground to see the error:
+
+```bash
+sudo csm debug 1
+```
+
+Press `Ctrl+C` to stop it.
+
+## Launch modes
+
+By default `csm` starts servers with Valve's `game/cs2.sh`, unchanged. There are two other ways:
+
+- `--alternate` uses `game/csm.sh`, which `csm` installs. It prefers the libraries that come with CS2. Try it when a server fails with `libserver.so` or `libv8` errors.
+- `--binary` runs the `cs2` binary directly. Use it only for troubleshooting.
+
+```bash
+sudo csm start --alternate       # all servers
+sudo csm start --alternate 2     # only server 2
+sudo csm restart --binary
+sudo csm debug --alternate 1
+```
+
+Put the flag before the server number. You cannot use both flags at once.
+
+A flag works for that one command. To use a mode everywhere `csm` starts servers, also in `update-plugins`, `update-game` and the update monitor, set `CSM_LAUNCH_MODE`:
+
+```bash
+sudo CSM_LAUNCH_MODE=alternate csm restart
+```
+
+A flag wins over the variable.
+
+On Debian 13 and newer, and Ubuntu 25.04 and newer, `csm` starts the servers inside Steam Runtime (SteamRT3), because CounterStrikeSharp fails to load there otherwise. See [Troubleshooting](/cs2/server-manager/troubleshooting#debian-13-and-ubuntu-2504).
+
+## Add or remove servers
+
+In `sudo csm`, open **Servers** and choose **Add servers** or **Remove servers**. New servers get the next free ports. Add them to Auto Tournament afterwards.
+
+## Rebuild or reconfigure one server
+
+```bash
+sudo csm reinstall 2         # delete server 2 and copy it again from master-install
+sudo csm update-config 2     # write server.cfg again, keep the game files
+```
+
+Use `reinstall` when game files are broken. `update-config` is much faster and is enough for config problems.
+
+To change the RCON password, max players or GSLT of all servers, use **Config** > **Update server configs** in the menu.
+
+## RCON bans
+
+A CS2 server blocks an IP after too many wrong RCON passwords. If Auto Tournament shows **IP banned**, fix the password in Auto Tournament first, then:
+
+```bash
+csm list-bans 1              # show banned IPs on server 1
+sudo csm unban 1 203.0.113.5 # remove one IP
+sudo csm unban-all 1         # remove all bans on server 1
+```
+
+Use `0` instead of the server number for all servers (not for `list-bans`).
+
+## Save disk space
+
+`csm` hardlinks the large `.vpk` game files from `master-install` into each server, so each extra server costs about 1.2 GB instead of 67 GB. New installs do this already. To convert older servers:
+
+```bash
+sudo csm dedupe-vpk --dry-run   # show what would change and how much space you save
+sudo csm stop
+sudo csm dedupe-vpk
+sudo csm start
+```
+
+- `sudo csm dedupe-vpk 2` handles only server 2.
+- `--verify` compares each file byte by byte first. It is slow.
+- `--allow-running` runs even when servers are running.
+- To undo it: `sudo csm stop && sudo csm dedupe-vpk --undo && sudo csm start`. This needs about 70 GB free per server. Also set `CSM_VPK_HARDLINK=0` wherever `csm` runs, or the next update links the files again.
+
+`master-install` and the servers must be on the same file system. The default layout is.

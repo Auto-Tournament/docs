@@ -1,0 +1,55 @@
+---
+title: Build from source
+description: Build the plugin yourself, run the tests, and contribute.
+icon: Hammer
+---
+
+Most people use the [release zip](/cs2/plugin/install). Build from source if you want to change the plugin.
+
+## What you need
+
+- The [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0).
+- Git.
+
+## Build
+
+```bash
+git clone https://github.com/Auto-Tournament/cs2-plugin.git
+cd cs2-plugin
+dotnet restore
+dotnet publish -c Release
+```
+
+The output goes to `build/Release/net8.0/publish/`, not to the usual `bin/` folder.
+
+## Copy to a server
+
+Copy the build output and the default config files. Change `CS2_DIR` to your server path:
+
+```bash
+CS2_DIR=/home/steam/cs2
+mkdir -p "${CS2_DIR}/game/csgo/addons/counterstrikesharp/plugins/MatchZy"
+cp -r build/Release/net8.0/publish/. "${CS2_DIR}/game/csgo/addons/counterstrikesharp/plugins/MatchZy/"
+cp -rn cfg/MatchZy "${CS2_DIR}/game/csgo/cfg/"
+```
+
+`cp -rn` does not overwrite config files that are already on the server. Restart the server, then check with `css_plugins list`.
+
+The plugin folder is still called `MatchZy`. Keep that name. A second folder with another name loads a second copy of the plugin.
+
+## Run the tests
+
+```bash
+dotnet build -c Release
+dotnet test tests/MatchZy.Tests -c Release
+```
+
+The GitHub build workflow runs the same commands on each push.
+
+## Contribute
+
+- Open an [issue](https://github.com/Auto-Tournament/cs2-plugin/issues) first for larger changes.
+- In a bug report, give the plugin version (`matchzy_version`), the CounterStrikeSharp version, the steps to reproduce, and the server log.
+- Keep pull requests small, and say how you tested the change.
+
+Releases are made with `release.sh`, from the GitHub **Release** workflow. It builds `MatchZy-<version>.zip` with the plugin under `addons/counterstrikesharp/plugins/MatchZy/` and the configs under `cfg/MatchZy/`.

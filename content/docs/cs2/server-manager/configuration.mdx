@@ -1,0 +1,89 @@
+---
+title: Config files and database
+description: Where to put your own config files, and how the plugin database is set up.
+icon: FolderCog
+---
+
+## Your own config files
+
+`csm` rebuilds server files when it updates the game or the plugins. Files you edit inside `server-N/` can be lost. Put your own files in the overrides folder instead:
+
+```text
+/home/cs2servermanager/overrides/game/
+```
+
+The folder mirrors the server's `game/` folder. `csm` copies it over the servers when it updates the plugins, so your files win. Examples:
+
+| Your file | Goes to |
+| --- | --- |
+| Plugin settings | `/home/cs2servermanager/overrides/game/csgo/cfg/MatchZy/config.cfg` |
+| Plugin database | `/home/cs2servermanager/overrides/game/csgo/cfg/MatchZy/database.json` |
+| CS2 configs | `/home/cs2servermanager/overrides/game/csgo/cfg/` |
+
+Change `cs2servermanager` if you chose another user in the installer.
+
+After a change, copy it to the servers. This also restarts them:
+
+```bash
+sudo csm update-plugins
+```
+
+A plain `sudo csm restart` does not copy the overrides.
+
+The **Config** tab in `sudo csm` has editors for the plugin `config.cfg` and `database.json` and the CounterStrikeSharp `admins.json`. They open the file in `nano` and copy it to all servers when you save.
+
+## The plugin database
+
+The CS2 plugin keeps match stats and its saved settings in a database. The installer offers two choices:
+
+- **Shared MySQL (default).** All servers use one MySQL database, `matchzy`, in the Docker container `matchzy-mysql`. Match stats end up in one place. You can also point the installer at your own MySQL server.
+- **SQLite per server.** Each server keeps its own `matchzy.db` file. No Docker needed, but stats are not shared.
+
+For an install without the menu, pick SQLite with:
+
+```bash
+sudo MATCHZY_DB_ENGINE=sqlite csm bootstrap
+```
+
+To check or repair the MySQL container, run `sudo csm`, open **Tools** and choose **MatchZy DB: verify/repair**.
+
+`csm` writes `database.json` for you. It only changes the file while it still contains the `__CSM_NOTE` line. Remove that line, and `csm` leaves your file alone.
+
+## Several servers on one database
+
+With shared MySQL, every server needs its own scope name, so the servers do not overwrite each other's saved settings. `csm` 1.7.8 and newer starts each server with:
+
+```text
++matchzy_config_scope <hostname>-server-<N>
+```
+
+For example `cs2-server-1` on a machine called `cs2`. The name comes from the server folder, so it stays the same after restarts, updates and port changes. The hostname keeps two machines on one database apart.
+
+If you rename the machine, or several machines have the same hostname, set your own prefix wherever `csm` starts servers, also in the update monitor cron:
+
+```bash
+sudo CSM_MATCHZY_SCOPE_PREFIX=eu-1 csm restart
+```
+
+The plugin must be version 1.4.28 or newer. `sudo csm doctor` checks this under **MatchZy per-server config (shared database)**. It fails when two servers report the same server ID, or when servers share MySQL with an old plugin or without the scope name.
+
+### Move an older install over
+
+1. Update `csm` (run the [install command](/cs2/server-manager/install#install) again).
+2. Run `sudo csm update-plugins`. It installs the latest plugin and restarts every server with the new start argument.
+3. In Auto Tournament, click **Retry** on each server on the **Servers** page. Until a server saves its own settings, it still reads the old shared ones.
+4. Run `sudo csm doctor` to check.
+
+Match stats already in the database stay where they are.
+
+If you cannot update the plugin, switch to SQLite: set `"DatabaseType": "SQLite"` in `/home/cs2servermanager/overrides/game/csgo/cfg/MatchZy/database.json` and in `/home/cs2servermanager/cs2-config/game/csgo/cfg/MatchZy/database.json`, then run `sudo csm update-plugins`.
+
+## Where csm keeps its own files
+
+`csm` keeps its state and logs in `/opt/cs2-server-manager`. To use another folder, set `CSM_ROOT` every time you run `csm`:
+
+```bash
+sudo CSM_ROOT=/srv/csm csm
+```
+
+Most people do not need this.

@@ -1,0 +1,38 @@
+---
+title: CS2 Server Manager
+description: Install and run several CS2 servers on one Linux machine with csm.
+icon: Terminal
+---
+
+CS2 Server Manager (`csm`) is a command-line tool with a menu in the terminal. On one Linux machine it:
+
+- installs CS2 with SteamCMD,
+- sets up Metamod:Source, CounterStrikeSharp and [Auto Tournament CS2](/cs2/plugin) (formerly MatchZy Enhanced) on every server,
+- runs each server in its own tmux session,
+- keeps the game and the plugins updated.
+
+It is made for Auto Tournament, but works for any setup that needs several CS2 match servers. Auto Tournament then controls the servers over RCON.
+
+- Source and releases: [github.com/Auto-Tournament/cs2-server-manager](https://github.com/Auto-Tournament/cs2-server-manager)
+- Bugs and questions: [GitHub issues](https://github.com/Auto-Tournament/cs2-server-manager/issues)
+
+## How it is set up
+
+`csm` creates a Linux user for the game servers, `cs2servermanager` by default. Everything lives in that user's home folder:
+
+| Path | What it is |
+| --- | --- |
+| `/home/cs2servermanager/master-install/` | One full CS2 install. SteamCMD only updates this one. |
+| `/home/cs2servermanager/server-1/`, `server-2/`, ... | One folder per server. The large game files are shared with `master-install`, so each extra server uses about 2 GB. |
+| `/home/cs2servermanager/overrides/game/` | Your own config files. They survive updates. |
+| `/home/cs2servermanager/logs/server-1.log` | The console log of each server. |
+
+`csm` keeps its own state and logs in `/opt/cs2-server-manager`.
+
+Server `N` runs in the tmux session `cs2-N`.
+
+## Next
+
+- [Install csm](/cs2/server-manager/install)
+- [Manage servers](/cs2/server-manager/managing-servers)
+- [All commands](/cs2/server-manager/commands)

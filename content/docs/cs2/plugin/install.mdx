@@ -1,0 +1,105 @@
+---
+title: Install
+description: Install and update the plugin on a CS2 server.
+icon: Download
+---
+
+<Callout>
+  If you use [CS2 Server Manager](/cs2/server-manager), it installs and updates the plugin for you. You can skip this page.
+</Callout>
+
+## What you need
+
+- A CS2 dedicated server (Steam app 730), up to date.
+- [Metamod:Source](https://www.sourcemm.net/downloads.php?branch=dev).
+- [CounterStrikeSharp](https://docs.cssharp.dev/). Use the build "with runtime" if .NET 8 is not installed on the machine.
+- An RCON password, so Auto Tournament can control the server.
+- GOTV on (`tv_enable 1`) if you want demos.
+
+## 1. Install Metamod:Source and CounterStrikeSharp
+
+Install both on the server and check that CounterStrikeSharp loads. Follow the CounterStrikeSharp guide for this.
+
+<Callout type="warn" title="Metamod version">
+  The newest Metamod builds (from 2026-09-08) do not work with the current CounterStrikeSharp release. The server log then shows `Plugin uses old SourceHook Metamod build`. Use Metamod `2.0.0.1411` until CounterStrikeSharp is updated.
+</Callout>
+
+## 2. Download and copy the plugin
+
+The release zip has one top folder, `MatchZy-<version>/`. Copy what is **inside** that folder into the server's `game/csgo/` folder. Change `VERSION` to the [latest release](https://github.com/Auto-Tournament/cs2-plugin/releases/latest) and `CS2_DIR` to your server path:
+
+```bash
+VERSION=1.4.33
+CS2_DIR=/home/steam/cs2
+curl -L -o /tmp/MatchZy.zip "https://github.com/Auto-Tournament/cs2-plugin/releases/download/v${VERSION}/MatchZy-${VERSION}.zip"
+unzip -q -o /tmp/MatchZy.zip -d /tmp
+cp -r "/tmp/MatchZy-${VERSION}/." "${CS2_DIR}/game/csgo/"
+```
+
+You now have:
+
+- `game/csgo/addons/counterstrikesharp/plugins/MatchZy/MatchZy.dll`
+- `game/csgo/cfg/MatchZy/`
+
+## 3. Set RCON
+
+Set an RCON password in the server config, for example in `game/csgo/cfg/server.cfg`:
+
+```text
+rcon_password "a-long-random-password"
+```
+
+## 4. Restart and check
+
+Restart the server. In the server console, run:
+
+```text
+css_plugins list
+```
+
+MatchZy must be in the list. The plugin still uses that name. If it is missing, check that CounterStrikeSharp loads first.
+
+Then add the server in Auto Tournament. See [Connect a CS2 server](/getting-started/connect-server).
+
+## Several servers on one database
+
+The plugin keeps stats and its saved settings in a database. The default is one SQLite file per server. Several servers can also share one MySQL database. The database is set in `game/csgo/cfg/MatchZy/database.json`:
+
+```json
+{
+  "DatabaseType": "MySQL",
+  "MySqlHost": "192.168.1.20",
+  "MySqlDatabase": "matchzy",
+  "MySqlUsername": "matchzy",
+  "MySqlPassword": "change-me",
+  "MySqlPort": 3306
+}
+```
+
+If several servers share one MySQL database:
+
+- Use version **1.4.28 or newer** on every server. Older versions stored the settings once per database. The servers then overwrote each other's settings, and Auto Tournament saw one server several times.
+- Give each server its own scope name as a start argument:
+
+```text
++matchzy_config_scope cs2-server-1
+```
+
+The start argument is better than setting it in `config.cfg`, because it is read before any config runs. The plugin logs the scope at startup, for example `[ConfigScope] Using scope 'cs2-server-1' (from start argument)`.
+
+CS2 Server Manager 1.7.8 and newer adds this argument for you. On a manual setup, add it yourself. After you change it, click **Retry** on each server on the **Servers** page.
+
+If you do not need shared stats, one SQLite file per server avoids the problem.
+
+## Update
+
+1. Save your own `cfg/MatchZy/database.json` and `cfg/MatchZy/config.cfg` if you changed them. The zip contains default copies that overwrite them.
+2. Download the new release and copy it the same way as in [step 2](#2-download-and-copy-the-plugin).
+3. Put your saved files back.
+4. Restart the server.
+
+Use the same version on all servers. Auto Tournament shows **Version mismatch** when servers run different versions.
+
+<Callout type="warn" title="Versions before 1.4.28 wrote the token to the log">
+  Older versions wrote the Auto Tournament server token in plain text to the server log. If you shared logs from an older version, set a new `SERVER_TOKEN` in `.env`, recreate the app container, and click **Retry** on each server.
+</Callout>

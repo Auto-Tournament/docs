@@ -1,0 +1,90 @@
+---
+title: Command reference
+description: Every csm command, flag and environment variable.
+icon: ListTree
+---
+
+Run `sudo csm` with no command to open the menu. Run `csm help` for a short list in the terminal.
+
+`<server>` is a server number: `1` for `server-1`. Where a command says so, `0` means all servers.
+
+## Servers
+
+| Command | What it does |
+| --- | --- |
+| `csm status` | Show which servers run. |
+| `csm start [--alternate\|--binary] [server]` | Start all servers, or one. |
+| `csm stop [server]` | Stop all servers, or one. |
+| `csm restart [--alternate\|--binary] [server]` | Restart all servers, or one. |
+| `csm attach <server>` | Open the server console (tmux). Leave with `Ctrl+B`, then `D`. |
+| `csm debug [--alternate\|--binary] <server>` | Run a server in the foreground. |
+| `csm list-sessions` | List the tmux sessions. |
+| `csm logs <server> [lines]` | Print the server log, or its last lines. |
+| `csm logs-file <server>` | Print the path of the server log file. |
+| `csm public-ip` | Print the public IP of the machine. |
+
+`--alternate` starts the server with `game/csm.sh`, which prefers the libraries that come with CS2. `--binary` runs the `cs2` binary directly, for troubleshooting only. Put the flag before the server number. See [Launch modes](/cs2/server-manager/managing-servers#launch-modes).
+
+## Updates
+
+| Command | What it does |
+| --- | --- |
+| `csm update-game` | Update CS2 on all servers after a Valve update. Stops and starts the servers. |
+| `csm update-server <server>` | Update CS2 on one server. |
+| `csm update-plugins` | Download Metamod, CounterStrikeSharp and the CS2 plugin, copy them and your overrides to all servers, and restart them. |
+| `csm monitor` | Run the update monitor once. |
+| `csm install-monitor-cron [interval]` | Run the update monitor from root's cron. The default interval is `*/5` (every 5 minutes). |
+| `csm remove-monitor-cron` | Remove the update monitor cron job. |
+
+## Setup and maintenance
+
+| Command | What it does |
+| --- | --- |
+| `csm install-deps` | Install the system packages `csm` needs with `apt`. |
+| `csm bootstrap` | Install or redeploy the servers without the menu. Options come from environment variables, see [Install without the menu](/cs2/server-manager/install#install-without-the-menu). |
+| `csm doctor [--yes] [--server <server>]` | Find common problems and offer fixes. `--yes` applies all fixes without asking. Needs `sudo`. |
+| `csm fix-libv8 <server\|0>` | Repair a missing `libv8.so`: check the main install with SteamCMD and copy the game files to the server again. |
+| `csm reinstall <server>` | Delete one server and copy it again from `master-install`. |
+| `csm update-config <server>` | Write `server.cfg` and `autoexec.cfg` of one server again, without touching the game files. |
+| `csm dedupe-vpk [--dry-run] [--verify] [--undo] [--allow-running] [server]` | Hardlink the `.vpk` files of the servers to `master-install` to save disk space. See [Save disk space](/cs2/server-manager/managing-servers#save-disk-space). |
+| `csm extract-map-data` | Extract map preview images. See [Map thumbnails](/cs2/server-manager/maps). |
+| `csm logdir` | Show the `csm` log folder and the latest command logs. |
+| `csm cleanup-all` | Delete all servers, the CS2 user and the MySQL container. |
+
+## RCON bans
+
+| Command | What it does |
+| --- | --- |
+| `csm list-bans <server>` | List the IPs a server has banned for wrong RCON passwords. |
+| `csm unban <server\|0> <ip>` | Remove one banned IP. |
+| `csm unban-all <server\|0>` | Remove all banned IPs. |
+
+## Which commands need sudo
+
+The menu and most commands that change something need `sudo`. `csm help`, `public-ip`, `status`, `logs`, `attach`, `list-bans` and `extract-map-data` can run without it, as long as your user can read the server files. When in doubt, use `sudo`.
+
+## Global flags
+
+| Flag | What it does |
+| --- | --- |
+| `-h`, `--help` | Show the help. |
+| `-d` | Run the menu without drawing it (daemon mode). |
+| `--copy-mode <mode>` | How game files are copied from `master-install` to the servers: `auto`, `reflink`, `rsync` or `legacy`. |
+
+## Environment variables
+
+Set these in front of the command, for example `sudo CSM_LAUNCH_MODE=alternate csm restart`. For the update monitor, they must also be in the cron job.
+
+| Variable | What it does |
+| --- | --- |
+| `CSM_LAUNCH_MODE` | `alternate` or `binary`: launch mode for every start, also in updates and the monitor. |
+| `CSM_STEAMRT` | `1` forces the Steam Runtime (SteamRT3) launcher on, `0` forces it off. By default it is on for Debian 13+ and Ubuntu 25.04+. |
+| `CSM_METAMOD_VERSION` | Metamod release tag for `update-plugins`, or `latest`. Default `2.0.0.1411`. |
+| `CSM_MATCHZY_SCOPE_PREFIX` | Prefix for the plugin scope name, instead of the hostname. |
+| `CSM_VPK_HARDLINK` | `0` turns off VPK hardlinks. New copies are full copies. |
+| `CSM_ROOT` | Folder for `csm` state and logs. Default `/opt/cs2-server-manager`. |
+| `CSM_LOG_DIR` | Folder for `csm` logs. Default `<CSM_ROOT>/logs`. |
+| `CSM_COPY_MODE` | The same as `--copy-mode`. |
+| `CS2_USER` | Linux user of the servers. Default `cs2servermanager`. |
+
+`csm bootstrap` reads more variables, such as `NUM_SERVERS` and `RCON_PASSWORD`. See [Install without the menu](/cs2/server-manager/install#install-without-the-menu).

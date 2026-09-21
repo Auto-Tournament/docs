@@ -1,0 +1,118 @@
+---
+title: Troubleshooting
+description: Fixes for common csm problems.
+icon: LifeBuoy
+---
+
+For problems between Auto Tournament and the servers, see the main [Troubleshooting](/reference/troubleshooting) page. For plugin problems, see [CS2 plugin troubleshooting](/cs2/plugin/troubleshooting).
+
+## Start with doctor
+
+```bash
+sudo csm doctor
+```
+
+`doctor` checks the most common problems and offers a fix for each one it finds:
+
+- **SteamCMD available**, and the SteamCMD wrapper in `/usr/bin/steamcmd`.
+- **Ownership under `/home/<cs2user>`**: files owned by root instead of the CS2 user.
+- **Steam Runtime installed (SteamRT3)**, on systems that need it.
+- **CS2 shared libs (libv8.so) present** on each server.
+- **MatchZy per-server config (shared database)**: servers on one MySQL database that would overwrite each other's settings.
+
+Add `--yes` to apply all fixes without questions, or `--server 2` to check one server. Without a terminal (for example from a script), `doctor` only applies fixes with `--yes`.
+
+## Logs
+
+- Server console log: `sudo csm logs 1 200`, or the file in `/home/cs2servermanager/logs/server-1.log`.
+- `csm`'s own log: `/opt/cs2-server-manager/logs/csm.log`. Each command also writes its own log file next to it.
+- `csm logdir` shows the log folder and the 10 latest command logs.
+- In the menu: **Tools** > **View recent command logs**.
+
+To follow the log live:
+
+```bash
+sudo tail -f /opt/cs2-server-manager/logs/csm.log
+```
+
+## A server does not start
+
+1. Run it in the foreground to see the error:
+
+   ```bash
+   sudo csm debug 1
+   ```
+
+2. Try the other launcher. It prefers the libraries that come with CS2:
+
+   ```bash
+   sudo csm start --alternate 1
+   ```
+
+3. Run `sudo csm doctor`.
+
+To see how a server was really started, show the tmux start command and the running process:
+
+```bash
+sudo su - cs2servermanager -c 'tmux list-panes -a -F "#{session_name}: #{pane_start_command}"' | grep cs2-1
+ps auxww | grep '/home/cs2servermanager/server-1/game/' | grep -v grep
+```
+
+## `libv8.so` is missing
+
+The server fails because `libv8.so` is not found. Check the game files and copy them to the server again:
+
+```bash
+sudo csm fix-libv8 1
+```
+
+Use `0` for all servers. `doctor` offers the same fix.
+
+## Debian 13 and Ubuntu 25.04
+
+On Debian 13 and newer, and Ubuntu 25.04 and newer, CounterStrikeSharp can fail to load with the system libraries ([CounterStrikeSharp #1024](https://github.com/roflmuffin/CounterStrikeSharp/issues/1024)). On these systems `csm` installs Steam Runtime (SteamRT3, Steam app `1628350`) into `/home/cs2servermanager/steamrt` and starts the servers through it.
+
+If it is missing, `doctor` offers to install it. To force Steam Runtime on or off on any system:
+
+```bash
+sudo CSM_STEAMRT=1 csm restart    # always use Steam Runtime
+sudo CSM_STEAMRT=0 csm restart    # never use Steam Runtime
+```
+
+Set the same variable in the update monitor cron job, or it goes back to the default on the next update.
+
+## `steamclient.so` is missing
+
+The server fails with a Steamworks or `steamclient.so` error. `csm` normally links this file during the install. To link it by hand:
+
+```bash
+sudo -u cs2servermanager mkdir -p /home/cs2servermanager/.steam/sdk64
+sudo -u cs2servermanager ln -sf /home/cs2servermanager/.local/share/Steam/steamcmd/linux64/steamclient.so /home/cs2servermanager/.steam/sdk64/steamclient.so
+sudo csm restart
+```
+
+## `Plugin uses old SourceHook Metamod build`
+
+Metamod is too new for the current CounterStrikeSharp. Run `sudo csm update-plugins`. It installs Metamod `2.0.0.1411`, which works.
+
+## Game files are broken
+
+Rebuild one server from `master-install`:
+
+```bash
+sudo csm reinstall 2
+```
+
+## `Unable to locate package steamcmd`
+
+Run `sudo csm install-deps`. It turns on the apt source that has SteamCMD and tries again. See [Install](/cs2/server-manager/install#if-steamcmd-cannot-be-installed) to do it by hand.
+
+## The same server shows up several times in Auto Tournament
+
+The servers share one MySQL database and overwrite each other's settings. Run `sudo csm doctor` and follow the steps under **MatchZy per-server config (shared database)**. See [Several servers on one database](/cs2/server-manager/configuration#several-servers-on-one-database).
+
+## Other problems during install
+
+- `Unsupported architecture`: run `uname -m`. `csm` runs on `x86_64` and `arm64` only.
+- Downloads fail: check that the machine can reach GitHub and Steam over HTTPS. Check the proxy and the firewall.
+- `CSM TUI must be run with sudo`: start the menu with `sudo csm`.

@@ -1,0 +1,115 @@
+---
+title: Install
+description: Requirements, the install command and the first setup.
+icon: Download
+---
+
+## What you need
+
+- Linux on `x86_64` or `arm64`. Debian and Ubuntu are the tested systems.
+- `sudo` access.
+- At least 8 GB RAM. Add more for many servers.
+- About 71 GB of disk for the first install, plus about 2 GB for each server.
+- Docker, if you use the shared MySQL database for the plugin (the default). See the [Docker install guide](https://docs.docker.com/engine/install/). `csm` does not install Docker for you.
+- A Game Server Login Token (GSLT) per server, if players join over the internet. Create one at [steamcommunity.com/dev/managegameservers](https://steamcommunity.com/dev/managegameservers) with app ID 730. For a LAN event you do not need one.
+
+`csm` installs the other packages it needs (SteamCMD, tmux, rsync, the 32-bit libraries and more) with `apt`. See [Server requirements](/modules/cs2/server-requirements) for the network ports.
+
+## Install
+
+Run this on the Linux machine. It downloads the latest `csm` for your CPU to `/usr/local/bin/csm` and starts the installer:
+
+```bash
+arch=$(uname -m); \
+case "$arch" in \
+  x86_64)  asset="csm-linux-amd64" ;; \
+  aarch64|arm64) asset="csm-linux-arm64" ;; \
+  *) echo "Unsupported architecture: $arch" && exit 1 ;; \
+esac; \
+tmp=$(mktemp); \
+curl -L "https://github.com/Auto-Tournament/cs2-server-manager/releases/latest/download/$asset" -o "$tmp" && \
+sudo install -m 0755 "$tmp" /usr/local/bin/csm && \
+rm "$tmp" && \
+sudo csm
+```
+
+Run the same command again later to update `csm` itself. The menu also has **Tools** > **Force update CSM now**.
+
+## The installer
+
+`sudo csm` opens the menu. The installer is under **Install** > **Install or redeploy servers**. It asks:
+
+- **MatchZy storage:** shared MySQL (the default) or one SQLite file per server. Shared MySQL keeps all match stats in one place and runs in a Docker container. You can also point it at your own MySQL server.
+- **Number of servers.** The default is 3.
+- **Game port and GOTV port** of server 1. The defaults are `27015` and `27020`.
+- **CS2 user.** The default is `cs2servermanager`.
+- **Hostname prefix, RCON password and max players.** Change the default RCON password. You enter this password in Auto Tournament.
+- **GSLT.**
+- Update options: validate the game files with SteamCMD, update the plugins, and install the [update monitor](/cs2/server-manager/updates#the-update-monitor).
+
+The first install downloads CS2, about 70 GB. This can take a long time.
+
+## Ports
+
+Server 1 uses game port `27015` and GOTV port `27020`. Each next server adds 10:
+
+| Server | Game port (UDP and TCP) | GOTV port |
+| --- | --- | --- |
+| 1 | 27015 | 27020 |
+| 2 | 27025 | 27030 |
+| 3 | 27035 | 27040 |
+
+Open these ports in your firewall. Players need UDP. Auto Tournament needs TCP on the game port for RCON.
+
+## Add the servers to Auto Tournament
+
+In Auto Tournament, add each server with the machine's IP, its game port and the RCON password. See [Connect a CS2 server](/getting-started/connect-server).
+
+Get the public IP of the machine with:
+
+```bash
+csm public-ip
+```
+
+## Install without the menu
+
+`csm bootstrap` installs or redeploys the servers with no questions. Set the options as environment variables:
+
+```bash
+sudo NUM_SERVERS=5 RCON_PASSWORD='a-long-random-password' csm bootstrap
+```
+
+| Variable | Default | What it sets |
+| --- | --- | --- |
+| `NUM_SERVERS` | `3` | Number of servers. |
+| `BASE_GAME_PORT`, `BASE_TV_PORT` | `27015`, `27020` | Ports of server 1. |
+| `CS2_USER` | `cs2servermanager` | Linux user for the servers. |
+| `HOSTNAME_PREFIX` | `CS2 Server` | Start of each server name. |
+| `RCON_PASSWORD` | a fixed default | RCON password. Always set it. |
+| `MATCHZY_DB_ENGINE` | `mysql` | `sqlite` for one SQLite file per server. |
+| `MATCHZY_SKIP_DOCKER` | `0` | `1` to skip the MySQL container. |
+| `ENABLE_METAMOD` | `1` | `0` to install without Metamod. |
+| `UPDATE_MASTER` | `1` | `0` to skip the game update. |
+| `FRESH_INSTALL` | `0` | `1` to start over from a clean install. |
+
+## If `steamcmd` cannot be installed
+
+`E: Unable to locate package steamcmd` means your apt sources do not include the part that has SteamCMD. `sudo csm install-deps` tries to fix this: it turns on the missing part in `/etc/apt/sources.list`, saves a backup next to it, and tries again.
+
+To do it by hand on Ubuntu:
+
+```bash
+sudo add-apt-repository multiverse
+sudo apt-get update
+sudo apt-get install steamcmd
+```
+
+On Debian, add `contrib` and `non-free` to your apt sources, then run `sudo apt-get update` and `sudo apt-get install steamcmd`.
+
+## Remove everything
+
+This deletes all servers, the CS2 user and the MySQL container:
+
+```bash
+sudo csm cleanup-all
+```

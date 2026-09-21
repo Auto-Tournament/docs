@@ -1,0 +1,109 @@
+---
+title: Match config and maps
+description: The match JSON the plugin loads, and how stock and workshop maps work.
+icon: FileBraces
+---
+
+Auto Tournament builds the match config for you. Read this page if you want to know what the server receives, or to load a match without Auto Tournament.
+
+## Load a match
+
+The plugin downloads a match config from a URL:
+
+```text
+matchzy_loadmatch_url "https://tournament.example.com/api/matches/r1m1.json"
+```
+
+If the URL needs a header, add the header name and value:
+
+```text
+matchzy_loadmatch_url "https://tournament.example.com/api/matches/r1m1.json" "Authorization" "Bearer <token>"
+```
+
+To load a file from the server instead, use a path relative to `csgo/`:
+
+```text
+matchzy_loadmatch MatchZy/my-match.json
+```
+
+## Required fields
+
+The plugin refuses a match config without these fields:
+
+- `maplist`: list of maps.
+- `num_maps`: number of maps in the series. `maplist` needs at least this many entries.
+- `team1` and `team2`: each with a `name` and `players`. `players` maps Steam64 IDs to player names.
+
+A one-map 5v5:
+
+```json
+{
+  "matchid": 12345,
+  "num_maps": 1,
+  "maplist": ["de_mirage"],
+  "team1": {
+    "name": "Team One",
+    "players": {
+      "76561198000000001": "Player1",
+      "76561198000000002": "Player2",
+      "76561198000000003": "Player3",
+      "76561198000000004": "Player4",
+      "76561198000000005": "Player5"
+    }
+  },
+  "team2": {
+    "name": "Team Two",
+    "players": {
+      "76561198000000006": "Player6",
+      "76561198000000007": "Player7",
+      "76561198000000008": "Player8",
+      "76561198000000009": "Player9",
+      "76561198000000010": "Player10"
+    }
+  }
+}
+```
+
+## Optional fields
+
+| Field | What it does |
+| --- | --- |
+| `matchid` | Match number. Used in events, demo names and stats. |
+| `players_per_team` | Players per team. |
+| `min_players_to_ready` | Ready players needed per team. |
+| `min_spectators_to_ready` | Ready spectators needed. |
+| `spectators` | Players who may join as spectators, as `{ "players": { "<steam64>": "<name>" } }`. |
+| `map_sides` | One entry per map: `team1_ct`, `team1_t`, `team2_ct`, `team2_t` or `knife`. |
+| `clinch_series` | End the series when a team cannot be caught. `true` or `false`. |
+| `skip_veto` | Play the maps in `maplist` in order. Auto Tournament runs the veto in the browser and sends the result. |
+| `wingman` | Play Wingman (2v2). Uses `live_wingman.cfg`. |
+| `cvars` | Server settings for this match, for example `{ "mp_overtime_enable": "1" }`. |
+| `admins` | List of Steam64 IDs that are admins for this match only. |
+| `simulation` | Play the match with bots. See [Simulation mode](/guides/simulation-mode). |
+| `simulation_timescale` | Speed of a simulated match, 0.1 to 10. |
+| `remote_log_url`, `remote_log_header_key`, `remote_log_header_value` | Event URL and header for this match only. |
+
+## Maps
+
+Each entry in `maplist` is a stock map or a workshop map:
+
+- **Stock map:** the map name, for example `de_mirage`. The plugin loads it with `changelevel`.
+- **Workshop map:** the workshop ID as a string of digits, for example `"3100869952"`. The plugin loads it with `host_workshop_map`.
+
+A Bo3 with a workshop map in the middle:
+
+```json
+{
+  "matchid": 12345,
+  "num_maps": 3,
+  "maplist": ["de_mirage", "3100869952", "de_anubis"],
+  "team1": { "name": "Team One", "players": { "76561198000000001": "Player1" } },
+  "team2": { "name": "Team Two", "players": { "76561198000000006": "Player6" } }
+}
+```
+
+Things to know:
+
+- A workshop entry must be only digits. Anything else is treated as a stock map name, and `changelevel` fails.
+- The CS2 server downloads workshop maps from Steam. If the server cannot reach Steam, the map does not load.
+- An admin can change the map before the match starts with `.map`: `.map de_mirage`, `.map mirage` (becomes `de_mirage`) or `.map 3100869952` for a workshop map.

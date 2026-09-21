@@ -55,7 +55,7 @@ RCON works, but the server cannot send events back.
 
 1. On the CS2 machine, run `curl <webhook-url>/api/events/test`. It must answer `"success":true`.
 2. If it fails, fix the **Webhook URL** in **Settings** > **Integrations & Webhooks**, DNS or the firewall.
-3. Check that MatchZy is loaded: run `css_plugins list` in the server console.
+3. Check that Auto Tournament CS2 (formerly MatchZy Enhanced) is loaded: run `css_plugins list` in the server console. The plugin still shows up as MatchZy.
 4. Click **Retry** on the server.
 
 ### IP banned
@@ -81,11 +81,11 @@ sudo csm update-game
 sudo csm restart
 ```
 
-Without CS2 Server Manager, update the server with SteamCMD and restart it. Then click **Refresh Status**. Install the update monitor so this happens on its own, see [CS2 Server Manager](/modules/cs2/server-manager#automatic-updates).
+Without CS2 Server Manager, update the server with SteamCMD and restart it. Then click **Refresh Status**. The update monitor of CS2 Server Manager can do this for you, see [Plugins and updates](/cs2/server-manager/updates#the-update-monitor).
 
 ### Plugin DB down
 
-MatchZy Enhanced cannot reach **its own** database on the game server. This is not the Auto Tournament database.
+The CS2 plugin cannot reach **its own** database on the game server. This is not the Auto Tournament database.
 
 - With CS2 Server Manager and its MySQL container: run `sudo csm`, open **Tools** and choose **MatchZy DB: verify/repair**.
 - With your own MySQL: check `game/csgo/cfg/MatchZy/database.json` (with CS2 Server Manager: `/home/cs2servermanager/overrides/game/csgo/cfg/MatchZy/database.json`), that the database host is reachable, and the user and password.
@@ -94,7 +94,7 @@ Restart the server and click **Refresh Status**.
 
 ### Version mismatch
 
-The servers run different versions of MatchZy Enhanced. Update all of them to the same version:
+The servers run different versions of the CS2 plugin. Update all of them to the same version:
 
 ```bash
 sudo csm update-plugins
@@ -102,7 +102,7 @@ sudo csm update-plugins
 
 ### The same server shows up several times
 
-Several servers share one MySQL database with an old MatchZy Enhanced, or without a scope name. See [Several servers and one database](/modules/cs2/matchzy-enhanced#several-servers-and-one-database).
+Several servers share one MySQL database with an old version of the CS2 plugin, or without a scope name. See [Several servers on one database](/cs2/plugin/install#several-servers-on-one-database).
 
 ## Tournaments and matches
 
@@ -136,6 +136,8 @@ After a series ends, the plugin keeps players on the server for a short time, an
 - Behind nginx, set `client_max_body_size 0`. See [Reverse proxy](/guides/reverse-proxy).
 
 ## CS2 Server Manager
+
+More fixes are in [CS2 Server Manager troubleshooting](/cs2/server-manager/troubleshooting).
 
 ### A server does not start
 

@@ -1,122 +1,20 @@
 ---
 title: CS2 Server Manager
-description: Install and run several CS2 servers on one Linux machine with csm.
+description: Install and run several CS2 servers on one Linux machine with csm. Overview and links.
 icon: Terminal
 ---
 
-CS2 Server Manager (`csm`) is a command-line tool with a menu in the terminal. On one Linux machine it:
+CS2 Server Manager (`csm`) is a command-line tool with a menu in the terminal. On one Linux machine it installs CS2, sets up Metamod:Source, CounterStrikeSharp and the Auto Tournament CS2 plugin (formerly MatchZy Enhanced) on every server, runs each server in tmux, and keeps the game and the plugins updated.
 
-- installs CS2 with SteamCMD,
-- sets up Metamod:Source, CounterStrikeSharp and MatchZy Enhanced on every server,
-- runs each server in its own tmux session,
-- keeps the game and the plugins updated.
+It is the easiest way to get servers for Auto Tournament. The full docs have their own section:
 
-Source and releases: [github.com/sivert-io/cs2-server-manager](https://github.com/sivert-io/cs2-server-manager). Check [Server requirements](/modules/cs2/server-requirements) before you install.
+<Cards>
+  <Card title="Overview" href="/cs2/server-manager" description="What csm does and where it keeps its files." />
+  <Card title="Install" href="/cs2/server-manager/install" description="Requirements, install command and ports." />
+  <Card title="Managing servers" href="/cs2/server-manager/managing-servers" description="Start, stop, logs, launch modes." />
+  <Card title="Plugins and updates" href="/cs2/server-manager/updates" description="Update CS2 and the plugins, and the update monitor." />
+  <Card title="Command reference" href="/cs2/server-manager/commands" description="Every command, flag and environment variable." />
+  <Card title="Troubleshooting" href="/cs2/server-manager/troubleshooting" description="doctor, libv8, Steam Runtime and more." />
+</Cards>
 
-## Install
-
-Run this on the Linux machine. It downloads the latest `csm` for your CPU to `/usr/local/bin/csm` and starts the installer:
-
-```bash
-arch=$(uname -m); \
-case "$arch" in \
-  x86_64)  asset="csm-linux-amd64" ;; \
-  aarch64|arm64) asset="csm-linux-arm64" ;; \
-  *) echo "Unsupported architecture: $arch" && exit 1 ;; \
-esac; \
-tmp=$(mktemp); \
-curl -L "https://github.com/sivert-io/cs2-server-manager/releases/latest/download/$asset" -o "$tmp" && \
-sudo install -m 0755 "$tmp" /usr/local/bin/csm && \
-rm "$tmp" && \
-sudo csm
-```
-
-The installer asks a few questions:
-
-- **Number of servers.** The default is 3.
-- **RCON password.** Change the default. You enter this password in Auto Tournament.
-- **MatchZy storage.** Shared MySQL (the default, runs in Docker) or one SQLite file per server. Shared MySQL needs Docker.
-
-The first install downloads CS2, about 70 GB. Each extra server uses about 2 GB more, because the large game files are shared between servers.
-
-## Ports
-
-Server 1 uses game port `27015` and GOTV port `27020`. Each next server adds 10:
-
-| Server | Game port (UDP and TCP) | GOTV port |
-| --- | --- | --- |
-| 1 | 27015 | 27020 |
-| 2 | 27025 | 27030 |
-| 3 | 27035 | 27040 |
-
-In Auto Tournament, add each server with the machine's IP, its game port and the RCON password.
-
-## Everyday commands
-
-```bash
-sudo csm                    # open the menu
-sudo csm status             # show all servers
-sudo csm start              # start all servers
-sudo csm start 2            # start server 2
-sudo csm stop
-sudo csm restart
-sudo csm update-game        # update CS2
-sudo csm update-plugins     # update the plugins and restart the servers
-sudo csm doctor             # find common problems and offer fixes
-```
-
-Logs and console:
-
-```bash
-sudo csm attach 1           # open the console of server 1 (tmux)
-sudo csm logs 1 200         # last 200 log lines of server 1
-sudo csm debug 1            # run server 1 in the foreground
-```
-
-Run `csm help` for all commands.
-
-## Automatic updates
-
-Valve updates CS2 often. Outdated servers cannot load matches, and Auto Tournament shows **CS2 update required**. Let `csm` check for updates every 5 minutes:
-
-```bash
-sudo csm install-monitor-cron
-```
-
-To update by hand:
-
-```bash
-sudo csm update-game
-sudo csm restart
-```
-
-## Your own config files
-
-`csm` rebuilds server files on updates. Put your own config files in the overrides folder, and they survive updates. The default CS2 user is `cs2servermanager`, so the folder is:
-
-```text
-/home/cs2servermanager/overrides/game/
-```
-
-For example, the MatchZy database config goes in `/home/cs2servermanager/overrides/game/csgo/cfg/MatchZy/database.json`. Run `sudo csm restart` after a change.
-
-## Several servers and one database
-
-With shared MySQL, every server needs its own scope name. `csm` 1.7.8 and newer adds `+matchzy_config_scope <hostname>-server-<N>` to each server for you. `sudo csm doctor` fails if servers share MySQL without it, or run MatchZy Enhanced older than 1.4.26.
-
-If you moved from an older version:
-
-1. Update `csm` (run the install command again).
-2. Run `sudo csm update-plugins`.
-3. In Auto Tournament, click **Retry** on each server on the **Servers** page.
-4. Run `sudo csm doctor` to check.
-
-## If a server does not start
-
-Try the other launcher. It prefers the libraries that come with CS2:
-
-```bash
-sudo csm start --alternate
-```
-
-More fixes are in [Troubleshooting](/reference/troubleshooting#cs2-server-manager).
+Check [Server requirements](/modules/cs2/server-requirements) before you install.

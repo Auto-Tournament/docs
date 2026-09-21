@@ -1,0 +1,105 @@
+---
+title: Commands
+description: Chat commands for players and admins, and console commands for the server.
+icon: SquareTerminal
+---
+
+Players type chat commands with a dot, for example `.ready`. Most also work with `!` (`!ready`) and as a console command with `css_` (`css_ready`).
+
+With Auto Tournament, admins usually control matches from the web app. See [Running matches](/guides/running-matches#admin-controls). The chat commands below still work on the server.
+
+## Player commands
+
+| Command | What it does |
+| --- | --- |
+| `.ready`, `.r` | Mark yourself ready. |
+| `.unready`, `.notready`, `.ur` | Mark yourself not ready. |
+| `.pause`, `.p` | Ask for a pause. |
+| `.unpause`, `.up` | Ask to unpause. By default both teams must unpause. |
+| `.tech` | Technical pause. |
+| `.tac` | Tactical timeout. |
+| `.stay` | After the knife round: keep your side. |
+| `.switch`, `.swap` | After the knife round: switch sides. |
+| `.ct`, `.t` | After the knife round: pick a side. |
+| `.stop` | Ask to restore the current round. Both teams must type it. Only when `matchzy_stop_command_available` is on. |
+| `.gg` | Vote to give up the match. Only when `matchzy_gg_enabled` is on. |
+| `.coach ct`, `.coach t` | Become the coach of a team. `.uncoach` stops it. |
+| `.help` | List the commands you can use. |
+| `.version` | Show the plugin version. |
+
+## Admin commands
+
+See [Who is an admin](/cs2/plugin/configuration#who-is-an-admin).
+
+| Command | What it does |
+| --- | --- |
+| `.start`, `.forcestart`, `.force` | Start the match now, even if not everyone is ready. |
+| `.forceready` | Mark a team ready. Only when `matchzy_allow_force_ready` is on. |
+| `.restart`, `.rr` | Restart the match. |
+| `.endmatch`, `.forceend` | End and reset the match. |
+| `.forcepause`, `.fp` | Pause as an admin. Only an admin can unpause it. |
+| `.forceunpause`, `.fup` | Unpause as an admin. |
+| `.roundknife`, `.rk` | Turn the knife round on or off. |
+| `.playout` | Turn playout (play all rounds) on or off. |
+| `.whitelist` | Turn the whitelist on or off. |
+| `.readyrequired <number>` | Set how many ready players are needed. `0` means everyone. |
+| `.restore <round>` | Restore a round from a backup. |
+| `.map <name>` | Change the map before the match starts. `.map mirage` becomes `de_mirage`. A number loads a workshop map. |
+| `.reloadmap` | Load the current map again. |
+| `.team1 <name>`, `.team2 <name>` | Set a team name. |
+| `.settings` | Show the current match settings. |
+| `.asay <message>` | Send a chat message as admin. |
+| `.rcon <command>` | Run a server command. |
+| `.prac`, `.tactics` | Start practice mode. |
+| `.match`, `.exitprac` | Leave practice mode and start match mode. |
+| `.testevent`, `.te` | Send a test event to the event URL. |
+
+Practice mode has more commands for grenades, bots and spawns, for example `.bot`, `.savenade <name>`, `.loadnade <name>`, `.rethrow`, `.showspawns` and `.noflash`. They work as in [MatchZy](https://shobhit-pathak.github.io/MatchZy/).
+
+## Console and RCON commands
+
+Run these in the server console, or over RCON. They do not need a player.
+
+### Matches
+
+| Command | What it does |
+| --- | --- |
+| `matchzy_loadmatch_url "<url>" ["<header>" "<value>"]` | Download and load a match config. The optional header is sent with the request. |
+| `matchzy match load "<url>"` | The same as `matchzy_loadmatch_url`. |
+| `matchzy_loadmatch <file>` | Load a match config from a file, relative to `csgo/`. |
+| `matchzy_clear_queued_match` | Drop a match that waits for the current series to reset. |
+| `matchzy_addplayer <steam64> <team1\|team2\|spec> "<name>"` | Add a player to the loaded match. |
+| `matchzy_removeplayer <steam64>` | Remove a player from all teams. |
+| `css_restart`, `css_endmatch` | Restart or end the match, as the chat commands. |
+
+If you load a match while the last series is still in postgame, it does not load right away. It waits until the series resets. The reply ends with `queued_match=<id>`. A new load replaces a waiting one. `css_restart` and `css_endmatch` drop it.
+
+### Status and reports
+
+| Command | What it does |
+| --- | --- |
+| `matchzy_version` | Show the plugin version. |
+| `matchzy_match_report` | Build the match report as JSON and push it to the report URL. If there is no report URL, it prints the JSON. |
+| `matchzy_get_match_stats <matchId>` | Print the stats of a match from the plugin database as JSON. |
+| `matchzy_get_pending_events` | Show how many events wait in the retry queue. |
+| `matchzy_clear_event_queue` | Delete all waiting and failed events from the retry queue. |
+| `matchzy_check_for_updates` | Ask Steam if this CS2 server is up to date. |
+
+### Backups
+
+| Command | What it does |
+| --- | --- |
+| `matchzy_listbackups <matchId>` | List round backups of a match. |
+| `matchzy_loadbackup <file>` | Restore a backup file. |
+| `matchzy_loadbackup_url <url>` | Restore a backup from a URL. |
+
+### Config
+
+| Command | What it does |
+| --- | --- |
+| `matchzy_reload_config` | Run `cfg/MatchZy/config.cfg` again. |
+| `reload_admins` | Load `cfg/MatchZy/admins.json` again. |
+
+All settings on the [Configuration](/cs2/plugin/configuration) page are console commands too. Run them with a value to change a setting on a running server.
+
+The plugin also accepts the Get5 names of some commands (`get5_loadmatch_url`, `get5_remote_log_url` and others), for tools made for Get5.

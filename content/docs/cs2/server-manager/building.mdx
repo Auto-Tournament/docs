@@ -1,0 +1,50 @@
+---
+title: Build from source
+description: Build csm yourself, run the tests, and contribute.
+icon: Hammer
+---
+
+Most people use the [release binary](/cs2/server-manager/install). Build from source if you want to change `csm`.
+
+## What you need
+
+- [Go](https://go.dev/dl/) 1.21 or newer.
+- Git.
+
+## Build
+
+```bash
+git clone https://github.com/Auto-Tournament/cs2-server-manager.git
+cd cs2-server-manager
+go build -o csm ./src/cmd/cs2-tui
+sudo ./csm
+```
+
+To build the release binaries for both CPU types:
+
+```bash
+GOOS=linux GOARCH=amd64 go build -o csm-linux-amd64 ./src/cmd/cs2-tui
+GOOS=linux GOARCH=arm64 go build -o csm-linux-arm64 ./src/cmd/cs2-tui
+```
+
+When you run `csm` from a folder that has an `overrides/` folder next to the binary, `csm` uses that folder as its root instead of `/opt/cs2-server-manager`. Set `CSM_ROOT` to choose the root yourself.
+
+## Run the tests
+
+```bash
+go test ./...
+```
+
+## Code layout
+
+- `src/cmd/cs2-tui/`: the `csm` command. It reads the command line and starts the menu when no command is given.
+- `src/internal/csm/`: the work itself: install, updates, tmux, plugins, doctor, maps.
+- `src/internal/tui/`: the terminal menu, built with Bubble Tea.
+
+## Contribute
+
+- Open an [issue](https://github.com/Auto-Tournament/cs2-server-manager/issues) first for larger changes.
+- In a bug report, give your Linux version and CPU type (`uname -m`), what you expected and what happened, and the logs: `sudo csm logs <server> 200` and `/opt/cs2-server-manager/logs/csm.log`.
+- Keep pull requests small, and say how you tested the change.
+
+Releases are made from the GitHub **Release** workflow with `scripts/release.sh`. It uploads `csm-linux-amd64` and `csm-linux-arm64`.

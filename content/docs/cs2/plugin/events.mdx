@@ -1,0 +1,143 @@
+---
+title: Events and report API
+description: What the plugin sends to Auto Tournament, and how it is set up.
+icon: Radio
+---
+
+The plugin talks to Auto Tournament over HTTP. It sends match events, match reports and demos, and it downloads its setup and the match configs. Auto Tournament sets all of this up when you add a server. This page explains what happens, for debugging or for your own integration.
+
+All requests from the plugin carry the server token. Auto Tournament checks it against `SERVER_TOKEN`.
+
+## Setup
+
+When you add a server, Auto Tournament sends these commands over RCON:
+
+```text
+matchzy_server_id "<server-id>"
+matchzy_bootstrap_token "<server-token>"
+matchzy_bootstrap_url "https://tournament.example.com/api/servers/<server-id>/bootstrap"
+```
+
+The plugin then downloads the setup from the bootstrap URL, with the token in the `X-MatchZy-Token` header. The answer is a list of `commands`, which the plugin runs and saves in its database. The list sets:
+
+- the event URL and its header (`matchzy_remote_log_url`, `matchzy_remote_log_header_key`, `matchzy_remote_log_header_value`),
+- the report URL and token (`matchzy_report_endpoint`, `matchzy_report_token`),
+- your default match settings from Auto Tournament, such as the chat prefix and the knife round.
+
+The plugin waits about 1.5 seconds after the last change to the URL or the token before it downloads, so the order of the two commands does not matter. After a restart, it downloads the saved URL again right away.
+
+If the setup gives a different `matchzy_server_id` than the one in the URL, the plugin logs `[Bootstrap] WARNING` and uses the setup anyway. This usually means the bootstrap URL is old. Click **Retry** on the server in Auto Tournament.
+
+## Endpoints on Auto Tournament
+
+| Method and path | Used for |
+| --- | --- |
+| `GET /api/servers/:id/bootstrap` | Setup download. |
+| `GET /api/matches/:slug.json` | Match config download. |
+| `POST /api/events` and `POST /api/events/:matchSlugOrServerId` | Match events. |
+| `POST /api/events/report` | Match reports. |
+| `POST /api/demos/:matchSlug/upload` | Demo upload. |
+| `GET /api/events/test` | Connection test. Answers `"success":true`. |
+
+## Events
+
+The plugin sends each event as a JSON `POST` to `matchzy_remote_log_url`, with the header from `matchzy_remote_log_header_key` and `matchzy_remote_log_header_value`. Auto Tournament uses `X-MatchZy-Token: <server-token>`.
+
+Every event has an `event` field with its name. Match events also have `matchid`, and map events have `map_number`.
+
+| Group | Events |
+| --- | --- |
+| Series and map | `series_start`, `going_live`, `round_started`, `round_end`, `halftime_started`, `overtime_started`, `side_swap`, `map_result`, `series_end` |
+| Warmup and knife | `warmup_ended`, `knife_round_started`, `knife_round_ended` |
+| Ready | `player_ready`, `player_unready`, `team_ready`, `all_players_ready` |
+| Pauses | `pause_requested`, `match_paused`, `unpause_requested`, `match_unpaused` |
+| Players | `player_connect`, `player_disconnect` |
+| Demos | `demo_recording_start`, `demo_recording_stop`, `demo_upload_start`, `demo_upload_success`, `demo_upload_fail`, `demo_upload_ended` |
+| Other | `backup_loaded`, `test_event` |
+
+These events are about the server, not a match:
+
+- `server_configured`: the server was set up. Has `server_id`, `hostname`, `plugin_version` and `remote_log_url`.
+- `server_health`: whether the plugin can reach its own database. Has `server_id`, `plugin_version`, `db_ok`, `db_type` (`sqlite` or `mysql`) and `db_error`. Auto Tournament shows **Plugin DB down** when `db_ok` is `false`.
+- `cs2_update_required`: Steam reports a newer CS2 version. Has `server_id` and `required_version`. Auto Tournament shows **CS2 update required**.
+
+An example `server_health` event:
+
+```json
+{
+  "event": "server_health",
+  "server_id": "s_1",
+  "plugin_version": "1.4.33",
+  "timestamp": 1769805517,
+  "db_ok": false,
+  "db_type": "mysql",
+  "db_error": "Unable to connect to any of the specified MySQL hosts."
+}
+```
+
+To send a test event, type `.testevent` in chat or run `css_testevent` in the console.
+
+### Retry queue
+
+If an event fails to send, the plugin stores it in its database and tries again every `matchzy_event_retry_interval` seconds (default 30). It gives up after 20 tries. Sent events are deleted after 7 days.
+
+When Auto Tournament sets up a server, it clears the queue first (`matchzy_clear_event_queue`), so old events do not go to an old URL. To check the queue:
+
+```text
+matchzy_get_pending_events
+```
+
+## Match report
+
+The match report is the full state of the match in one JSON document: phase, map, scores, ready state, pause state, the players on each team and their connection state, and server status. Auto Tournament uses it to show the live match page.
+
+The plugin pushes a report to `matchzy_report_endpoint` when:
+
+- a player connects or disconnects,
+- warmup starts, and after the knife round,
+- a round starts or ends.
+
+It sends a `POST` with the header `x-matchzy-token: <matchzy_report_token>` and this body:
+
+```json
+{
+  "serverId": "s_1",
+  "matchSlug": "r1m1",
+  "report": {
+    "match": { "matchId": 12345, "slug": "r1m1", "phase": "live", "map": { "name": "de_mirage", "number": 1, "total": 3, "round": 7 }, "score": { "team1": 4, "team2": 2 } },
+    "teams": { "team1": { "name": "Team One", "side": "ct", "players": [] }, "team2": { "name": "Team Two", "side": "t", "players": [] } },
+    "spectators": { "connected": [], "configured": [] },
+    "connections": [],
+    "server": { "moduleVersion": "1.4.33", "tournamentStatus": "playing" }
+  }
+}
+```
+
+The example is shortened. The plugin tries 3 times. It needs `matchzy_report_endpoint` and a server ID, otherwise it does not push.
+
+To see the report yourself, run `matchzy_match_report` in the console. It pushes the report, or prints it if there is no report URL.
+
+## Demos
+
+With `matchzy_demo_recording_enabled` on, the plugin records a demo when the match goes live. It turns GOTV on (`tv_enable 1`) before recording. After each map it uploads the demo to `matchzy_demo_upload_url` with the header from `matchzy_demo_upload_header_key` and `matchzy_demo_upload_header_value`. Auto Tournament sets the URL for each match to `/api/demos/<match-slug>/upload`.
+
+The upload sends `demo_upload_start`, then `demo_upload_success` or `demo_upload_fail`.
+
+## Server status values
+
+Auto Tournament reads these over RCON to see what the server is doing:
+
+- `matchzy_tournament_status`: `idle`, `loading`, `warmup`, `knife`, `playing`, `paused`, `halftime`, `postgame` or `error`.
+- `matchzy_tournament_match`: the loaded match. Empty when the server is idle.
+- `matchzy_tournament_next_match`: a match that waits for the current series to reset.
+- `matchzy_tournament_updated`: Unix time of the last change.
+
+## Settings stored per server
+
+The plugin saves the settings it gets from Auto Tournament in its database, so they survive a restart. With a shared MySQL database, each server keeps its own copy. The plugin tells servers apart by the scope name (`+matchzy_config_scope`), or else by the bind address and game port. See [Several servers on one database](/cs2/plugin/install#several-servers-on-one-database).
+
+These settings are stored per server: `matchzy_server_id`, the bootstrap URL and token, the event URL and header, the report URL and token, the demo upload URL, the chat prefixes and the `matchzy_warmup_*` settings.
+
+## Secrets in logs
+
+Since version 1.4.28, the plugin never writes tokens or passwords to the log, the console or the chat. Tokens, header values, `rcon_password`, `sv_password` and any setting with `token`, `password`, `secret` or `header_value` in the name show as `(hidden, N chars)`. You can share server logs when you ask for help.

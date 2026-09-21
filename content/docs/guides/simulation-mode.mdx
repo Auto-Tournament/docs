@@ -13,7 +13,7 @@ In simulation mode, every match is played by bots. The veto is done automaticall
 ## What you need
 
 - A test install of Auto Tournament.
-- At least one CS2 server with MatchZy Enhanced, added on the **Servers** page.
+- At least one CS2 server with [Auto Tournament CS2](/cs2/plugin) (formerly MatchZy Enhanced), added on the **Servers** page.
 - Teams, or players for a shuffle tournament. The players do not need to be real Steam accounts that join.
 
 ## Turn it on
@@ -50,7 +50,7 @@ Send `{"simulateMatches": false}` to switch it off again.
 **With a build from source.** The local build shows the **Developer / Simulation** tab and a **Dev Tools** page, and it allows simulation already:
 
 ```bash
-git clone https://github.com/sivert-io/matchzy-auto-tournament.git
+git clone https://github.com/Auto-Tournament/auto-tournament.git
 cd matchzy-auto-tournament
 cp example.env .env
 ```
@@ -65,7 +65,7 @@ The local build does not keep the database in a volume. Your data is gone when y
 
 ## Speed
 
-**Simulation Timescale** sets how fast the bots play, from 0.1 to 10. Values above 2 can make bots act strangely. Speeds above 4 need MatchZy Enhanced 1.4.25 or newer. The value is sent when a match loads, so a change only affects matches that load after it.
+**Simulation Timescale** sets how fast the bots play, from 0.1 to 10. Values above 2 can make bots act strangely. Speeds above 4 need the CS2 plugin 1.4.25 or newer. The value is sent when a match loads, so a change only affects matches that load after it.
 
 For a fast test bracket, create the tournament with **Max Rounds per Map** set to 4 and overtime set to **Disabled – no draws (damage tiebreak)**. Every map then ends after at most 4 rounds and always has a winner.
 

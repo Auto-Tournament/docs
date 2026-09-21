@@ -1,0 +1,92 @@
+---
+title: Plugins and updates
+description: Update CS2 and the plugins, by hand or with the update monitor.
+icon: RefreshCw
+---
+
+## Update CS2
+
+Valve updates CS2 often. An outdated server cannot load matches, and Auto Tournament shows **CS2 update required**.
+
+```bash
+sudo csm update-game
+```
+
+This updates `master-install` with SteamCMD, stops all servers, copies the new files to each server and starts them again. Players on the servers are kicked, so do not run it during a match.
+
+To update only one server:
+
+```bash
+sudo csm update-server 2
+```
+
+## Update the plugins
+
+```bash
+sudo csm update-plugins
+```
+
+This downloads the plugins, copies them and your [overrides](/cs2/server-manager/configuration#your-own-config-files) to every server, and restarts the servers. It installs:
+
+- **Metamod:Source `2.0.0.1411`.** This version is fixed on purpose. Metamod builds from 2026-09-08 do not work with the current CounterStrikeSharp release, which then fails with `Plugin uses old SourceHook Metamod build`.
+- **CounterStrikeSharp**, the latest release.
+- **[Auto Tournament CS2](/cs2/plugin)**, the latest release.
+
+`update-plugins` always installs the whole bundle, so it replaces a newer Metamod with the fixed version. To choose another Metamod build, set `CSM_METAMOD_VERSION` to a [release tag](https://github.com/alliedmodders/metamod-source/releases), or to `latest` for the newest build:
+
+```bash
+sudo CSM_METAMOD_VERSION=2.0.0.1468 csm update-plugins
+```
+
+Keep all servers on the same plugin version. Auto Tournament shows **Version mismatch** when they differ.
+
+## The update monitor
+
+The update monitor checks each server's log and updates servers that need it. Install it as a cron job that runs every 5 minutes:
+
+```bash
+sudo csm install-monitor-cron
+```
+
+Other intervals use cron syntax for the minute field:
+
+```bash
+sudo csm install-monitor-cron "*/10"
+```
+
+To remove it:
+
+```bash
+sudo csm remove-monitor-cron
+```
+
+To run one check by hand:
+
+```bash
+sudo csm monitor
+```
+
+### How the monitor works
+
+When Steam reports a new CS2 version, the plugin writes this line to the server log:
+
+```text
+[MATCHZY_UPDATE_AVAILABLE] required_version=<number>
+```
+
+The monitor looks for this line in each server's log. It only updates a server that is **stopped**. It never stops a running server, so it cannot break a match.
+
+The plugin's default is to only report the update (`matchzy_safeautoupdater_action warn_only`). The server keeps running, so the monitor does not update it. You then have two choices:
+
+- **Update by hand** when no match is running: `sudo csm update-game`.
+- **Let the server stop itself.** Set `matchzy_safeautoupdater_action restart` in the plugin config. The plugin then kicks players and shuts the server down, but only when no match is running (idle, postgame or error). The next monitor run updates and starts it.
+
+To set it for all servers, add the line to `/home/cs2servermanager/overrides/game/csgo/cfg/MatchZy/config.cfg`, then run `sudo csm update-plugins`:
+
+```text
+matchzy_safeautoupdater_action restart
+```
+
+After an update, the monitor waits before it reacts to the same server again, so a server that keeps restarting does not update in a loop.
+
+The monitor writes its log to `auto_update_monitor.log` in the `csm` log folder. Run `csm logdir` to find it.

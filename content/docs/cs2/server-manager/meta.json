@@ -1,0 +1,18 @@
+{
+  "title": "CS2 Server Manager",
+  "description": "Run several CS2 servers on one Linux machine",
+  "icon": "Terminal",
+  "root": true,
+  "pages": [
+    "index",
+    "install",
+    "managing-servers",
+    "configuration",
+    "updates",
+    "maps",
+    "commands",
+    "troubleshooting",
+    "---Developers---",
+    "building"
+  ]
+}

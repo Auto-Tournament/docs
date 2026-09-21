@@ -1,106 +1,22 @@
 ---
-title: MatchZy Enhanced
-description: Install and update the CS2 plugin that connects your servers to Auto Tournament.
+title: Auto Tournament CS2 plugin
+description: The CS2 server plugin, formerly MatchZy Enhanced. Overview and links.
 icon: Plug
 ---
 
-MatchZy Enhanced is a CounterStrikeSharp plugin. It runs inside each CS2 server. It loads matches from Auto Tournament, runs warmup, ready-up, knife round and pauses, and sends events, results and demos back.
+Auto Tournament CS2 (formerly MatchZy Enhanced) is the plugin that connects your CS2 servers to Auto Tournament. It runs inside each server, loads matches, runs warmup, ready-up, the knife round and pauses, and sends events, results and demos back.
 
-- Source and releases: [github.com/sivert-io/MatchZy-Enhanced](https://github.com/sivert-io/MatchZy-Enhanced)
-- Use the latest release. Some features in these docs need a recent version. The page says so when they do.
+The plugin still shows up as **MatchZy** in the server's plugin list. Its settings, commands, config folders and release files keep the MatchZy name for now.
 
-<Callout>
-  If you use [CS2 Server Manager](/modules/cs2/server-manager), it installs and updates MatchZy Enhanced for you. Skip to [Several servers and one database](#several-servers-and-one-database).
-</Callout>
+The full plugin docs have their own section:
 
-## Install by hand
+<Cards>
+  <Card title="Overview" href="/cs2/plugin" description="What the plugin is, and how it relates to MatchZy." />
+  <Card title="Install" href="/cs2/plugin/install" description="Install and update the plugin by hand." />
+  <Card title="Configuration" href="/cs2/plugin/configuration" description="Config files and all matchzy_ settings." />
+  <Card title="Commands" href="/cs2/plugin/commands" description="Chat commands and console commands." />
+  <Card title="Events and report API" href="/cs2/plugin/events" description="What the plugin sends to Auto Tournament." />
+  <Card title="Troubleshooting" href="/cs2/plugin/troubleshooting" description="Fixes for common plugin problems." />
+</Cards>
 
-### 1. Install Metamod:Source and CounterStrikeSharp
-
-Install [Metamod:Source](https://www.sourcemm.net/downloads.php?branch=dev) and [CounterStrikeSharp](https://docs.cssharp.dev/) on the server first, and check that CounterStrikeSharp loads. Follow the CounterStrikeSharp guide for this.
-
-<Callout type="warn" title="Metamod version">
-  The newest Metamod builds (from 2026-09-08) do not work with the current CounterStrikeSharp release. The server log then shows `Plugin uses old SourceHook Metamod build`. Use Metamod `2.0.0.1411` until CounterStrikeSharp is updated.
-</Callout>
-
-### 2. Download and copy the plugin
-
-The release zip has one top folder, `MatchZy-<version>/`. Copy what is **inside** that folder into the server's `game/csgo/` folder. Change `CS2_DIR` to your server path:
-
-```bash
-VERSION=1.4.32
-CS2_DIR=/home/steam/cs2
-curl -L -o /tmp/MatchZy.zip "https://github.com/sivert-io/MatchZy-Enhanced/releases/download/v${VERSION}/MatchZy-${VERSION}.zip"
-unzip -q -o /tmp/MatchZy.zip -d /tmp
-cp -r "/tmp/MatchZy-${VERSION}/." "${CS2_DIR}/game/csgo/"
-```
-
-You now have:
-
-- `game/csgo/addons/counterstrikesharp/plugins/MatchZy/MatchZy.dll`
-- `game/csgo/cfg/MatchZy/`
-
-### 3. Set RCON
-
-Set an RCON password in the server config, for example in `game/csgo/cfg/server.cfg`:
-
-```text
-rcon_password "a-long-random-password"
-```
-
-To record demos, GOTV must be on (`tv_enable 1`).
-
-### 4. Restart and check
-
-Restart the server. In the server console, run:
-
-```text
-css_plugins list
-```
-
-MatchZy must be in the list. Then add the server in Auto Tournament, see [Connect a CS2 server](/getting-started/connect-server).
-
-## You do not need to configure the plugin
-
-Auto Tournament sets up the plugin over RCON when you add the server. It sets the event URL, the demo upload URL, the token and the default match settings. Change match settings in Auto Tournament under **Settings**, not in `config.cfg`. Auto Tournament sends them again for each match.
-
-## Several servers and one database
-
-The plugin stores stats and its own settings in a database. The default is a SQLite file per server. Several servers can also share one MySQL database. The database is set in `game/csgo/cfg/MatchZy/database.json`.
-
-If several servers share one MySQL database:
-
-- Use MatchZy Enhanced **1.4.28 or newer** on every server. Older versions stored the plugin settings once per database. The servers then overwrote each other's settings, and Auto Tournament saw one server several times.
-- Give each server its own scope name as a start argument:
-
-```text
-+matchzy_config_scope cs2-server-1
-```
-
-CS2 Server Manager 1.7.8 and newer adds this argument for you. On a manual setup, add it yourself. After you change it, click **Retry** on each server on the **Servers** page.
-
-If you do not need shared stats, one SQLite file per server avoids the problem.
-
-## Update
-
-Download the new release and copy it the same way as in [step 2](#2-download-and-copy-the-plugin). Keep your own `cfg/MatchZy/database.json` if you changed it: copy it somewhere else first and put it back after. Then restart the server.
-
-Use the same version on all servers. Auto Tournament shows **Version mismatch** when servers run different versions.
-
-<Callout type="warn" title="Versions before 1.4.28 wrote the token to the log">
-  Older versions wrote the Auto Tournament server token in plain text to the server log. If you shared logs from an older version, set a new `SERVER_TOKEN` in `.env`, recreate the app container, and click **Retry** on each server.
-</Callout>
-
-## Chat commands
-
-Players type these in the game chat:
-
-| Command | What it does |
-| --- | --- |
-| `.ready` / `.unready` | Mark yourself ready or not ready. |
-| `.pause` / `.unpause` | Ask for a pause, or unpause. Both teams must unpause. |
-| `.tech` | Technical pause. |
-| `.tac` | Tactical timeout. |
-| `.gg` | Vote to give up the match, if it is turned on. |
-
-Admins control matches from Auto Tournament. See [Running matches](/guides/running-matches#admin-controls).
+If you use [CS2 Server Manager](/cs2/server-manager), it installs and updates the plugin for you.
