@@ -4,6 +4,8 @@ description: Build csm yourself, run the tests, and contribute.
 icon: Hammer
 ---
 
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+
 Most people use the [release binary](/cs2/server-manager/install). Build from source if you want to change `csm`.
 
 ## What you need
@@ -11,14 +13,44 @@ Most people use the [release binary](/cs2/server-manager/install). Build from so
 - [Go](https://go.dev/dl/) 1.21 or newer.
 - Git.
 
-## Build
+## Build and run
+
+<Steps>
+
+<Step>
+
+### Clone the repository
 
 ```bash
 git clone https://github.com/Auto-Tournament/cs2-server-manager.git
 cd cs2-server-manager
+```
+
+</Step>
+
+<Step>
+
+### Build
+
+```bash
 go build -o csm ./src/cmd/cs2-tui
+```
+
+</Step>
+
+<Step>
+
+### Run
+
+```bash
 sudo ./csm
 ```
+
+When you run `csm` from a folder that has an `overrides/` folder next to the binary, `csm` uses that folder as its root instead of `/opt/cs2-server-manager`. Set `CSM_ROOT` to choose the root yourself.
+
+</Step>
+
+</Steps>
 
 To build the release binaries for both CPU types:
 
@@ -26,8 +58,6 @@ To build the release binaries for both CPU types:
 GOOS=linux GOARCH=amd64 go build -o csm-linux-amd64 ./src/cmd/cs2-tui
 GOOS=linux GOARCH=arm64 go build -o csm-linux-arm64 ./src/cmd/cs2-tui
 ```
-
-When you run `csm` from a folder that has an `overrides/` folder next to the binary, `csm` uses that folder as its root instead of `/opt/cs2-server-manager`. Set `CSM_ROOT` to choose the root yourself.
 
 ## Run the tests
 

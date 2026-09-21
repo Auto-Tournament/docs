@@ -1,0 +1,180 @@
+---
+title: Running locally
+description: Run Auto Tournament from source for development.
+icon: Laptop
+---
+
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+
+## What you need
+
+- Node.js 20. The repository has an `.nvmrc`, so `nvm use` picks the right version.
+- Yarn 1 (classic).
+- Docker, for the database.
+- Git.
+
+## Run the dev servers
+
+<Steps>
+
+<Step>
+
+### Fork and clone
+
+Fork [Auto-Tournament/auto-tournament](https://github.com/Auto-Tournament/auto-tournament) on GitHub, then clone your fork:
+
+```bash
+git clone https://github.com/YOUR_USERNAME/auto-tournament.git
+cd auto-tournament
+```
+
+</Step>
+
+<Step>
+
+### Install the packages
+
+```bash
+yarn install
+```
+
+</Step>
+
+<Step>
+
+### Start the database
+
+```bash
+yarn db
+```
+
+This starts PostgreSQL 16 in a Docker container called `matchzy-postgres` on port `5432`.
+
+</Step>
+
+<Step>
+
+### Create `.env`
+
+```bash
+cp example.env .env
+```
+
+The `DB_*` values in `example.env` match `yarn db`. Set `STEAM_API_KEY` so you can sign in with Steam, and set the address of the dev server:
+
+```bash title=".env"
+FRONTEND_BASE_URL=http://localhost:5173
+STEAM_API_KEY=your-steam-web-api-key
+```
+
+</Step>
+
+<Step>
+
+### Start the API and the web app
+
+```bash
+yarn dev
+```
+
+This starts the API on port `3000` and the web app on port `5173`. The API log is also written to `logs/dev-api-<time>.log`.
+
+</Step>
+
+<Step>
+
+### Open the app
+
+Open [http://localhost:5173](http://localhost:5173) and sign in with Steam. On an empty database, the first user becomes admin. The dev build also shows **Dev Tools** in the menu and the **Developer / Simulation** tab in **Settings**.
+
+</Step>
+
+</Steps>
+
+## Run a production build
+
+To test the Docker image the way users run it, build it from your checkout:
+
+<Steps>
+
+<Step>
+
+### Set the secrets
+
+Set `SESSION_SECRET`, `SERVER_TOKEN` and `STEAM_API_KEY` in `.env`. Set `FRONTEND_BASE_URL=http://localhost:3069`.
+
+</Step>
+
+<Step>
+
+### Build and start
+
+```bash
+yarn docker:local:up
+```
+
+This runs `docker compose --env-file .env -f docker/docker-compose.local.yml up -d --build`. The build has **Dev Tools** turned on and allows simulation mode.
+
+</Step>
+
+<Step>
+
+### Open the app
+
+Open [http://localhost:3069](http://localhost:3069). Follow the log with `yarn docker:local:logs`.
+
+</Step>
+
+<Step>
+
+### Stop it
+
+```bash
+yarn docker:local:down
+```
+
+This build does not keep the database in a volume. The data is gone when the containers are removed.
+
+</Step>
+
+</Steps>
+
+## Test a pull request
+
+<Steps>
+
+<Step>
+
+### Check out the branch
+
+With the GitHub CLI:
+
+```bash
+gh pr checkout 123
+```
+
+</Step>
+
+<Step>
+
+### Run it
+
+Use `yarn dev` for a quick look, or `yarn docker:local:up` to test the production build. After a change to the Dockerfile or the dependencies, use `yarn docker:local:rebuild`.
+
+</Step>
+
+</Steps>
+
+## Useful commands
+
+| Command | What it does |
+| --- | --- |
+| `yarn lint` | Run ESLint. `yarn lint:fix` fixes what it can. |
+| `yarn typecheck` | Typecheck the API and the web app. |
+| `yarn typecheck:ratchet` | Fail if there are more type errors than in `scripts/typecheck-baseline.json`. CI runs this one. |
+| `yarn docs:api` | Generate `docs/API-REFERENCE.md` and `docs/openapi.json` from the routers. |
+| `yarn db:reset` | Delete the dev database container and start a new, empty one. |
+| `yarn db:stop` | Stop the dev database. |
+| `yarn build` | Build the API and the web app. |
+
+To test matches without real players, see [Simulation mode](/guides/simulation-mode).

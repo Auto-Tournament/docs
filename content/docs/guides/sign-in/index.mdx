@@ -1,0 +1,70 @@
+---
+title: Sign-in providers
+description: Which sign-in methods exist and how admin access works.
+icon: KeyRound
+---
+
+Auto Tournament can show a sign-in button for each of these providers:
+
+| Provider | Protocol | Guide |
+| --- | --- | --- |
+| Steam | OpenID | [Steam](/guides/sign-in/steam) |
+| Discord | OAuth2 | [Discord](/guides/sign-in/discord) |
+| Keycloak | OpenID Connect | [Keycloak](/guides/sign-in/keycloak) |
+| GitHub | OAuth2 | [GitHub](/guides/sign-in/github) |
+| Google | OAuth2 with OpenID Connect scopes | [Google](/guides/sign-in/google) |
+
+The login page shows one button per provider that is turned on and fully set up. You can turn on more than one.
+
+## Steam is always needed
+
+Players are stored by Steam ID. Match results, teams and admin rights all belong to a Steam ID. So even if you sign in with Discord, Keycloak, GitHub or Google, you need a Steam account linked to that login.
+
+This is how it works:
+
+1. You sign in with Discord, Keycloak, GitHub or Google for the first time.
+2. Auto Tournament shows **Connect your Steam account**. Click **Connect with Steam** and sign in with Steam.
+3. Auto Tournament saves the link between the two accounts.
+4. From then on, that login signs you in as your Steam account directly.
+
+If you already signed in with Steam in the same browser, step 2 is skipped. The new login is linked to that Steam account right away.
+
+Because of this, Steam must be set up (`STEAM_API_KEY`) for the other providers to be useful. Until the link is made, a Discord, Keycloak, GitHub or Google login can only reach the **Connect your Steam account** page.
+
+<Callout type="warn">
+  On a shared computer, sign out before someone else signs in. If the previous person's Steam session is still there, a new login is linked to their Steam account.
+</Callout>
+
+## Admin access
+
+Admin rights belong to a Steam ID, whatever button you used to sign in. You get admin in one of these ways:
+
+- On a new install, the first Steam user who signs in becomes admin. See [First login](/getting-started/first-login).
+- An existing admin edits your player on the **Players** page and turns on **Is admin**.
+- Your Steam64 ID is in `ADMIN_STEAM_IDS` in `.env`. See [If you are not admin](/getting-started/first-login#if-you-are-not-admin).
+
+There is no admin list for Discord, Keycloak, GitHub or Google accounts. When you sign in with one of them, you get the rights of the Steam account it is linked to.
+
+## Callback address
+
+Each provider sends you back to Auto Tournament after sign-in. The address is `FRONTEND_BASE_URL` followed by the provider's callback path, for example:
+
+```text
+https://tournament.example.com/api/auth/github/callback
+```
+
+If the API has another public address than the web app, set `BACKEND_BASE_URL`. The callback then uses that address instead of `FRONTEND_BASE_URL`.
+
+The address you register at the provider must match exactly: same scheme (`http` or `https`), same host, same port, no slash at the end.
+
+## Check which providers are on
+
+This shows the providers the login page will show:
+
+```bash
+curl -fsS http://localhost:3069/api/auth/providers
+```
+
+A provider with `"enabled": true` has a button. A provider that is missing is not turned on, or is missing its client ID or secret.
+
+All sign-in variables are listed in [Configuration](/reference/configuration#sign-in-providers).

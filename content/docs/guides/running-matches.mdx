@@ -4,14 +4,61 @@ description: Map veto, live matches, results, and admin actions.
 icon: Swords
 ---
 
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+
 ## How a match runs
 
-1. **Veto.** Both teams do the map veto on their team pages.
-2. **Server.** Auto Tournament picks a free server and loads the match. If no server is free, the match waits.
-3. **Warmup.** Players join with the `connect` command from the team page or the match page. Each player is put on the right team. Players type `.ready` in chat.
-4. **Live.** The match starts when all players are ready. The **Matches** page shows the score, the round and the phase (live, halftime, overtime, paused).
-5. **Result.** When the series ends, Auto Tournament saves the result and moves the bracket forward. If demo recording is on, the server uploads the demo. You can download it from the match.
-6. **Next match.** The server resets and is free for the next match. There is a short wait after a series ends before the server resets, so players can see the result.
+<Steps>
+
+<Step>
+
+### Veto
+
+Both teams do the map veto on their player pages. See [Map veto](#map-veto) for the order.
+
+</Step>
+
+<Step>
+
+### Server
+
+Auto Tournament picks a free server and loads the match. If no server is free, the match waits.
+
+</Step>
+
+<Step>
+
+### Warmup
+
+Players join with the **Connect to Server** button on their player page, or the `connect` command from the match. Each player is put on the right team. Players type `.ready` in chat.
+
+</Step>
+
+<Step>
+
+### Live
+
+The match starts when all players are ready. The **Matches** page shows the score, the round and the phase (live, halftime, overtime, paused).
+
+</Step>
+
+<Step>
+
+### Result
+
+When the series ends, Auto Tournament saves the result and moves the bracket forward. If demo recording is on, the server uploads the demo. You can download it from the match.
+
+</Step>
+
+<Step>
+
+### Next match
+
+The server resets and is free for the next match. There is a short wait after a series ends before the server resets, so players can see the result.
+
+</Step>
+
+</Steps>
 
 ## Map veto
 
@@ -41,7 +88,7 @@ Veto is used for every best of 1, 3 and 5 match. The map pool must have exactly 
 5. Team B picks map 4. Team A picks the side.
 6. The last map is map 5.
 
-If a team cannot finish the veto, check that both teams use the right team page link and are signed in with Steam. As a last option, an admin can use **Skip veto**.
+If a team cannot finish the veto, check that the players are signed in with Steam and are on the team's roster. As a last option, an admin can use **Skip veto**.
 
 ## Admin controls
 
@@ -66,20 +113,92 @@ The **Admin Tools** page has the same kind of actions for one or more servers at
 
 ## A match needs a decision
 
-In single and double elimination, a series can end level on maps, rounds and damage. The match then shows **NEEDS ADMIN DECISION**. Open the match and choose the winner. The bracket then continues as normal.
+In single and double elimination, a series can end level on maps, rounds and damage. The match then shows **NEEDS ADMIN DECISION**.
 
-The same action works for a match that is stuck live or loaded.
+<Steps>
+
+<Step>
+
+### Open the match
+
+Open the match on the **Matches** page.
+
+</Step>
+
+<Step>
+
+### Choose the winner
+
+Choose the winning team in the match window. The bracket then continues as normal.
+
+</Step>
+
+</Steps>
+
+The same action works for a match that is stuck live or loaded. From the API, use `POST /api/matches/:slug/winner` with an admin token.
 
 ## After a restart
 
 If the app or a server restarted during a match, the match state can be out of date.
 
-1. Fix any warnings on the **Servers** page first.
-2. Open **Admin Tools** and click **Run Match Recovery Now**.
-3. Open the match again and check the state.
+<Steps>
 
-If players cannot join a match that is not live yet, use **Reallocate server** to move it to another server.
+<Step>
+
+### Fix server warnings
+
+Open **Servers** and fix any warnings first. See [Troubleshooting](/reference/troubleshooting#server-warnings).
+
+</Step>
+
+<Step>
+
+### Run match recovery
+
+Open **Admin Tools** and click **Run Match Recovery Now**.
+
+</Step>
+
+<Step>
+
+### Check the match
+
+Open the match again and check the state. If players cannot join a match that is not live yet, use **Reallocate server** to move it to another server.
+
+</Step>
+
+</Steps>
+
+Auto Tournament also runs recovery once when it starts. To run it from a script, send `POST /api/recovery/recover` with an admin token. `POST /api/recovery/replay/:matchSlug` replays the events of one match from the last hour. Send `{"sinceTimestamp": 1730000000}` in the body to choose another start time.
 
 ## Matches outside a tournament
 
-For a scrim or a show match, open **Matches** and click **Create Manual Match**. Choose the teams, the maps and the rules. Choose a server, or leave it empty so Auto Tournament picks a free one. Manual matches do not change the bracket.
+For a scrim or a show match, use a manual match. Manual matches do not change the bracket.
+
+<Steps>
+
+<Step>
+
+### Create the match
+
+Open **Matches** and click **Create Manual Match**.
+
+</Step>
+
+<Step>
+
+### Choose teams, maps and rules
+
+Choose the teams, the maps and the rules.
+
+</Step>
+
+<Step>
+
+### Choose a server
+
+Choose a server, or leave it empty so Auto Tournament picks a free one. Then save. Players join the same way as in a tournament match.
+
+</Step>
+
+</Steps>

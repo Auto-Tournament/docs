@@ -4,6 +4,8 @@ description: Prepare a CS2 server and add it to Auto Tournament.
 icon: Server
 ---
 
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+
 Auto Tournament does not run the game. It controls CS2 dedicated servers that you run yourself. Each server needs the **Auto Tournament CS2** plugin (formerly MatchZy Enhanced), which reports match events back to Auto Tournament.
 
 ## How the connection works
@@ -15,16 +17,26 @@ The server and Auto Tournament talk in both directions:
 
 Both directions must work. Most setup problems are a firewall or a wrong address in one of them.
 
-## 1. Get a server with the CS2 plugin
+## Add a server
+
+<Steps>
+
+<Step>
+
+### Get a server with the CS2 plugin
 
 Pick one:
 
-- **CS2 Server Manager (recommended).** A command-line tool that installs several CS2 servers on one Linux machine with the plugin already set up. See [CS2 Server Manager](/cs2/server-manager).
+- **CS2 Server Manager (recommended).** A command-line tool that installs several CS2 servers on one Linux machine with the plugin already set up. See [Install CS2 Server Manager](/cs2/server-manager/install).
 - **Manual install.** Install Metamod:Source, CounterStrikeSharp and the CS2 plugin on a server you already have. See [Install the CS2 plugin](/cs2/plugin/install).
 
 Write down the host (IP or domain), the game port (default `27015`) and the RCON password of each server.
 
-## 2. Test that the server can reach Auto Tournament
+</Step>
+
+<Step>
+
+### Test that the server can reach Auto Tournament
 
 Run this on the machine where the CS2 server runs. Use your webhook URL (see [First login](/getting-started/first-login#check-the-webhook-url)):
 
@@ -34,21 +46,67 @@ curl http://192.168.1.50:3069/api/events/test
 
 The answer must contain `"success":true`. If the command fails, fix the network or the webhook URL before you continue.
 
-## 3. Add the server
+</Step>
 
-1. Open **Servers** in the menu.
-2. Click **Add Server**.
-3. Fill in **Server Name**, **Host / IP Address**, **Port** and **RCON Password**.
-4. Click **Test connectivity** to check both directions.
-5. Save.
+<Step>
+
+### Open the Servers page
+
+Open **Servers** in the menu and click **Add Server**.
+
+</Step>
+
+<Step>
+
+### Fill in the server details
+
+Fill in **Server Name**, **Host / IP Address**, **Port** and **RCON Password**. Click **Test connectivity** to check both directions, then save.
+
+</Step>
+
+<Step>
+
+### Wait for the server to come online
 
 Auto Tournament now sets up the plugin over RCON. After a short time the server shows as online. If it shows a warning, hover over it to see which direction fails, and check [Troubleshooting](/reference/troubleshooting#server-warnings).
+
+</Step>
+
+</Steps>
 
 Repeat for each server, or use **Batch Add** for many servers at once. A tournament can run as many matches at the same time as you have free servers.
 
 ## After you change something
 
-When you change a server config, update the plugin or update CS2, restart the server. Then click **Refresh Status** on the **Servers** page, and **Retry** on any server that is not set up so Auto Tournament sets it up again.
+When you change a server config, update the plugin or update CS2:
+
+<Steps>
+
+<Step>
+
+### Restart the CS2 server
+
+With CS2 Server Manager, run `sudo csm restart 1` for server 1, or `sudo csm restart` for all servers.
+
+</Step>
+
+<Step>
+
+### Refresh the status
+
+On the **Servers** page, click **Refresh Status**.
+
+</Step>
+
+<Step>
+
+### Retry servers that are not set up
+
+Click **Retry** on any server that is not set up, so Auto Tournament sets it up again.
+
+</Step>
+
+</Steps>
 
 ## Next
 

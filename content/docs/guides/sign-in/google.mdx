@@ -1,0 +1,91 @@
+---
+title: Google
+description: Turn on Sign in with Google.
+icon: Mail
+---
+
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+
+Users sign in with their Google account and link it to Steam once. Auto Tournament asks Google for the `openid`, `email` and `profile` scopes. It identifies the account by its Google account ID, not the email address. Set up [Steam](/guides/sign-in/steam) first. See [Sign-in providers](/guides/sign-in) for how linking and admin access work.
+
+<Callout type="warn">
+  Google only accepts redirect URIs on a public domain with `https://`, or on `http://localhost`. A LAN address such as `http://192.168.1.50:3069` does not work. Use a domain with HTTPS, see [Reverse proxy](/guides/reverse-proxy).
+</Callout>
+
+<Steps>
+
+<Step>
+
+### Create an OAuth client in Google Cloud
+
+1. Open the [Google Cloud console](https://console.cloud.google.com/) and sign in.
+2. In the project picker at the top, select a project or click **New project**, give it a name and click **Create**.
+3. Open the menu, then **Google Auth Platform** (under **APIs & Services** in some accounts). If you see **Get started**, click it and fill in:
+   - **App name**: for example `Auto Tournament`. Users see this name when they sign in.
+   - **User support email**: your email.
+   - **Audience**: **External**.
+   - **Contact information**: your email.
+   - Agree to the Google API Services User Data Policy, then click **Create**.
+4. Click **Clients** in the left menu, then **Create client**.
+5. Set **Application type** to **Web application** and enter a **Name**, for example `Auto Tournament`.
+6. Add the redirect URI from the next step, then click **Create**.
+7. Copy the **Client ID** and the **Client secret** from the dialog. Download the JSON file too if you want a copy. You may not be able to see the secret again later.
+
+</Step>
+
+<Step>
+
+### Set the redirect URI
+
+Under **Authorized redirect URIs**, click **Add URI** and enter:
+
+```text
+FRONTEND_BASE_URL/api/auth/google/callback
+```
+
+For example `https://tournament.example.com/api/auth/google/callback`. You do not need **Authorized JavaScript origins**.
+
+To change it later, open **Clients**, click the client, edit the URI and click **Save**. Google can take a few minutes to apply the change.
+
+</Step>
+
+<Step>
+
+### Add the values to `.env`
+
+```bash title=".env"
+AUTH_GOOGLE_ENABLED=true
+GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+```
+
+The button only appears when all three are set.
+
+</Step>
+
+<Step>
+
+### Restart the app
+
+```bash
+docker compose up -d --force-recreate matchzy-tournament
+```
+
+</Step>
+
+<Step>
+
+### Test the button
+
+1. Open `FRONTEND_BASE_URL/login` in a private browser window.
+2. Click **Sign in with Google** and pick your Google account.
+3. The first time, you see **Connect your Steam account**. Click **Connect with Steam** and sign in with Steam.
+4. Sign out, then click **Sign in with Google** again. You are now signed in as your Steam account without the Steam step.
+
+While the app is in **Testing**, only the test users you add under **Audience** can sign in. To let anyone with a Google account sign in, open **Audience** and click **Publish app**. The scopes Auto Tournament asks for do not need Google's app verification.
+
+If Google shows "Error 400: redirect_uri_mismatch", the redirect URI in step 2 does not match `FRONTEND_BASE_URL` exactly.
+
+</Step>
+
+</Steps>

@@ -1,0 +1,95 @@
+---
+title: Keycloak
+description: Turn on sign-in with Keycloak (OpenID Connect).
+icon: ShieldCheck
+---
+
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+
+Use Keycloak when your community already has a Keycloak server, or when you want Keycloak to broker another login. Users sign in through Keycloak and link it to Steam once. Auto Tournament asks for the `openid`, `profile` and `email` scopes. Set up [Steam](/guides/sign-in/steam) first. See [Sign-in providers](/guides/sign-in) for how linking and admin access work.
+
+<Steps>
+
+<Step>
+
+### Create a client in Keycloak
+
+1. Open the Keycloak admin console and sign in.
+2. Pick your realm in the realm list at the top left.
+3. Click **Clients** in the left menu, then **Create client**.
+4. **General settings**: set **Client type** to **OpenID Connect** and **Client ID** to a name, for example `auto-tournament`. Click **Next**.
+5. **Capability config**: turn **Client authentication** on. Under **Authentication flow**, keep **Standard flow** ticked. Click **Next**.
+6. **Login settings**: set **Root URL** to your `FRONTEND_BASE_URL`. Leave the other fields for the next step. Click **Save**.
+7. Open the **Credentials** tab of the new client and copy the **Client Secret**.
+
+If you leave **Client authentication** off, the client is public and has no secret. Auto Tournament supports that too: leave `KEYCLOAK_CLIENT_SECRET` empty.
+
+</Step>
+
+<Step>
+
+### Set the redirect URI
+
+On the **Settings** tab of the client, under **Access settings**, set **Valid redirect URIs** to:
+
+```text
+FRONTEND_BASE_URL/api/auth/keycloak/callback
+```
+
+For example `https://tournament.example.com/api/auth/keycloak/callback`. Click **Save**.
+
+</Step>
+
+<Step>
+
+### Add the values to `.env`
+
+`KEYCLOAK_ISSUER_URL` is the address of the realm: your Keycloak address, then `/realms/` and the realm name.
+
+```bash title=".env"
+AUTH_KEYCLOAK_ENABLED=true
+KEYCLOAK_ISSUER_URL=https://sso.example.com/realms/tournament
+KEYCLOAK_CLIENT_ID=auto-tournament
+KEYCLOAK_CLIENT_SECRET=your-keycloak-client-secret
+```
+
+Optional:
+
+```bash title=".env"
+# Name on the button. Default: Keycloak
+AUTH_KEYCLOAK_LABEL=Community login
+# Send users straight to one identity provider in Keycloak (its alias)
+KEYCLOAK_IDP_HINT=vipps
+# Button text and colors
+AUTH_KEYCLOAK_BUTTON_LABEL=Sign in with Community login
+AUTH_KEYCLOAK_BUTTON_BG_COLOR=#3262a8
+AUTH_KEYCLOAK_BUTTON_TEXT_COLOR=#ffffff
+AUTH_KEYCLOAK_BUTTON_HOVER_BG_COLOR=#274c82
+```
+
+</Step>
+
+<Step>
+
+### Restart the app
+
+```bash
+docker compose up -d --force-recreate matchzy-tournament
+```
+
+</Step>
+
+<Step>
+
+### Test the button
+
+1. Open `FRONTEND_BASE_URL/login` in a private browser window.
+2. Click **Sign in with Keycloak** (or your `AUTH_KEYCLOAK_LABEL`) and sign in at Keycloak.
+3. The first time, you see **Connect your Steam account**. Click **Connect with Steam** and sign in with Steam.
+4. Sign out, then sign in with Keycloak again. You are now signed in as your Steam account without the Steam step.
+
+If Keycloak shows "Invalid parameter: redirect_uri", the value in **Valid redirect URIs** does not match `FRONTEND_BASE_URL` exactly.
+
+</Step>
+
+</Steps>

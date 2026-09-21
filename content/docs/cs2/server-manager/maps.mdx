@@ -4,27 +4,57 @@ description: Extract map preview images from the CS2 game files.
 icon: Image
 ---
 
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+
 `csm` can pull the map preview images out of the CS2 game files. You need this only if you want the images for your own site or tool. Auto Tournament does not need it.
 
-## What you need
+You need a finished install, so `/home/cs2servermanager/master-install` exists.
 
-- A finished install, so `/home/cs2servermanager/master-install` exists.
-- Python 3 with the `vpk` and `Pillow` modules:
+<Steps>
+
+<Step>
+
+### Install the Python modules
+
+The command needs Python 3 with the `vpk` and `Pillow` modules:
 
 ```bash
 sudo pip3 install --break-system-packages vpk Pillow
 ```
 
-## Extract
+</Step>
 
-Go to the folder where you want the images, then run the command:
+<Step>
+
+### Go to an empty folder
+
+The images are written to the current folder:
 
 ```bash
 mkdir -p ~/cs2-maps && cd ~/cs2-maps
+```
+
+</Step>
+
+<Step>
+
+### Extract
+
+```bash
 csm extract-map-data
 ```
 
-You can also use **Tools** > **Extract map thumbnails** in `sudo csm`.
+You can also use **Tools** > **Extract map thumbnails** in `sudo csm`. With another CS2 user than `cs2servermanager`, set `CS2_USER`:
+
+```bash
+CS2_USER=mycs2user csm extract-map-data
+```
+
+</Step>
+
+</Steps>
+
+## What you get
 
 The command reads `pak01_dir.vpk` from `master-install` and writes two folders in the current folder:
 
@@ -32,11 +62,5 @@ The command reads `pak01_dir.vpk` from `master-install` and writes two folders i
 - `map_thumbnails/`: for each map, a PNG, a full-size WEBP, and a WEBP that is 1280 pixels wide, for example `de_mirage.png`, `de_mirage.webp` and `de_mirage_thumb.webp`. Maps with more than one screenshot also get `de_mirage_1.webp`, `de_mirage_1_thumb.webp` and so on.
 
 Images that did not change are not written again. Run it after a CS2 update to get new maps.
-
-With another CS2 user than `cs2servermanager`, set `CS2_USER`:
-
-```bash
-CS2_USER=mycs2user csm extract-map-data
-```
 
 The `csm` repository also has a ready set of images in [map_thumbnails](https://github.com/Auto-Tournament/cs2-server-manager/tree/main/map_thumbnails).

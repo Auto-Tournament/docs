@@ -1,0 +1,147 @@
+---
+title: Translating
+description: Add a language to the web app, or fix an existing translation.
+icon: Languages
+---
+
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+
+The web app uses [i18next](https://www.i18next.com/). English is the source. The other languages are community translations, and some of them lag behind.
+
+Languages in the app today: English, French, German, Spanish, Italian, Portuguese (`pt-PT`), Polish, Dutch, Simplified Chinese and Norwegian bokmål. Fixing gaps in one of those is as welcome as adding a new one.
+
+## Add a language
+
+The steps use German (`de`) as the example. Use your own language code.
+
+<Steps>
+
+<Step>
+
+### Copy the English files
+
+```bash
+cp -r client/src/locales/en client/src/locales/de
+cp client/src/locales/brackets-viewer/en.json client/src/locales/brackets-viewer/de.json
+```
+
+`client/src/locales/<lang>/translation/` has one JSON file per area of the app, such as `core.json` and `tournament.json`, and an `index.ts` that merges them. `brackets-viewer/<lang>.json` has the text for the bracket view.
+
+</Step>
+
+<Step>
+
+### Translate the values, not the keys
+
+```json
+{
+  "dashboard": {
+    "title": "Turnier-Dashboard"
+  }
+}
+```
+
+Keys stay in English. Keep `{{placeholders}}` as they are.
+
+</Step>
+
+<Step>
+
+### Register the language
+
+In `client/src/i18n.ts`, import the files, add them to `resources`, and add the code to `supportedLngs`:
+
+```ts title="client/src/i18n.ts"
+import de from './locales/de/translation';
+import bracketsViewerDe from './locales/brackets-viewer/de.json';
+
+export const resources = {
+  // ...
+  de: {
+    translation: de,
+    bracketsViewer: bracketsViewerDe,
+  },
+} as const;
+
+// and add the code to supportedLngs
+supportedLngs: ['en', /* ... */ 'de'],
+```
+
+</Step>
+
+<Step>
+
+### Add it to the language switcher
+
+In `client/src/components/common/LanguageSwitcher.tsx`, add an entry to `LANGUAGES`:
+
+```tsx
+{ code: 'de', flagCode: 'DE', label: 'Deutsch' },
+```
+
+</Step>
+
+<Step>
+
+### Add Material UI's own text
+
+Material UI has translations for its components, such as tables and date pickers. If it has one for your language ([list](https://mui.com/material-ui/guides/localization/)), add it to `getMuiLocale` in `client/src/main.tsx`:
+
+```ts title="client/src/main.tsx"
+import { deDE } from '@mui/material/locale';
+
+if (lang.startsWith('de')) return deDE;
+```
+
+</Step>
+
+<Step>
+
+### Try it
+
+```bash
+yarn dev
+```
+
+Open [http://localhost:5173](http://localhost:5173) and pick your language in the top bar. Click through the main pages: dashboard, teams, players, servers, matches, tournament creation, the bracket, the veto, settings, and the player and team pages. Look for long text that breaks the layout and characters that do not show.
+
+</Step>
+
+<Step>
+
+### Check for missing keys
+
+```bash
+yarn workspace @matchzy/client i18n:missing
+yarn workspace @matchzy/client i18n:check
+```
+
+CI runs the same checks. Every language must have every English key.
+
+</Step>
+
+<Step>
+
+### Send it in
+
+```bash
+git checkout -b translate-de
+git add client/src/locales/de client/src/locales/brackets-viewer/de.json \
+  client/src/i18n.ts client/src/components/common/LanguageSwitcher.tsx client/src/main.tsx
+git commit -m "feat(i18n): add German translation"
+git push origin translate-de
+```
+
+Then open a pull request. Translators are credited in the release notes.
+
+</Step>
+
+</Steps>
+
+## Wording
+
+- Use the esports words players in your language use. "Bracket", "veto", "Bo3" and "ELO" often stay in English.
+- Clear is better than word for word.
+- Use the same translation for the same English word everywhere.
+
+Unsure about a word? Open an issue with the **Translation Contribution** template and ask.

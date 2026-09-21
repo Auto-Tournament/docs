@@ -1,0 +1,79 @@
+---
+title: Steam
+description: Turn on Sign in with Steam.
+icon: Gamepad2
+---
+
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+
+Steam is the main sign-in method. Players and admins are stored by Steam ID, and the other providers link to a Steam account. Set up Steam first.
+
+<Steps>
+
+<Step>
+
+### Get a Steam Web API key
+
+1. Open the [Steam Web API key page](https://steamcommunity.com/dev/apikey) and sign in with Steam.
+2. In **Domain Name**, enter the domain of your install, for example `tournament.example.com`. Steam does not check it, so `localhost` also works.
+3. Tick the box to agree to the Steam Web API Terms of Use.
+4. Click **Register**.
+5. Copy the **Key**.
+
+Steam does not give keys to limited accounts. An account is limited until it has spent at least 5 USD in the Steam store.
+
+</Step>
+
+<Step>
+
+### Check the return address
+
+You do not register a redirect URL at Steam. Auto Tournament sends Steam the return address itself:
+
+```text
+FRONTEND_BASE_URL/api/auth/steam/callback
+```
+
+For example `https://tournament.example.com/api/auth/steam/callback`. Make sure `FRONTEND_BASE_URL` in `.env` is the address you open in the browser.
+
+</Step>
+
+<Step>
+
+### Add the key to `.env`
+
+```bash title=".env"
+AUTH_STEAM_ENABLED=true
+STEAM_API_KEY=your-steam-web-api-key
+FRONTEND_BASE_URL=https://tournament.example.com
+```
+
+`AUTH_STEAM_ENABLED` is `true` when it is not set. Set it to `false` to hide the Steam button.
+
+</Step>
+
+<Step>
+
+### Restart the app
+
+```bash
+docker compose up -d --force-recreate matchzy-tournament
+```
+
+</Step>
+
+<Step>
+
+### Test the button
+
+Open `FRONTEND_BASE_URL/login`. Click **Sign in with Steam** and sign in. On a new install, the first Steam user becomes admin and lands on the dashboard. Other users land on their player page.
+
+If the button is missing, the key is empty or Steam rejected it. Auto Tournament checks the key and hides the button when it does not work. Check the key and look at the logs:
+
+```bash
+docker compose logs matchzy-tournament | grep -i steam
+```
+
+</Step>
+
+</Steps>

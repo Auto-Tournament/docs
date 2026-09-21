@@ -4,20 +4,63 @@ description: Create teams, import rosters, and share team pages.
 icon: Users
 ---
 
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+
 ## Create a team
 
-1. Open **Teams** and click **Create Team**.
-2. Enter the team name and a short tag, for example `NAVI`.
-3. Add players. For each player, enter a Steam ID and a name.
-4. Save.
+<Steps>
 
-The team ID is made from the name. It is part of the public team page address.
+<Step>
 
-You can enter a player as a Steam64 ID or a Steam profile URL. Custom profile URLs (vanity URLs) need a Steam Web API key, set with `STEAM_API_KEY` in `.env` or under **Steam Integration** in **Settings**.
+### Open the Teams page
+
+Open **Teams** and click **Create Team**.
+
+</Step>
+
+<Step>
+
+### Name the team
+
+Enter the team name and a short tag, for example `NAVI`. The team ID is made from the name. It is part of the team page address.
+
+</Step>
+
+<Step>
+
+### Add the players
+
+For each player, enter a Steam ID and a name. You can enter a Steam64 ID or a Steam profile URL. Custom profile URLs (vanity URLs) need a Steam Web API key, set with `STEAM_API_KEY` in `.env`.
+
+</Step>
+
+<Step>
+
+### Save
+
+Click **Create Team**.
+
+</Step>
+
+</Steps>
 
 ## Import teams
 
-On the **Teams** page, click **Import JSON** and paste a list like this:
+<Steps>
+
+<Step>
+
+### Open the import dialog
+
+On the **Teams** page, click **Import JSON**.
+
+</Step>
+
+<Step>
+
+### Paste the teams
+
+Paste a list like this:
 
 ```json
 [
@@ -35,9 +78,35 @@ On the **Teams** page, click **Import JSON** and paste a list like this:
 - `elo` is the starting rating. It is optional. The default is 1500.
 - `discordId` is optional. Invalid Discord IDs are ignored, and the player is imported without one.
 
+</Step>
+
+<Step>
+
+### Import
+
+Confirm the import. The teams show up on the **Teams** page.
+
+</Step>
+
+</Steps>
+
 ## Import players
 
-Shuffle tournaments use players, not teams. On the **Players** page, click **Import JSON/CSV**.
+Shuffle tournaments use players, not teams.
+
+<Steps>
+
+<Step>
+
+### Open the import dialog
+
+On the **Players** page, click **Import JSON/CSV**.
+
+</Step>
+
+<Step>
+
+### Paste JSON or CSV
 
 JSON:
 
@@ -58,18 +127,29 @@ steamId,name,initialELO
 
 `steamId` and `name` are required. `initialELO` and `avatarUrl` are optional.
 
+</Step>
+
+<Step>
+
+### Import
+
+Confirm the import. The players show up on the **Players** page.
+
+</Step>
+
+</Steps>
+
 ## Player registration
 
 By default, anyone who signs in with Steam gets a player record. To only allow players that an admin created or imported, turn off **Player registration** in **Settings**.
 
-## Team pages
+## Team pages and player pages
 
-Every team has a public page at `/team/<team-id>`. Open **Public Links** in the menu to copy all of them. Send each team its link before the tournament.
+Every team has a page at `/team/<team-id>`. It shows the team's current match, the roster, stats and match history. Viewers must sign in to open it.
 
-Anyone can open the page. It shows the team's matches, live scores and the bracket. These parts are only shown to players on the team who are signed in with Steam:
+The map veto and the button to join the server are on each player's own page, `/player/<steam-id>`. Players land there after they sign in with Steam. Only players on the team can use the veto and see the server details.
 
-- The map veto buttons.
-- The server address and `connect` command.
+To share a team page, click the link icon next to the team on **Teams** (**Copy team match link**). Send players the [guide for players](/guides/players).
 
 ## Ratings
 
@@ -77,10 +157,26 @@ Every player has a rating that changes after each match. New players start at 15
 
 ## Replace a player during a match
 
-If a player cannot play, you can add a backup player to a running match:
+If a player cannot play, you can add a backup player to a running match.
 
-1. Open the match on the **Matches** page.
-2. Scroll to **Add Player** in the match details.
-3. Search for the player and choose the team.
+<Steps>
+
+<Step>
+
+### Open the match
+
+Open the match on the **Matches** page.
+
+</Step>
+
+<Step>
+
+### Add the player
+
+Scroll to **Add Player** in the match details. Search for the player and choose the team.
+
+</Step>
+
+</Steps>
 
 Auto Tournament adds the player to the match on the server.

@@ -4,9 +4,15 @@ description: Back up the database, update the image, and roll back if needed.
 icon: RefreshCw
 ---
 
-Run all commands in the folder with your `docker-compose.yml` and `.env`.
+import { Step, Steps } from 'fumadocs-ui/components/steps';
 
-## 1. Back up the database
+Run all commands in the folder with your `docker-compose.yml` and `.env`. To move from 2.x to 3.0, read [Upgrading to 3.0](/guides/upgrading-to-3) first.
+
+<Steps>
+
+<Step>
+
+### Back up the database
 
 The update does not delete your data, but make a backup first:
 
@@ -15,30 +21,57 @@ mkdir -p backups
 docker compose exec -T postgres sh -c 'pg_dump -U "$POSTGRES_USER" "$POSTGRES_DB"' > "backups/autotournament-$(date +%F-%H%M%S).sql"
 ```
 
-The command reads the database user and name from the container, so it also works if you changed `DB_USER` or `DB_NAME`.
+The command reads the database user and name from the container, so it also works if you changed `DB_USER` or `DB_NAME`. If the stack is down, start the database first with `docker compose up -d postgres`.
 
-## 2. Pull the new image and restart
+</Step>
+
+<Step>
+
+### Pull the new image
 
 ```bash
 docker compose pull
+```
+
+</Step>
+
+<Step>
+
+### Restart
+
+```bash
 docker compose up -d
 ```
 
 `up -d` replaces the app container with the new image and keeps the database volume. Database changes run on their own when the app starts.
 
-## 3. Check that it works
+</Step>
+
+<Step>
+
+### Watch the log
 
 ```bash
 docker compose logs -f matchzy-tournament
 ```
 
-Wait until the log shows that the server started, then press `Ctrl+C` and run:
+Wait until the log shows that the server started, then press `Ctrl+C`.
+
+</Step>
+
+<Step>
+
+### Check that it works
 
 ```bash
 curl -fsS http://localhost:3069/health
 ```
 
 If the app does not start, the log usually shows the reason. The most common causes are a missing value in `.env` or a database that cannot be reached.
+
+</Step>
+
+</Steps>
 
 ## Use a fixed version
 
@@ -47,20 +80,35 @@ If the app does not start, the log usually shows the reason. The most common cau
 ```yaml title="docker-compose.yml"
 services:
   matchzy-tournament:
-    image: sivertio/matchzy-auto-tournament:2.4.13
+    image: sivertio/matchzy-auto-tournament:2.4.15
 ```
 
 Versions are listed on the [releases page](https://github.com/Auto-Tournament/auto-tournament/releases). The image tag has no `v` in front.
 
 ## Go back to an older version
 
-1. Set the older version in `image:` in `docker-compose.yml`.
-2. Run:
+<Steps>
+
+<Step>
+
+### Set the older version
+
+Set the older version in `image:` in `docker-compose.yml`, for example `sivertio/matchzy-auto-tournament:2.4.13`.
+
+</Step>
+
+<Step>
+
+### Pull and restart
 
 ```bash
 docker compose pull
 docker compose up -d
 ```
+
+</Step>
+
+</Steps>
 
 A newer version can change the database. If the older version does not start after that, restore the backup you made before the update into an empty database.
 

@@ -1,0 +1,78 @@
+---
+title: Discord
+description: Turn on Sign in with Discord.
+icon: MessageSquare
+---
+
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+
+Users sign in with their Discord account and link it to Steam once. Auto Tournament asks Discord for the `identify` and `email` scopes. Set up [Steam](/guides/sign-in/steam) first. See [Sign-in providers](/guides/sign-in) for how linking and admin access work.
+
+<Steps>
+
+<Step>
+
+### Create a Discord application
+
+1. Open the [Discord Developer Portal](https://discord.com/developers/applications) and sign in.
+2. Click **New Application**.
+3. Enter a name, for example `Auto Tournament`. Users see this name when they sign in.
+4. Tick the box to agree to the Developer Terms of Service and Developer Policy, then click **Create**.
+5. In the left menu, click **OAuth2**.
+6. Under **Client information**, copy the **Client ID**.
+7. Click **Reset Secret**, confirm, and copy the **Client Secret**. Discord shows it only once.
+
+</Step>
+
+<Step>
+
+### Add the redirect URL
+
+On the same **OAuth2** page, under **Redirects**, click **Add Redirect** and enter:
+
+```text
+FRONTEND_BASE_URL/api/auth/discord/callback
+```
+
+For example `https://tournament.example.com/api/auth/discord/callback`. Click **Save Changes**.
+
+</Step>
+
+<Step>
+
+### Add the values to `.env`
+
+```bash title=".env"
+AUTH_DISCORD_ENABLED=true
+DISCORD_CLIENT_ID=123456789012345678
+DISCORD_CLIENT_SECRET=your-discord-client-secret
+```
+
+The button only appears when all three are set.
+
+</Step>
+
+<Step>
+
+### Restart the app
+
+```bash
+docker compose up -d --force-recreate matchzy-tournament
+```
+
+</Step>
+
+<Step>
+
+### Test the button
+
+1. Open `FRONTEND_BASE_URL/login` in a private browser window.
+2. Click **Sign in with Discord** and approve the request in Discord.
+3. The first time, you see **Connect your Steam account**. Click **Connect with Steam** and sign in with Steam.
+4. Sign out, then click **Sign in with Discord** again. You are now signed in as your Steam account without the Steam step.
+
+If Discord shows "Invalid OAuth2 redirect_uri", the redirect URL in step 2 does not match `FRONTEND_BASE_URL` exactly.
+
+</Step>
+
+</Steps>

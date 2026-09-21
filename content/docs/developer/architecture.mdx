@@ -1,0 +1,76 @@
+---
+title: Architecture
+description: How the Auto Tournament code is laid out, and how the parts talk to each other.
+icon: Workflow
+---
+
+Auto Tournament is one repository, [Auto-Tournament/auto-tournament](https://github.com/Auto-Tournament/auto-tournament), with two Yarn workspaces:
+
+- `api/`: the backend. Node.js 20, Express and TypeScript. It stores data in PostgreSQL and sends live updates with Socket.IO.
+- `client/`: the web app. React, Vite and Material UI.
+
+Other folders: `docker/` (the Dockerfile and Compose files), `tests/` (Playwright tests), `scripts/` (test, release and docs scripts), `docs/` (the generated API reference) and `examples/discord-bot/` (an example bot that uses the API).
+
+## In the Docker image
+
+The published image runs two processes, started by `/app/start.sh`:
+
+- **Node** runs the API on port `3000` inside the container.
+- **Caddy** listens on port `3069`. It serves the built web app from `/app/public` and forwards `/api/*`, `/api-docs*`, `/socket.io/*` and `/health` to Node.
+
+If either process stops, the container stops, so Docker's restart policy can start it again. This is why the web app, the API and the WebSocket all use port `3069`, and why `PORT=3000` must not change.
+
+## In development
+
+`yarn dev` starts the API with `tsx watch` on port `3000` and the Vite dev server on port `5173`. Vite forwards `/api`, `/socket.io` and `/map-images` to the API. See [Running locally](/developer/running-locally).
+
+## The API
+
+| Folder | What is in it |
+| --- | --- |
+| `api/src/routes/` | One Express router per area. `routeTable.ts` lists every router and its path prefix, for example `/api/matches` and `/api/events`. |
+| `api/src/services/` | The logic: tournaments, brackets, matches, server allocation, RCON, veto, ratings, recovery. |
+| `api/src/middleware/` | `auth.ts` checks admin sessions and API tokens. `serverAuth.ts` checks the token that game servers send. |
+| `api/src/config/` | Database connection and schema, Passport sign-in providers, and the OpenAPI setup. |
+| `api/src/types/`, `api/src/utils/` | Shared types and helpers. |
+
+### Database
+
+The schema is in `api/src/config/database.schema.ts`. On start, the API creates missing tables and adds missing columns with `ALTER TABLE ... ADD COLUMN`. Changes that are more than a new column, such as a backfill or a new constraint, are written by hand in `api/src/config/database.ts`. There are no numbered migration files.
+
+### Brackets
+
+Each tournament type has a bracket generator that implements `IBracketGenerator` (`api/src/services/bracketGenerators/types.ts`). The registry in `bracketGenerators/index.ts` maps types to generators:
+
+- Single elimination, double elimination and round robin use `standardBracketGenerator`, built on [brackets-manager.js](https://github.com/Drarig29/brackets-manager.js).
+- Swiss uses `swissBracketGenerator`. Later rounds are paired by `swissProgressionService` when a round is done.
+- Shuffle has no generator. `shuffleTournamentService` makes the matches round by round.
+
+To add a tournament type, write a generator and add it to the registry.
+
+### Game servers
+
+The API talks to CS2 servers in two directions:
+
+- **To the server:** RCON, in `rconService`. When you add a server, `serverInitializationService` sets `matchzy_server_id`, `matchzy_bootstrap_token` and `matchzy_bootstrap_url` over RCON, in that order. The plugin then downloads its settings from `GET /api/servers/:id/bootstrap`.
+- **From the server:** the plugin posts events to `/api/events` and match reports to `/api/events/report`. Each request carries `SERVER_TOKEN` in the `X-MatchZy-Token` header. `matchEventHandler` applies the events.
+
+`matchAllocationService` picks a free server for each ready match. `matchConfigBuilder` builds the match config that the plugin downloads. The plugin side is described in [Events and report API](/cs2/plugin/events).
+
+## The web app
+
+| Folder | What is in it |
+| --- | --- |
+| `client/src/pages/` | One component per page, for example `Teams.tsx`, `Matches.tsx` and `PlayerProfile.tsx`. Routes are in `App.tsx`. |
+| `client/src/components/` | Shared components, grouped by area. |
+| `client/src/locales/` | Translations. English is the source. See [Translating](/developer/translating). |
+
+## API reference files
+
+`docs/API-REFERENCE.md` and `docs/openapi.json` are generated from the routers. After you add, remove or change a route, run:
+
+```bash
+yarn docs:api
+```
+
+CI runs `yarn docs:api:check` and fails when the files are out of date.

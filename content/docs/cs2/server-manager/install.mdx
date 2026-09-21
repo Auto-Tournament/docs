@@ -4,6 +4,8 @@ description: Requirements, the install command and the first setup.
 icon: Download
 ---
 
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+
 ## What you need
 
 - Linux on `x86_64` or `arm64`. Debian and Ubuntu are the tested systems.
@@ -17,7 +19,13 @@ icon: Download
 
 ## Install
 
-Run this on the Linux machine. It downloads the latest `csm` for your CPU to `/usr/local/bin/csm` and starts the installer:
+<Steps>
+
+<Step>
+
+### Download `csm` and start it
+
+Run this on the Linux machine. It downloads the latest `csm` for your CPU to `/usr/local/bin/csm` and opens the menu:
 
 ```bash
 arch=$(uname -m); \
@@ -35,9 +43,21 @@ sudo csm
 
 Run the same command again later to update `csm` itself. The menu also has **Tools** > **Force update CSM now**.
 
-## The installer
+</Step>
 
-`sudo csm` opens the menu. The installer is under **Install** > **Install or redeploy servers**. It asks:
+<Step>
+
+### Open the installer
+
+In the menu, choose **Install** > **Install or redeploy servers**.
+
+</Step>
+
+<Step>
+
+### Answer the questions
+
+The installer asks:
 
 - **MatchZy storage:** shared MySQL (the default) or one SQLite file per server. Shared MySQL keeps all match stats in one place and runs in a Docker container. You can also point it at your own MySQL server.
 - **Number of servers.** The default is 3.
@@ -47,7 +67,39 @@ Run the same command again later to update `csm` itself. The menu also has **Too
 - **GSLT.**
 - Update options: validate the game files with SteamCMD, update the plugins, and install the [update monitor](/cs2/server-manager/updates#the-update-monitor).
 
+</Step>
+
+<Step>
+
+### Wait for the download
+
 The first install downloads CS2, about 70 GB. This can take a long time.
+
+</Step>
+
+<Step>
+
+### Open the ports
+
+Open the game ports and GOTV ports in your firewall. See [Ports](#ports) for the numbers. Players need UDP. Auto Tournament needs TCP on the game port for RCON.
+
+</Step>
+
+<Step>
+
+### Add the servers to Auto Tournament
+
+Get the public IP of the machine:
+
+```bash
+csm public-ip
+```
+
+In Auto Tournament, add each server with this IP, its game port and the RCON password. See [Connect a CS2 server](/getting-started/connect-server).
+
+</Step>
+
+</Steps>
 
 ## Ports
 
@@ -58,18 +110,6 @@ Server 1 uses game port `27015` and GOTV port `27020`. Each next server adds 10:
 | 1 | 27015 | 27020 |
 | 2 | 27025 | 27030 |
 | 3 | 27035 | 27040 |
-
-Open these ports in your firewall. Players need UDP. Auto Tournament needs TCP on the game port for RCON.
-
-## Add the servers to Auto Tournament
-
-In Auto Tournament, add each server with the machine's IP, its game port and the RCON password. See [Connect a CS2 server](/getting-started/connect-server).
-
-Get the public IP of the machine with:
-
-```bash
-csm public-ip
-```
 
 ## Install without the menu
 

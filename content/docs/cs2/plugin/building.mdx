@@ -4,6 +4,8 @@ description: Build the plugin yourself, run the tests, and contribute.
 icon: Hammer
 ---
 
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+
 Most people use the [release zip](/cs2/plugin/install). Build from source if you want to change the plugin.
 
 ## What you need
@@ -11,18 +13,37 @@ Most people use the [release zip](/cs2/plugin/install). Build from source if you
 - The [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0).
 - Git.
 
-## Build
+## Build and install
+
+<Steps>
+
+<Step>
+
+### Clone the repository
 
 ```bash
 git clone https://github.com/Auto-Tournament/cs2-plugin.git
 cd cs2-plugin
+```
+
+</Step>
+
+<Step>
+
+### Build
+
+```bash
 dotnet restore
 dotnet publish -c Release
 ```
 
 The output goes to `build/Release/net8.0/publish/`, not to the usual `bin/` folder.
 
-## Copy to a server
+</Step>
+
+<Step>
+
+### Copy to a server
 
 Copy the build output and the default config files. Change `CS2_DIR` to your server path:
 
@@ -33,9 +54,21 @@ cp -r build/Release/net8.0/publish/. "${CS2_DIR}/game/csgo/addons/counterstrikes
 cp -rn cfg/MatchZy "${CS2_DIR}/game/csgo/cfg/"
 ```
 
-`cp -rn` does not overwrite config files that are already on the server. Restart the server, then check with `css_plugins list`.
+`cp -rn` does not overwrite config files that are already on the server.
 
 The plugin folder is still called `MatchZy`. Keep that name. A second folder with another name loads a second copy of the plugin.
+
+</Step>
+
+<Step>
+
+### Restart and check
+
+Restart the server, then run `css_plugins list` in the server console. MatchZy must be in the list.
+
+</Step>
+
+</Steps>
 
 ## Run the tests
 

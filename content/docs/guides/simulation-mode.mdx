@@ -4,6 +4,8 @@ description: Test a full tournament with bots instead of real players.
 icon: FlaskConical
 ---
 
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+
 In simulation mode, every match is played by bots. The veto is done automatically. Use it to test your servers, your bracket and your settings before an event.
 
 <Callout type="warn">
@@ -16,27 +18,45 @@ In simulation mode, every match is played by bots. The veto is done automaticall
 - At least one CS2 server with [Auto Tournament CS2](/cs2/plugin) (formerly MatchZy Enhanced), added on the **Servers** page.
 - Teams, or players for a shuffle tournament. The players do not need to be real Steam accounts that join.
 
-## Turn it on
+## Turn it on with the Docker image
 
-Simulation is off in production builds. You must allow it with an environment variable, and then switch it on.
+Simulation is off in production builds. The published Docker image does not show the **Developer / Simulation** tab in **Settings**, so you allow simulation with an environment variable and switch it on with the API.
 
-### 1. Allow it
+<Steps>
 
-Add this line to `.env` and recreate the app container:
+<Step>
+
+### Allow simulation
+
+Add this line to `.env`:
 
 ```bash title=".env"
 MATCHZY_ENABLE_SIMULATION_IN_PROD=true
 ```
 
+</Step>
+
+<Step>
+
+### Recreate the app container
+
 ```bash
 docker compose up -d --force-recreate matchzy-tournament
 ```
 
-### 2. Switch it on
+</Step>
 
-The switch is on the **Developer / Simulation** tab in **Settings**. The published Docker image does not show this tab. Pick one of these two ways.
+<Step>
 
-**With the API.** Create an admin API token (see [API](/reference/api)) and run:
+### Create an admin API token
+
+Add an admin token to `API_TOKENS` in `.env` and recreate the container again. See [API](/reference/api#create-a-token).
+
+</Step>
+
+<Step>
+
+### Switch simulation on
 
 ```bash
 curl -X PUT http://localhost:3069/api/settings \
@@ -47,15 +67,39 @@ curl -X PUT http://localhost:3069/api/settings \
 
 Send `{"simulateMatches": false}` to switch it off again.
 
-**With a build from source.** The local build shows the **Developer / Simulation** tab and a **Dev Tools** page, and it allows simulation already:
+</Step>
+
+</Steps>
+
+## Turn it on with a build from source
+
+The local build shows the **Developer / Simulation** tab and a **Dev Tools** page, and it allows simulation already.
+
+<Steps>
+
+<Step>
+
+### Clone the repository
 
 ```bash
 git clone https://github.com/Auto-Tournament/auto-tournament.git
-cd matchzy-auto-tournament
+cd auto-tournament
 cp example.env .env
 ```
 
-Set `SESSION_SECRET`, `SERVER_TOKEN` and `STEAM_API_KEY` in `.env`, then:
+</Step>
+
+<Step>
+
+### Fill in `.env`
+
+Set `SESSION_SECRET`, `SERVER_TOKEN` and `STEAM_API_KEY` in `.env`.
+
+</Step>
+
+<Step>
+
+### Build and start
 
 ```bash
 docker compose --env-file .env -f docker/docker-compose.local.yml up -d --build
@@ -63,13 +107,25 @@ docker compose --env-file .env -f docker/docker-compose.local.yml up -d --build
 
 The local build does not keep the database in a volume. Your data is gone when you remove the containers.
 
+</Step>
+
+<Step>
+
+### Switch simulation on
+
+Open **Settings** > **Developer / Simulation** and turn on simulation.
+
+</Step>
+
+</Steps>
+
 ## Speed
 
 **Simulation Timescale** sets how fast the bots play, from 0.1 to 10. Values above 2 can make bots act strangely. Speeds above 4 need the CS2 plugin 1.4.25 or newer. The value is sent when a match loads, so a change only affects matches that load after it.
 
 For a fast test bracket, create the tournament with **Max Rounds per Map** set to 4 and overtime set to **Disabled – no draws (damage tiebreak)**. Every map then ends after at most 4 rounds and always has a winner.
 
-The timescale does not change the wait after a series ends. The plugin keeps the server for a while before it resets, and the next match on that server loads after the reset. That wait is `mp_match_restart_delay` plus the `matchzy_series_end_kick_delay_*` settings on the server, with 60 seconds extra when demos are uploaded. Lower them on test servers if the next match starts too slowly.
+The timescale does not change the wait after a series ends. The plugin keeps the server for a while before it resets, and the next match on that server loads after the reset. To keep this short, simulated matches load with `mp_match_restart_delay 10`, a 10 second series-end kick delay and `tv_delay 0`, so the demo stops and uploads right away. Real matches keep your own settings.
 
 ## Start over
 

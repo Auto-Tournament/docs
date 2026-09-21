@@ -4,9 +4,31 @@ description: Serve Auto Tournament on your own domain with HTTPS.
 icon: Globe
 ---
 
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+
 Auto Tournament serves the web app, the API and the live updates (WebSocket) on one port, `3069`. To use a domain with HTTPS, put a reverse proxy in front of that port.
 
-## Set the public address
+<Steps>
+
+<Step>
+
+### Point the domain at your machine
+
+Create a DNS record for your domain, for example `tournament.example.com`, that points to the machine that runs Auto Tournament. Open ports 80 and 443 in the firewall.
+
+</Step>
+
+<Step>
+
+### Set up the reverse proxy
+
+Use [Caddy](#caddy) or [nginx](#nginx) with the config below. Both forward the domain to `127.0.0.1:3069`.
+
+</Step>
+
+<Step>
+
+### Set the public address
 
 In `.env`, set `FRONTEND_BASE_URL` to the address people open in the browser:
 
@@ -14,13 +36,29 @@ In `.env`, set `FRONTEND_BASE_URL` to the address people open in the browser:
 FRONTEND_BASE_URL=https://tournament.example.com
 ```
 
-With an `https://` address, login cookies are only sent over HTTPS. Recreate the app container after the change:
+With an `https://` address, login cookies are only sent over HTTPS.
+
+</Step>
+
+<Step>
+
+### Recreate the app container
 
 ```bash
 docker compose up -d --force-recreate matchzy-tournament
 ```
 
-Then check **Settings** > **Integrations & Webhooks** > **Webhook URL**. The game servers must be able to reach this address. Change it to the new domain if it still shows the old address.
+</Step>
+
+<Step>
+
+### Update the webhook URL
+
+Open **Settings** > **Integrations & Webhooks** > **Webhook URL**. The game servers must be able to reach this address. Change it to the new domain if it still shows the old address. Then click **Retry** on each server on the **Servers** page.
+
+</Step>
+
+</Steps>
 
 ## Caddy
 

@@ -4,6 +4,8 @@ description: Update CS2 and the plugins, by hand or with the update monitor.
 icon: RefreshCw
 ---
 
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+
 ## Update CS2
 
 Valve updates CS2 often. An outdated server cannot load matches, and Auto Tournament shows **CS2 update required**.
@@ -79,14 +81,52 @@ The monitor looks for this line in each server's log. It only updates a server t
 The plugin's default is to only report the update (`matchzy_safeautoupdater_action warn_only`). The server keeps running, so the monitor does not update it. You then have two choices:
 
 - **Update by hand** when no match is running: `sudo csm update-game`.
-- **Let the server stop itself.** Set `matchzy_safeautoupdater_action restart` in the plugin config. The plugin then kicks players and shuts the server down, but only when no match is running (idle, postgame or error). The next monitor run updates and starts it.
+- **Let the server stop itself.** Set `matchzy_safeautoupdater_action restart` in the plugin config. The plugin then kicks players and shuts the server down, but only when no match is running (idle, postgame or error). The next monitor run updates and starts it. See [Set up automatic updates](#set-up-automatic-updates).
 
-To set it for all servers, add the line to `/home/cs2servermanager/overrides/game/csgo/cfg/MatchZy/config.cfg`, then run `sudo csm update-plugins`:
+After an update, the monitor waits before it reacts to the same server again, so a server that keeps restarting does not update in a loop.
+
+The monitor writes its log to `auto_update_monitor.log` in the `csm` log folder. Run `csm logdir` to find it.
+
+## Set up automatic updates
+
+With these steps, servers update themselves between matches.
+
+<Steps>
+
+<Step>
+
+### Install the update monitor
+
+```bash
+sudo csm install-monitor-cron
+```
+
+</Step>
+
+<Step>
+
+### Let the plugin stop idle servers
+
+Add this line to `/home/cs2servermanager/overrides/game/csgo/cfg/MatchZy/config.cfg`:
 
 ```text
 matchzy_safeautoupdater_action restart
 ```
 
-After an update, the monitor waits before it reacts to the same server again, so a server that keeps restarting does not update in a loop.
+</Step>
 
-The monitor writes its log to `auto_update_monitor.log` in the `csm` log folder. Run `csm logdir` to find it.
+<Step>
+
+### Copy the config to all servers
+
+```bash
+sudo csm update-plugins
+```
+
+This also restarts the servers, so do not run it during a match.
+
+</Step>
+
+</Steps>
+
+When CS2 updates, each server shuts down after its match. The next monitor run updates it and starts it again.

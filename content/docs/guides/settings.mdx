@@ -1,0 +1,65 @@
+---
+title: Settings page
+description: What is on each tab of the Settings page, and how to change the server name.
+icon: SlidersHorizontal
+---
+
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+
+Open **Settings** in the menu. Settings on this page are stored in the database. Environment variables in `.env` are described in [Configuration](/reference/configuration).
+
+Match defaults are sent to the servers when a server is set up and before each match loads. A change applies to the next match that loads, not to a match that is already running.
+
+## The tabs
+
+| Tab | What is on it |
+| --- | --- |
+| Integrations & Webhooks | **Webhook URL**: the address your CS2 servers send events and demos to. **Sync CS2 Maps**: download the CS2 map list. |
+| Players & Access | **Player registration**: whether a new Steam login creates a player record. Turn it off to only allow players that an admin created or imported. |
+| Matches & Ratings | Chat prefix and knife round defaults, demo folder and file name, **Server hostname format**, the extra wait at the end of a series, and whether matches change player ratings. |
+| Advanced | Default plugin settings for ready-up, access, admin tools and more. Plugin features such as auto-ready, pause limits, side selection after the knife round, `.gg` and forfeit. Leave a field empty to use the plugin default. |
+| Developer / Simulation | [Simulation mode](/guides/simulation-mode) and developer helpers. Only shown in builds with developer tools, not in the published Docker image. |
+
+The plugin settings behind these fields are described in [CS2 plugin configuration](/cs2/plugin/configuration).
+
+## Change the server name
+
+By default, a server takes the name `{TEAM1} vs {TEAM2}` when a match loads.
+
+<Steps>
+
+<Step>
+
+### Open the match settings
+
+Open **Settings** > **Matches & Ratings**.
+
+</Step>
+
+<Step>
+
+### Set the format
+
+In **Server hostname format**, enter the name you want. You can use these tokens: `{MATCH_ID}`, `{MAP}`, `{MAPNUMBER}`, `{TEAM1}`, `{TEAM2}`, `{TEAM1_SCORE}`, `{TEAM2_SCORE}`. For example:
+
+```text
+Summer Cup | {TEAM1} vs {TEAM2}
+```
+
+Leave the field empty to keep the hostname from each server's own `server.cfg`. The plugin sets the hostname on every match load, so an empty field is the only way to keep yours.
+
+</Step>
+
+<Step>
+
+### Save
+
+Save the settings. The next match that loads uses the new name.
+
+</Step>
+
+</Steps>
+
+## Stop matches from changing ratings
+
+Under **Rating Updates** on the **Matches & Ratings** tab, you can turn off rating changes. Use this when another system decides the ratings for your event.

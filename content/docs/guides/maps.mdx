@@ -1,0 +1,105 @@
+---
+title: Maps and map pools
+description: Sync the CS2 map list, add workshop maps, and build map pools.
+icon: Map
+---
+
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+
+A tournament plays maps from a **map pool**. Map veto needs a pool of exactly 7 maps. If you are not sure, use the **Active Duty** pool. Auto Tournament creates it from the current competitive maps.
+
+## Sync the CS2 map list
+
+<Steps>
+
+<Step>
+
+### Open the integrations settings
+
+Open **Settings** > **Integrations & Webhooks**.
+
+</Step>
+
+<Step>
+
+### Sync
+
+Click **Sync CS2 Maps** and wait for the message that says how many maps were added. Existing maps are kept. Only new maps are added.
+
+</Step>
+
+</Steps>
+
+The sync reads the map list from GitHub. If it fails with a rate limit error, wait a few minutes, or set `GITHUB_TOKEN` in `.env`. See [Configuration](/reference/configuration#game-servers).
+
+## Add a workshop map
+
+<Steps>
+
+<Step>
+
+### Open the map dialog
+
+Open **Maps & Map Pools** and click **Add Map**.
+
+</Step>
+
+<Step>
+
+### Paste the workshop link
+
+Paste a Steam Workshop URL, such as `https://steamcommunity.com/sharedfiles/filedetails/?id=3100869952`, or only the number, into **Steam Workshop URL or ID**. Auto Tournament fills in the **Map ID**, the **Display Name** and the image.
+
+</Step>
+
+<Step>
+
+### Save
+
+Change any field you want, then click **Create**.
+
+</Step>
+
+</Steps>
+
+For a workshop map, the map ID is the workshop number. The CS2 plugin loads it with `host_workshop_map`, so the server must be able to reach Steam. See [Match config](/cs2/plugin/match-config).
+
+For a stock map, enter the map ID yourself, for example `de_dust2`, and a display name. Use **Fetch from GitHub** or **Upload Image** to add an image.
+
+## Create a map pool
+
+<Steps>
+
+<Step>
+
+### Open the map pools
+
+Open **Maps & Map Pools** and open the **Map Pools** tab.
+
+</Step>
+
+<Step>
+
+### Create the pool
+
+Click **Create Map Pool**, choose the maps and give the pool a name. For veto, choose exactly 7 maps.
+
+</Step>
+
+<Step>
+
+### Save
+
+Save the pool. It shows up in the list of map pools when you create a tournament.
+
+</Step>
+
+</Steps>
+
+On the **Map Pools** tab you can also edit, turn off or delete a pool, and choose which pool is the default. The default pool cannot be deleted.
+
+## Problems
+
+- **The veto does not start.** The pool does not have 7 maps. Use **Active Duty** or a pool with 7 maps.
+- **Maps are missing.** Run **Sync CS2 Maps** again.
+- **A map image does not show.** Edit the map and upload the image again.

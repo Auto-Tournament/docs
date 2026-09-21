@@ -1,4 +1,16 @@
 {
   "title": "Guides",
-  "pages": ["tournament-formats", "teams-and-players", "running-matches", "simulation-mode", "updating", "reverse-proxy"]
+  "pages": [
+    "tournament-formats",
+    "teams-and-players",
+    "players",
+    "maps",
+    "running-matches",
+    "settings",
+    "sign-in",
+    "simulation-mode",
+    "updating",
+    "upgrading-to-3",
+    "reverse-proxy"
+  ]
 }

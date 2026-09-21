@@ -1,0 +1,103 @@
+---
+title: Contributing
+description: Report bugs, send pull requests, and ask for help from other players.
+icon: GitPullRequest
+---
+
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+
+Bug reports, fixes, translations and docs changes are all welcome. The code is at [github.com/Auto-Tournament/auto-tournament](https://github.com/Auto-Tournament/auto-tournament).
+
+## Report a bug
+
+[Open an issue](https://github.com/Auto-Tournament/auto-tournament/issues/new/choose) with the **Bug Report** template. Write:
+
+- what happened, and what you expected,
+- the steps to reproduce it,
+- your setup: operating system, Docker version and Auto Tournament version.
+
+The version is shown on the login page, and `curl http://localhost:3069/api/settings/version` prints it.
+
+Other templates: **Feature Request**, **Question**, **CS2 Server Setup Help**, **Documentation Issue**, **Performance Issue** and **Translation Contribution**. If you need several players to test something, or want feedback on a change, use **Community Request**. People who help with those get credited.
+
+Bugs in the CS2 plugin go to [its own repository](https://github.com/Auto-Tournament/cs2-plugin/issues), and bugs in CS2 Server Manager to [that repository](https://github.com/Auto-Tournament/cs2-server-manager/issues).
+
+## Send a pull request
+
+<Steps>
+
+<Step>
+
+### Open an issue first for larger changes
+
+For a new feature or a big change, open an issue first, so you know it fits before you write the code.
+
+</Step>
+
+<Step>
+
+### Set up the code
+
+Fork and clone the repository, and start the dev servers. See [Running locally](/developer/running-locally).
+
+</Step>
+
+<Step>
+
+### Make a branch
+
+```bash
+git checkout -b fix-veto-timer
+```
+
+</Step>
+
+<Step>
+
+### Make the change
+
+- Keep each pull request to one fix or one feature.
+- Follow the code style around your change. Run `yarn lint`.
+- Update the docs if the behaviour changes.
+- After you change a route, run `yarn docs:api`.
+
+</Step>
+
+<Step>
+
+### Test it
+
+Test what you changed by hand, and add or update a test when you can. See [Tests](/developer/tests).
+
+</Step>
+
+<Step>
+
+### Commit and push
+
+Write commit messages that say what changed and why.
+
+```bash
+git commit -m "fix(veto): keep the side timer after a page reload"
+git push origin fix-veto-timer
+```
+
+</Step>
+
+<Step>
+
+### Open the pull request
+
+Open a pull request against `main`. Fill in the template: what it does, the issue it fixes, and how you tested it. CI runs lint, the typecheck, the i18n and API docs checks and the E2E tests.
+
+</Step>
+
+</Steps>
+
+## Questions
+
+Ask in [GitHub Discussions](https://github.com/Auto-Tournament/auto-tournament/discussions) or on [Discord](https://discord.gg/n7gHYau7aW).
+
+## Code of conduct
+
+Be respectful. The details are in [CODE_OF_CONDUCT.md](https://github.com/Auto-Tournament/auto-tournament/blob/main/.github/CODE_OF_CONDUCT.md).

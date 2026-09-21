@@ -1,0 +1,145 @@
+---
+title: Tests
+description: Run the Playwright test suite, and write new tests.
+icon: TestTube
+---
+
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+
+The tests use [Playwright](https://playwright.dev/). There are API tests, which call the HTTP API, and UI tests, which drive a browser. They run in Chromium.
+
+## Run the full suite
+
+The full suite runs in Docker. It builds the app, starts it with a fresh database, runs the tests and removes everything afterwards.
+
+<Steps>
+
+<Step>
+
+### Install the browser
+
+```bash
+yarn test:install
+```
+
+</Step>
+
+<Step>
+
+### Start Docker
+
+The test scripts need a running Docker daemon.
+
+</Step>
+
+<Step>
+
+### Run the tests
+
+```bash
+yarn test
+```
+
+This runs `scripts/test-e2e-sharded.sh` with 4 shards. Each shard gets its own app container, starting at port `3123`, and all shards share one test database server. The logs go to `logs/test-results/`.
+
+</Step>
+
+<Step>
+
+### Open the report
+
+```bash
+yarn test:report
+```
+
+</Step>
+
+</Steps>
+
+More shards finish faster but use more memory and CPU:
+
+```bash
+yarn test:sharded:3
+yarn test:sharded:5
+yarn test:sharded       # 10 shards
+bash scripts/test-e2e-sharded.sh 7
+```
+
+To run everything against one app container instead, use `yarn test:single`. To pick tests in Playwright's UI mode, use `yarn test:ui`. Both use `docker/docker-compose.local.yml`.
+
+## Run tests against your own stack
+
+While you work on a test, it is faster to keep the app running and run only that test.
+
+<Steps>
+
+<Step>
+
+### Set the test values in `.env`
+
+The tests need the test helpers turned on and the same tokens the test scripts use:
+
+```bash title=".env"
+ENABLE_TEST_ENDPOINTS=true
+SERVER_TOKEN=server123
+API_TOKENS=ci-admin:ci-admin-token-0123456789abcdef
+API_TOKENS_READONLY=ci-readonly:ci-readonly-token-0123456789abcdef
+```
+
+Only use these values on a test install. `ENABLE_TEST_ENDPOINTS` turns on `/api/test/*`, which can sign anyone in as admin.
+
+</Step>
+
+<Step>
+
+### Start the app
+
+```bash
+yarn docker:local:up
+```
+
+The tests expect the app on [http://localhost:3069](http://localhost:3069). Set `PLAYWRIGHT_BASE_URL` to use another address.
+
+</Step>
+
+<Step>
+
+### Run the tests you want
+
+```bash
+SKIP_WEBSERVER=1 yarn test:api
+SKIP_WEBSERVER=1 yarn test:manual tests/api/veto.spec.ts
+SKIP_WEBSERVER=1 yarn test:manual --grep "@veto"
+```
+
+`SKIP_WEBSERVER=1` stops Playwright from starting its own server.
+
+</Step>
+
+</Steps>
+
+Other scripts: `yarn test:ui:manual` and `yarn test:api:manual` open Playwright's UI mode, `yarn test:veto` and `yarn test:cs-major` run tagged groups.
+
+## Write a test
+
+The test layout:
+
+- `tests/api/`: API tests.
+- `tests/ui/`: UI tests.
+- `tests/helpers/`: shared helpers for sign-in, teams, servers, veto and the database.
+- `tests/setup.spec.ts`: global setup, runs first.
+
+Things to know:
+
+- **Sign in on both sides.** Playwright's `page` and `request` have separate cookies, and most helpers use `request`. Call `setupTestContext(page, request)` in `beforeEach`, which signs in on both.
+- **Act as a player for the veto.** The veto checks the caller's Steam ID, and an admin is not on either team. The veto helpers use admin impersonation (`impersonatePlayer`, `stopImpersonating`) for you. The veto board is on the player page, `/player/:steamId`.
+- **Use fake servers.** A server with host `0.0.0.0` answers RCON with canned replies and is always online. `createTestServer` does this. Any other host makes the tournament start check try a real RCON call, which fails.
+- **Do not skip.** Do not write `if (!visible) test.skip()`. Assert instead, so a missing element fails the run.
+- **Tag tests** with `@api`, `@ui`, `@crud`, `@veto`, `@cs-major` or `@auth`, so they can be filtered with `--grep`.
+- **Keep files small.** Split a test file when it grows past 300 to 400 lines.
+
+`tests/README.md` in the repository has examples for each helper.
+
+## In CI
+
+On each pull request, GitHub Actions runs lint, the typecheck ratchet, the i18n key check, the API docs check, and the E2E suite in 4 parallel jobs. Pull requests that only change docs skip the E2E jobs.

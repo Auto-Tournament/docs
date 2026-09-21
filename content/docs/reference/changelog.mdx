@@ -1,0 +1,1295 @@
+---
+title: Changelog
+description: Release notes for each version of Auto Tournament.
+icon: ScrollText
+---
+
+Notable changes in each release of [Auto Tournament](https://github.com/Auto-Tournament/auto-tournament), newest first. Versions before 3.0 were released as **MatchZy Auto Tournament** (MAT), and their entries keep the names used at the time. For the commits behind a version, see its [release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases).
+
+- **MAJOR**: X.0.0
+- **MINOR**: X.Y.0
+- **PATCH**: X.Y.Z
+
+{/* TODO 3.0: Before 3.0 ships, add the v3.0.0 entry here: the rename to Auto Tournament, the new UI, the new Docker image name and a link to /guides/upgrading-to-3. */}
+
+## v2.4.15 (2026-09-21) — **PATCH**
+
+### Ops/Docs
+
+- Call the CS2 plugin **Auto Tournament CS2** (formerly MatchZy Enhanced) in the app, the English text, the issue templates, the README and the API description. The plugin repository is now [Auto-Tournament/cs2-plugin](https://github.com/Auto-Tournament/cs2-plugin), and the plugin release check and the link on the servers page point there. The plugin still reports itself as MatchZy, so detection and version checks are unchanged
+
+## v2.4.14 (2026-09-21) — **PATCH**
+
+### Features
+
+- Rename the app to **Auto Tournament** in the page title, the web app manifest, the API title and the README. The Docker image, the database and internal names are unchanged
+- Use the ram logo for the favicon, the app icons and the README
+
+### Ops/Docs
+
+- Move the repositories to the [Auto-Tournament](https://github.com/Auto-Tournament) organisation and point repository links there: the plugin release check, map thumbnail URLs, links in the UI and issue templates, and the release scripts. GitHub redirects the old URLs, and map image URLs already stored in the database keep working
+- Rewrite the README, CONTRIBUTING and TRANSLATING in plain language
+
+## v2.4.13 (2026-09-16) — **PATCH**
+
+### Fixes
+
+- Keep rating history when a tournament is deleted. Deleting a tournament removed its matches' rating history while players kept their ratings. History rows now keep the match label and tournament name, and existing databases are migrated on start. Resetting a tournament still removes that run's history
+
+## v2.4.12 (2026-09-16) — **PATCH**
+
+### Fixes
+
+- Fix **Test connectivity** on the servers page returning an error for every server. The server modal now also shows the error inline
+- Stop ratings from stacking up across tournament resets. A reset deleted the matches and their rating history but kept the players' ratings, so each run built on the last. A reset now puts each player back to their rating from before their first match of that run
+- Start the rating history and chart on the player page at the player's starting rating
+- Send `mp_match_restart_delay 10` in simulated match configs
+
+## v2.4.11 (2026-09-16) — **PATCH**
+
+### Features
+
+- Free a server for the next match as soon as it is idle and its demo upload has reported back, instead of waiting about 3 minutes after the series ends. A server whose demo is still uploading is held, for at most 15 minutes
+- Simulated matches use `tv_delay 0` and 10 second series-end kick delays, so their demos stop and upload right away. Real matches keep the server's `tv_delay` and your kick delays
+- A demo upload that never reports back holds a server for at most about 5 minutes (`tv_delay` + 15 seconds + the 150 second upload timeout) instead of 15 minutes, with a warning in the log
+
+### Fixes
+
+- Show the same Swiss standings on the bracket page and the leaderboard as the round pairing uses: wins, losses, Buchholz, round difference, seed. `GET /api/tournament/bracket` returns `swissStandings`, and the leaderboard adds rank, Buchholz and round difference
+- **Save & Generate** with no changes now leaves the wizard instead of staying on the review step
+- **Test connectivity** no longer changes the server's event URL. Servers that are not set up show as unknown
+- Show a readable message when a proxy returns an HTML error page, such as a 502
+- Team page: tournament status when the team has no match, roster ratings, rank among the tournament's teams, and match labels in play order in the history
+- Send an admin who views the app as a player to that player's page, and hide the admin menu while doing so
+- On small screens the menu opens as a drawer and starts closed
+- Explain on map chips and in the match window when a map was decided by a tiebreak
+
+### Ops/Docs
+
+- Update the example Discord bot for the 2.4.10 API: bracket labels, matches that need a decision, the champion, and scores read from the explicit series and map score fields
+
+## v2.4.10 (2026-09-16) — **PATCH**
+
+### Fixes
+
+- Fix Swiss tournaments getting stuck after round 1. Advancing the round failed with a database error on the last result of the round, and nothing paired the later rounds anyway. Rounds 2 and on are now paired from the standings when the previous round is done: teams with the same record play each other, the lowest team of an odd group moves down, rematches are avoided, and odd team counts get one bye per round (never a second bye for a team while another has none). Tournaments already stuck are paired the next time the tournament is loaded. See [Match rules and formats](/guides/tournament-formats#swiss)
+- Complete a Swiss tournament after its last round and name the top of the standings as champion. Standings count byes and sort by wins, losses, Buchholz and round difference
+- Show "Waiting for pairing" on unpaired Swiss matches instead of "Veto pending", and "BYE" for a bye
+- Show the format as "Best of 3" in the review-changes dialog instead of `bo3`
+- Report the last map's rounds as the map score on completed matches, instead of nothing
+
+## v2.4.9 (2026-09-16) — **PATCH**
+
+### Features
+
+- Add a **Needs decision** status for elimination series that run out of maps while level. MAT first decides such a series itself on maps won, then rounds, then damage. If that is still level, the server is freed and an admin picks the winner in the match window, or with `POST /api/matches/:slug/winner`. Progression, stats and ratings apply as for a normal series end. This also works for a match stuck in live or loaded. See [Match rules and formats](/guides/tournament-formats#when-a-series-ends-level)
+- Label double elimination matches "UB R1 M1", "LB R2 M1" and "Grand Final" on match cards, the list view, the match window and server chips
+
+### Fixes
+
+- Fix double elimination series that ran out of maps without a winner never ending, which held up the rest of the bracket. Swiss and round robin still allow a drawn series
+- Queue double elimination matches in play order: upper and lower bracket rounds alternate, and the grand final comes last. Only matches with both teams get a queue position
+- Stop match reports from changing the map number of a finished match
+- Name the upper bracket final and lower bracket final in the grand final's empty slots
+- List a changed grand final mode in the wizard's confirm dialog, and apply the double elimination default (Simple) when switching type
+- Clear live stats when a tournament is deleted. Match slugs are reused, so a new match could start with the old one's series score
+
+## v2.4.8 (2026-09-16) — **PATCH**
+
+### Fixes
+
+- Fix servers staying "busy" after a restart. With autostart on, the plugin puts an empty server in warmup, and MAT treated every warmup as a running match. Warmup with no match loaded now counts as free
+- Give servers to matches in queue order. Each ready match polled on its own timer, so whichever polled first after a server freed up took it, and match 3 could start before match 2
+- Stop applying plugin reports from an idle server to the match it finished last. Reports now only apply to the match that server is running
+- Fix the stored config after a simulated veto ignoring the tournament's max rounds and overtime. Servers already got the right config, but the stored copy showed 24 rounds
+- Keep `settings.matchFormat` in sync with the format after editing a tournament
+- Show "Winner of" and the feeder match in empty bracket slots instead of "#1" and "#2", which looked like seeds but were not
+- Fix the "You" chip on a team roster pointing at the wrong player when viewing someone else's profile
+- Translate the servers page, admin tools, match admin controls and the remaining wizard text, and fix plurals that showed raw text such as "3 server3}"
+- Move noisy log lines (match config dumps, allocation status on every poll, player lists) to debug, and fix "SERIES ENDED: undefined 0-1 undefined"
+
+## v2.4.7 (2026-09-16) — **PATCH**
+
+### Features
+
+- Show the champion on the tournament and bracket pages once a tournament is done. `GET /api/tournament` returns it as `winner`
+- Add separate score fields to the match API: `team1SeriesScore`/`team2SeriesScore` for maps won, and `team1MapScore`/`team2MapScore` for rounds on the current map
+- Offer all three overtime options in the tournament wizard and shuffle setup, including "Disabled – no draws (damage tiebreak)", which was API-only. The review step now lists max rounds and overtime
+- Translate the team page and the remaining English text, and fill every missing key in all locales
+
+### Fixes
+
+- Fix one match running on two servers at once. A load sent to a server still in postgame was queued by the plugin, MAT took it as failed and loaded the match somewhere else, and results from both servers were applied. MAT now reads server status correctly, treats a queued load as loaded, cancels queued loads it no longer wants, and ignores events and config fetches from a server the match is not assigned to
+- Fix demos being saved under the next match. The upload URL is per server and was already pointing at the next match when the previous demo finished. Uploads now go to the match the demo was recorded for
+- Fix live Bo3 scores mixing one team's rounds with the other team's maps won, such as "23 vs 1"
+- Fix match history showing 0 kills and 0 damage for everyone when the plugin filed players under the wrong team
+- Stop the header covering the impersonation banner, so the button to stop viewing as a player can be clicked
+- Keep the veto board visible when an action is refused, with the error shown above it
+- Show a server as busy during a live match even when the plugin still reports idle
+- Show no score during warmup between maps, instead of the previous map's score
+- Fix "Total Change" in the ELO summary using a different starting rating than the history above it
+- Stop the wizard changing settings it does not show, such as turning the grand final mode into "none" on save
+- Say the tournament is waiting on vetoes or servers, not "live", before any match has loaded
+
+### Ops/Docs
+
+- Push the release version bump straight to main instead of opening a bot pull request, which left a failed CI run on every release
+- Check in CI that no locale is missing translation keys
+
+## v2.4.6 (2026-09-15) — **PATCH**
+
+### Features
+
+- Allow a simulation timescale up to 10×, up from 4×. A simulated Bo3 bracket took hours at 4×. The speed is set in the match config, so it applies to matches that load after the change. Needs MatchZy-Enhanced 1.4.25 or newer above 4×
+
+## v2.4.5 (2026-09-15) — **PATCH**
+
+Versions 2.4.2 to 2.4.4 were never published. Their release builds failed before any image was pushed, and the tags were removed.
+
+### Fixes
+
+- Fix Bo3 and Bo5 series being marked finished after the first map. The plugin reports `postgame` between maps, and MAT treated that as the end of the match, so the winner never advanced in the bracket and the rest of the series was ignored. Only the real series end completes a match now. A match that was closed this way opens again when the server keeps sending events for it
+- Fix setting up a server that another MAT instance had configured before. MAT sent the bootstrap URL before the new token, so the plugin fetched its config with the old token, got a 401 and never received its config. The token is now sent first
+- Stop reporting "Failed to end match" when a tournament reset restarts a server. The server restarts before it can answer the RCON command, so the missing reply is now treated as sent
+- Complete pending map vetoes when simulation mode is turned on while a tournament is running. Before, only matches that started after that point got an automatic veto
+- Fix the veto page saying the opponent had made their choice right after your own ban or pick
+- Show translated action names in the veto history instead of raw values such as `SIDE_PICK`
+- Translate the remaining text on the veto and match pages. Norwegian has all the new text; other languages show English for it until translated
+- Make veto map tiles real buttons, so a veto can be done with a keyboard or a screen reader
+- Remove leftover debug output from the API logs, which printed veto state and map lists every time a match loaded
+
+### Ops/Docs
+
+- Build the arm64 release image natively instead of under QEMU, where builds had started crashing, and push images before creating the tag
+- Split the E2E tests across parallel CI jobs, build the test image once, and skip E2E for pull requests that only change docs
+
+## v2.4.1 (2026-09-15) — **PATCH**
+
+### Fixes
+
+- Remove the second registrations of `GET /api/tournament/{id}/leaderboard` and `DELETE /api/matches/{slug}`. Neither ever ran, since Express answers with the first. The leaderboard stays public, as the leaderboard page needs, and deleting a match still refuses bracket matches
+- Fix the OpenAPI spec describing the leaderboard with the unused copy's summary
+
+### Ops/Docs
+
+- Fail CI when a route is registered twice
+
+## v2.4.0 (2026-09-15) — **MINOR**
+
+### Features
+
+- Store a Discord ID on each player, so a Discord bot can find the player behind a Discord user. Admins set it in the player editor, players set their own on their profile page, and team imports fill it in. An import only fills an empty ID and never changes one that was set or removed by hand. Only admins and API tokens can read it
+- Add `GET /api/players/by-discord-id/{discordId}`, which works with a read-only API token. It returns a list, because a parent may put their own Discord ID on several children
+- Add a `/mymatch` command to the example Discord bot, which shows the current match of the player (or players) behind the Discord user who ran it
+
+### Fixes
+
+- Check OAuth `state` on the Discord, GitHub and Keycloak login callbacks. Without it, a link could attach an attacker's SSO account to an admin who had signed in with Steam, and the attacker could then sign in as that admin. Steam-only instances were not affected
+- Sign the `pending_steam_link` cookie. It was plain JSON, so anyone could point someone else's Discord, GitHub or Keycloak login at their own Steam account
+- Clear the Steam, pending-link and impersonation cookies on logout. `/logout` also chose the cookie's `secure` flag from `NODE_ENV` rather than the connection, so on a production install served over plain HTTP the cookie was never cleared
+- Stop logging OAuth access and refresh tokens at info level on SSO callbacks
+
+### Ops/Docs
+
+- Generate release notes from squash-merged pull requests. Earlier releases on GitHub listed only the version bump
+
+## v2.3.0 (2026-09-07) — **MINOR**
+
+### Features
+
+- Add API tokens (`API_TOKENS`, `API_TOKENS_READONLY`) so a bot or script can call the admin API without signing in through a browser
+- Publish an OpenAPI spec covering every endpoint, at `/api-docs.json` and in the repository, so you can generate a client in any language
+- Add an example Discord bot under `examples/discord-bot`, with a scoreboard that updates itself while a match is played
+
+### Fixes
+
+- Require `X-MatchZy-Token` on the game event webhooks. They accepted events from anyone who could reach the API, so anyone could report match results. Servers that MAT set up already send the token. Set `ALLOW_UNAUTHENTICATED_EVENTS=true` to keep accepting events without one while you reconnect a server that does not
+- Fix `/api-docs` and `/api-docs.json` returning the dashboard instead of the API documentation. The reverse proxy in the Docker image only forwarded paths under `/api/`, so Swagger UI had never worked in a Docker deployment
+- Fix the OpenAPI spec served by the Docker image having no descriptions. The image ships bundled JavaScript, and the descriptions are read from the TypeScript sources, which are not in it
+- Fix three `/api/templates/{id}` endpoints appearing twice in the OpenAPI spec, from documentation comments written with Express-style `:id` instead of `{id}`
+
+### Ops/Docs
+
+- Generate the endpoint reference and the OpenAPI spec from the Express routers, and fail CI when either drifts from the code
+- Add a guide for calling the API from a bot or script, with a worked Discord scoreboard example
+- Mark routes that are registered twice and never reached. `GET /api/tournament/{id}/leaderboard` is registered both before and after the admin guard, so it answers without one
+
+## v2.2.0 (2026-08-30) — **MINOR**
+
+### Features
+
+- Add `ADMIN_STEAM_IDS` to grant admin from the environment, so an instance with players but no admin can be recovered without wiping the database
+- Check the Steam Web API key at startup and log whether it is missing, invalid or unreachable
+- Warn when a saved team puts a player on two teams of the same tournament
+
+### Fixes
+
+- Fix the team page reading membership from the match config snapshot, which hid the server from a player added after the match was created and still showed it to a removed one
+- Fix admin refusals redirecting to the player profile without saying why
+- Fix IP-ban tracking being skipped whenever the game-port query failed, even though the server answered RCON
+
+## v2.1.1 (2026-08-29) — **PATCH**
+
+### Fixes
+
+- Fix an assigned, answering server reading as "waiting for server assignment"
+- Add the missing endpoint behind "Add player to match", which failed for spectators and backup players
+- Fix Copy Console Command doing nothing over plain HTTP
+
+### Ops/Docs
+
+- Sweep every main page for WCAG 2.1 A/AA accessibility violations
+- Cover a drawn decider ending the series
+
+## v2.1.0 (2026-08-29) — **MINOR**
+
+### Features
+
+- Add a server hostname format setting, including an empty value that keeps the hostname from your `server.cfg`
+- Add admin impersonation, so an admin can view the site as another player
+
+### Fixes
+
+- Fix match reports never reaching MAT, which left live phase tracking, connection snapshots and server status reconciliation dead
+- Fix the knife round showing the match as warmup throughout side selection
+- Fix End Match ending only the round, leaving the match showing LIVE
+- Fix a stale match record pinning a server forever
+- Fix a BO3/BO5 recording only the last map in series stats and profile KDA
+- Fix a player on two teams deadlocking the veto
+- Fix upgrades failing on missing columns by deriving column migrations from the schema
+- Fix one unhandled promise rejection taking down the API
+- Fix the container serving 502s when the API dies
+
+### Ops/Docs
+
+- Run lint, type checking and the E2E suite on every pull request
+- Fix the release workflow, which referenced Docker Hub secrets that did not exist
+
+## v2.0.14 (2026-02-15) — **PATCH**
+
+### Features
+
+- Add Steam Workshop map details lookup (resolve title + preview image from URL/ID)
+
+## v2.0.13 (2026-02-15) — **PATCH**
+
+### Features
+
+- Show CS2 “update required” status details in server status responses
+- Improve per-match demo recording/upload configuration flow
+- Harden Steam integration health checks and error handling
+
+## v2.0.12 (2026-02-03) — **PATCH**
+
+### Features
+
+- Add player team resolution endpoint and enrich player profile data
+- Improve team name display and chat prefix configuration
+- Update chat prefix placeholders across multiple languages
+
+### Refactors
+
+- Update MatchZy Enhanced configuration payloads and translations
+
+### Ops/Docs
+
+- Remove outdated i18n fallback documentation and legacy icon SVG
+
+## v2.0.11 (2026-02-01) — **PATCH**
+
+### Features
+
+- Show urgent CS2 “update required” warnings in the Servers UI (persistent admin snackbar + per-server indicators)
+- Verify CS2 server version against Steam and block outdated/unverified servers from allocation (RCON `status` fallback + Steam UpToDateCheck)
+- Add match reallocation so admins can move staged matches off a bad/outdated server
+- Show and persist the installed CS2 build per server (build id + version string)
+- Report MatchZy plugin DB health via `server_health` and surface persistent admin warning (“Plugin DB DOWN”)
+- Speed up server initialization via bootstrap payload (`/api/servers/:id/bootstrap`) and track reachability (`server_can_reach_api_at`)
+- Add fleet CS2 monitoring + tournament start preflight to prevent starting with outdated servers
+
+### Fixes
+
+- Fix CS2 build parsing when RCON `version` output doesn’t include BuildID (use `status` version line fallback)
+- Fix plugin version comparison so newer-than-latest builds aren’t incorrectly flagged as “older”
+
+### Ops/Docs
+
+- Add `yarn docker:local:restart` helper for local Docker restarts
+
+## v2.0.8 (2026-01-29) — **PATCH**
+
+### Features
+
+- feat: improve match score display logic across components
+- feat: enhance health monitoring and server tracking logic
+- feat: improve match score handling and display in various components
+- feat: enhance ESLint configuration and improve script handling
+- feat: remove MkDocs documentation scripts and update language flag handling
+- feat: refine simulation mode handling in tournament start endpoint
+- feat: allow simulation settings in production for local Docker builds
+- feat: enable developer tools in local Docker configuration
+- feat: enhance Swagger documentation with security schemes
+
+### Fixes
+
+- fix: update Swagger documentation for Steam API and tournament responses
+
+### Refactors
+
+- refactor: remove react-flagpack and update flag handling
+
+### Chore/Release
+
+- chore: bump version to 2.0.8 and update changelog
+
+### Merges
+
+- Merge pull request #128 from sivert-io/release
+
+## v2.0.7 (2026-01-28) — **PATCH**
+
+### Features
+
+- feat: enhance localization for Spanish and Portuguese across multiple components
+- feat: enhance Italian localization across multiple components
+- feat: update documentation links and enhance Italian localization
+- feat: enhance Dutch localization across multiple components
+- feat: update French localization files for improved accuracy and consistency
+- feat: enhance localization and add safety checks for translation outputs
+- feat: add auto-translate fallback script and enhance localization files
+- feat: enhance localization for dashboard settings in multiple languages
+- feat: update localization files for German, Dutch, and Portuguese
+- feat: update localization files for German, Spanish, French, Italian, Norwegian, Dutch, Polish, and Portuguese
+- feat: update localization files for Spanish, Italian, Polish, and Portuguese
+- feat: add English fallback check script and update localization files
+- feat: add i18n sync script and enhance localization files
+- feat: add missing i18n keys checker and enhance localization files
+- feat: add comprehensive localization support for multiple languages
+- feat: enhance settings localization and player registration options
+- feat: add matchzyAutostartMode to settings and localization
+- feat: enhance settings management with MatchZy core defaults
+
+### Refactors
+
+- refactor: remove PublicPages component and update routing
+
+### Chore/Release
+
+- chore: bump version to 2.0.7 and update changelog
+- chore: update .gitignore to exclude additional file types
+- chore: remove tracked local tournament.db
+
+### Merges
+
+- Merge pull request #127 from sivert-io/release
+
+## v2.0.6 (2026-01-25) — **PATCH**
+
+### Features
+
+- feat: enhance localization and improve match handling
+- feat: add initial state for allowSelfRegister in settings
+
+### Refactors
+
+- refactor: streamline authentication and match status handling
+
+### Chore/Release
+
+- chore: bump version to 2.0.6 and update changelog
+
+### Merges
+
+- Merge pull request #124 from sivert-io/release
+
+## v2.0.5 (2026-01-25) — **PATCH**
+
+### Features
+
+- feat: add allocation status endpoint for player access
+- feat: implement direct access block for admin routes
+- feat: add test-only login endpoint for non-admin players
+
+### Chore/Release
+
+- chore: bump version to 2.0.5 and update changelog
+- chore: update changelog for version 2.0.4 release
+
+### Merges
+
+- Merge pull request #123 from sivert-io/release
+- Merge pull request #122 from sivert-io/release
+
+## v2.0.4 (2026-01-24) — **PATCH**
+
+### Features
+
+- feat: update release script to make test execution optional
+- feat: implement signed player_steam_id cookie for enhanced admin authentication
+- feat: enhance session management for reverse proxy setups
+- feat: add reverse proxy guide for nginx with HTTPS support
+
+### Refactors
+
+- refactor: improve release script by using predefined SCRIPT_DIR
+
+### Chore/Release
+
+- chore: bump version to 2.0.4 and update changelog
+
+### Merges
+
+- Merge pull request #121 from sivert-io/release
+
+## v2.0.3 (2026-01-24) — **PATCH**
+
+### Features
+
+- feat: optimize server initialization process with concurrent checks and improved logging
+- feat: integrate MatchZy version fetching and update environment configuration
+
+### Fixes
+
+- fix: improve error handling and logging in server heartbeat updates
+
+### Refactors
+
+- refactor: improve logging and error handling in server tracking and version fetching
+
+### Chore/Release
+
+- chore: bump version to 2.0.3 and update changelog
+
+### Merges
+
+- Merge pull request #119 from sivert-io/release
+
+## v2.0.2 (2026-01-24) — **PATCH**
+
+### Features
+
+- feat: enhance release script to handle uncommitted changes
+- feat: enhance server log checking and update translations
+- feat: update server modal and batch server modal for improved ID handling and connectivity checks
+- feat: enhance server initialization and logging for webhook configuration
+- feat: add admin status endpoint and enhance Steam callback logging
+
+### Docs
+
+- docs: update environment variable instructions for Docker setup
+- docs: enhance Docker setup instructions with detailed configuration steps
+- docs: update getting started instructions for Docker setup
+
+### Chore/Release
+
+- chore: bump version to 2.0.2 and update changelog
+- chore: enhance logging and configuration for database operations
+- chore: remove no-cache-filter option from docker build command in release script
+
+### Merges
+
+- Merge pull request #117 from sivert-io/release
+
+## v2.0.1 (2026-01-22) — **PATCH**
+
+### Docs
+
+- docs: update troubleshooting guide for admin access
+- docs: expand troubleshooting guide for admin access
+- docs: add troubleshooting section for admin access recovery
+
+### Chore/Release
+
+- chore: bump version to 2.0.1 for api and client packages
+- chore: bump version to 2.0.1 and update changelog
+- chore: update docker-compose.local.yml for production settings
+- chore: enhance environment variable documentation and session handling
+- chore: refine environment variable handling in docker-compose files
+- chore: update docker-compose files to utilize .env for environment variables
+- chore: add STEAM_API_KEY environment variable to docker-compose files
+- chore: refine docker-compose.local.yml for clarity and configuration
+- chore: update docker-compose.yml for clarity and configuration options
+
+### Merges
+
+- Merge pull request #115 from sivert-io/release
+
+---
+
+## v2.0.0 (2026-01-22) — **MAJOR**
+
+> **MAJOR release**
+
+### Features
+
+- feat: enhance version bumping process in release script
+- feat: synchronize package versions and enhance build process
+- feat: enhance session management and IP ban detection in RCON service
+- feat: improve accessibility and user feedback in UI components
+- feat: integrate MatchZy Enhanced v1.3.0 settings into configuration
+- feat: enhance server allocation and status management
+- feat: implement server initialization and health monitoring services
+- feat: add loading indicators to modals with CircularProgress
+- feat: add demo recording control to MatchZy Enhanced configuration
+- feat: integrate MatchZy Enhanced v1.3.0 configuration for tournaments
+- feat: integrate gamedig for server status checks and enhance RCON connection testing
+- feat: enhance BatchServerModal and ServerModal with Autocomplete and server management logic
+- feat: implement tournament completion checks and enhance match status updates
+- feat: enhance logging and match configuration retrieval
+- feat: add matchzy debug chat setting and enhance settings handling
+- feat: enhance Keycloak authentication configuration and UI customization
+- feat: enhance match configuration and player selection logic
+- feat: refactor navigation components and enhance session management
+- feat: update dependencies and enhance session management with PostgreSQL support
+- feat: enhance player match retrieval and avatar enrichment logic
+- feat: update EmptyState component usage in MapPoolsTab and MapsTab
+- feat: enhance VetoInterface and VetoMapCard for improved turn indication
+- feat: update ProtectedRoute to clarify public route access
+- feat: enhance admin authentication flow with provider-specific profile data
+- feat: enhance server status endpoint for improved caching and response payload
+- feat: enhance authentication options with Keycloak, Discord, and GitHub support
+- feat: implement self-registration feature for Steam logins and enhance player management
+- feat: enhance authentication with GitHub OAuth2 support and session management
+- feat: implement Steam and SSO authentication with Passport integration
+- feat: add matchzy debug chat feature for enhanced logging
+- feat: add simulation mode support for server availability checks
+- feat: improve match handling for BO1 series and duplicate series_end events
+- feat: enhance tournament settings with global round and overtime options
+- feat: add database reset functionality and improve map handling
+- feat: implement internationalization support with i18next
+- feat: enhance team name handling in TeamModal and Teams components
+- feat: add bulk delete functionality for matches, players, servers, and teams
+
+### Fixes
+
+- fix: change to project root directory in release script
+- fix: ensure tournament updates are awaited in the update route
+- fix: refine series score handling for completed BO1 matches
+
+### Refactors
+
+- refactor: remove release-step9.sh script
+- refactor: improve match configuration and admin handling
+- refactor: adjust match allocation grace period and enhance server status logging
+- refactor: enhance localization and slugification across components
+- refactor: update LanguageSwitcher to display language names in their native form
+
+### Docs
+
+- docs: enhance contribution guidelines and add translation support
+- docs: update README to correct image path for tournament bracket view
+- docs: update mkdocs configuration and navigation structure
+- docs: update README and documentation to include Kanban board link for project tracking
+- docs: update CS2 Server Manager documentation for clarity and structure
+
+### Chore/Release
+
+- chore: enhance Dockerfile and release script for improved user experience
+- chore: improve Docker build process and release script
+- chore: bump version to 2.0.0 for api and client packages
+- chore: streamline version synchronization process in release script
+- chore: enhance version synchronization in release script
+- chore: bump version to 2.0.0 and update changelog
+- chore: remove placeholder notebook file
+- chore: replace .env.example with example.env for improved configuration guidance
+- chore: log application version on startup and enhance version syncing in release script
+
+### Merges
+
+- Merge pull request #114 from sivert-io/release
+- Merge pull request #108 from sivert-io/106-feature-high-priority-add-steam-and-future-sso-authentication-via-passport
+- Merge pull request #105 from sivert-io/feat/matches-waiting-banner-and-lint-fixes
+- Merge pull request #102 from sivert-io/fix-teamname-unicode-84
+- Merge pull request #101 from sivert-io/feature/bulk-delete
+
+### Other
+
+- Improve server allocation UI, add MatchZy debug chat toggle, fix lint
+
+## v1.7.6 (2026-01-01) — **PATCH**
+
+### Features
+
+- feat: enhance tournament and match progression logic
+- feat: add endpoint to reset simulation state while preserving configuration
+- feat: add standalone release step 9 script for building and pushing Docker images
+
+### Docs
+
+- docs: point MatchZy Enhanced links to me.sivert.io
+- docs: group changelog entries into themed sections
+- docs: regenerate changelog from full git history
+- docs: document admin player attributes in roadmap
+- docs: update roadmap with recent implemented features
+- docs: mark tournament templates as implemented in roadmap
+
+### Chore/Release
+
+- chore: bump version to 1.7.6 and update changelog
+- chore: update release scripts for steps 9–11
+
+### Merges
+
+- Merge pull request #100 from sivert-io/release
+- Merge pull request #99 from sivert-io/fix-auto-matches-overtime
+- Merge pull request #98 from sivert-io/docs/link-matchzy-enhanced-site
+- Merge pull request #97 from sivert-io/docs/changelog-grouped-sections
+- Merge pull request #96 from sivert-io/docs/generated-changelog-from-history
+- Merge pull request #95 from sivert-io/docs/update-roadmap-admin-player-flags
+- Merge pull request #94 from sivert-io/docs/update-roadmap-new-features
+- Merge pull request #93 from sivert-io/docs/update-roadmap-templates-implemented
+- Merge pull request #92 from sivert-io/add-backup-steps
+- Merge pull request #91 from sivert-io/docker-desktop
+
+### Other
+
+- style: update bracket participant colors and backgrounds for better visibility
+
+## v1.7.5 (2025-12-30) — **PATCH**
+
+### Features
+
+- feat: add in-game admin management instructions to player guide
+- feat: improve manual match creation and allocation process
+- feat: enhance match creation and allocation logic
+- feat: enhance match status styling and update logic
+- feat: introduce PlayerName component for consistent player name rendering
+- feat: add admin management features and player attributes
+- feat: filter out unassigned matches in bracket display
+- feat: enhance match allocation logic and UI feedback
+- feat: enhance player statistics with headshot tracking and UI improvements
+- feat: enhance PlayerProfile with improved match data handling and UI updates
+- feat: enhance match event handling for draw scenarios
+- feat: centralize player avatar rendering with PlayerAvatar component
+- feat: add round map label functionality for shuffle tournaments
+- feat: implement optimistic parallel match allocation strategy
+- feat: enhance match allocation error handling and player ELO display
+- feat: deduplicate match statistics for accurate player leaderboard calculations
+- feat: add player highlighting feature in match performance display
+- feat: enhance manual match modal and match details display
+- feat: add team name generation routes and integrate into manual match modal
+- feat: add ELO template import functionality and built-in templates
+- feat: implement damage-based tiebreak logic in MatchDetailsModal
+- feat: add MatchListCard component for match display
+- feat: update overtime settings and tie-breaking logic in match components
+- feat: enhance manual match configuration and event handling
+- feat: update recent matches display in PlayerProfile component
+- feat: enhance match event handling and player statistics tracking
+- feat: add match notification audio component for player profile and team match
+- feat: add support for queued match status in server status responses
+- feat: add queued server status and enhance player profile navigation
+- feat: implement manual match templates and enhance player generation
+- feat: enhance type definitions for environment variables
+- feat: add ratings management and bulk match creation for tournaments
+- feat: enhance manual match creation and server allocation logic
+- feat: enhance match handling and player normalization in manual matches
+- feat: enhance manual match creation with map pool and template functionality
+- feat: add match deletion functionality for manual matches
+- feat: enhance modal dialog behavior to prevent accidental closures
+- feat: enhance manual match configuration with simulation and round limit settings
+- feat: enhance manual match creation with team and map selection
+- feat: enhance server status caching and improve match allocation logic
+- feat: improve server status accuracy and match allocation logic
+- feat: add tournament configuration fields for match settings
+- feat: add maxRounds and overtimeMode to tournament configuration
+- feat: enhance server availability metrics and UI integration
+- feat: implement specific match allocation method in MatchAllocationService
+- feat: enhance server availability status and UI updates
+- feat: reconcile match status with plugin phase updates
+- feat: enhance snackbar notifications for match and tournament events
+- feat: add server availability warnings to tournament start process
+- feat: implement spinner timeout for tournament start process
+- feat: enhance local Docker commands and documentation for improved usability
+- feat: add docker restart command for improved local development workflow
+- feat: integrate server allocation tracking into match allocation and status services
+- feat: enhance PlayerProfile with recent match performance metrics
+- feat: enhance player roster and profile displays with updated match status
+- feat: add winner identification logic in useBracket hook
+- feat: implement manual match creation functionality
+- feat: add match volume estimation for tournament formats
+- feat: enhance match event handling with real-time score updates
+- feat: enhance ServerEventsMonitor with additional event types and score display
+- feat: add clearAll method to MatchLiveStatsService and invoke it in TournamentService
+- feat: enhance events route response and improve server events monitoring
+- feat: enhance live match styling in brackets viewer
+- feat: add simulation timescale key to settings service
+- feat: add simulation timescale setting for match simulation
+- feat: add structural validation checks in match allocation and configuration
+- feat: enhance live stats updates and player performance extraction
+- feat: add server events monitoring endpoint and emit server-level events
+- feat: add simulation mode toggle to tournament start process
+- feat: add early confirmation prompt to release script
+- feat: enhance server status logging and allocation process
+- feat: centralize development environment checks with useIsDevelopment hook
+- feat: add connectivity checks for server allocation
+- feat: implement bi-directional server connectivity checks
+- feat: implement automated veto simulation for tournament matches
+- feat: implement FadeInImage component for improved image loading
+- feat: update map image formats to webp for improved performance
+- feat: add NotFound page and update routing for 404 handling
+- feat: add PublicPages component and update routing
+- feat: enhance Steam login flow and player profile error handling
+- feat: enhance Settings page with tabbed navigation and reset functionality
+- feat: enhance chat prefix defaults and UI settings for MatchZy
+- feat: add Steam OpenID authentication for player login
+- feat: implement per-server MatchZy configuration management
+- feat: update player statistics handling across match and profile components
+- feat: deduplicate match history in PlayerProfile for accurate statistics
+- feat: update MatchInfoCard to handle server status more effectively
+- feat: add overtime segments configuration to tournament settings
+- feat: enhance MatchZy settings management with chat prefixes and knife round toggle
+- feat: add .nvmrc file and update yarn.lock for dependency management
+- feat: implement shuffle match handling in MatchInfoCard and MatchScoreboard
+- feat: enhance tournament review functionality with bracket handling
+- feat: implement match status formatting and enhance single map layout
+- feat: enhance Steam API integration and error handling
+- feat: add simulation mode setting for match configuration
+- feat: enhance development data generation with realistic names
+- feat: expand friendly team names pool for tournament matches
+- feat: enhance theme with custom scrollbar styles
+- feat: enhance tournament match naming with friendly team names
+- feat: enhance match data retrieval with server information
+- feat: enhance server status endpoint and client-side match handling
+- feat: enhance tournament leaderboard with real-time updates and loading optimizations
+- feat: implement public player selection and current match endpoints
+- feat: reorganize admin tools for improved usability
+- feat: add clean servers command to admin commands
+- feat: implement lightweight server connectivity checks in match allocation
+- feat: add test utilities endpoint and enhance logging for E2E tests
+- feat: enhance authentication middleware with default token fallback
+- feat: enhance tournament logging and improve code readability
+- feat: enhance shuffle tournament functionality with new configuration options
+- feat: integrate Snackbar context for global error handling in Layout component
+- feat: restructure API and client for improved organization and functionality
+- feat: add mkdocs-exclude plugin and update documentation configuration
+- feat: update documentation and UI for shuffle tournament features
+- feat: filter out shuffle-generated teams in TeamSelectionStep and Teams page
+- feat: enhance Bracket component for shuffle tournaments
+- feat: enhance MatchDetailsModal and MatchCard for shuffle tournaments
+- feat: improve match allocation logic for shuffle tournaments
+- feat: enhance onboarding checklist to include player management
+- feat: add custom input fields for team, player, and server counts in Development page
+- feat: shuffle tournaments, player ratings, and screenshot automation
+- feat: add completedAt field to VetoState and fix timestamp format in logger
+- feat: add standalone Discord webhook script and auto-updating changelog
+
+### Fixes
+
+- Fix sharded E2E tests and align Settings/public pages behavior (#86)
+- fix: add MenuItem import for autocomplete functionality in ManualMatchBasicsStep component
+- fix: improve score display logic in MatchListCard component
+- fix: streamline score display in MatchListCard component
+- fix: correct error message formatting and improve team name assignment logic in shuffle tournament service
+- fix: update database connection string to use explicit IPv4 loopback
+- fix: handle missing player scenario in Player Management UI tests
+- fix: update postgame status messages for clarity
+- fix: improve server online status determination in MatchInfoCard
+- fix: update MatchZy Enhanced links in documentation
+- fix: update documentation links to new domain
+- fix: improve error handling in startShuffleTournament function
+- fix: enforce numeric match ID in match configuration
+- fix: update match configuration to use numeric match ID
+- fix: update match status in shuffle tournament service for immediate readiness
+- fix: improve error handling and logging in match allocation service
+- fix: prevent duplicate webhook warning notifications in Layout component
+- fix: standardize spacing in error log block for consistency
+- fix: update client-side LogEntry timestamp type to string for ISO format compatibility
+- fix: standardize spacing in completion log block for consistency
+- fix: align VetoState.completedAt type between server and client
+- fix: standardize console log label spacing to 16 characters for alignment
+- fix: standardize spacing alignment in error console log labels
+- fix: standardize console log label spacing for consistent alignment
+- fix: standardize spacing alignment in error console log labels
+- fix: standardize console log label spacing for consistent alignment
+- fix: remove Docker commands from Discord webhook and reverse changelog order
+
+### Refactors
+
+- refactor: enhance match validation logic for bracket matches
+- refactor: improve MatchDetailsModal structure and PlayerAvatar logic
+- refactor: improve match configuration handling and type safety
+- refactor: simplify environment variable access in useIsDevelopment hook
+- refactor: simplify type assertions and enhance match configuration handling
+- Refactor manual match modal into smaller steps and add review
+- refactor: optimize server status caching logic in ServerStatusService
+- refactor: streamline randomization logic in generateRoundMatches function
+- refactor: update round limit and overtime configurations in tournament documentation
+- refactor: remove round limit type from tournament configuration
+- refactor: update match allocation logic to align with MatchZy specifications
+- refactor: simplify button text logic in BatchServerModal
+- refactor: improve BatchServerModal for better server verification handling
+- refactor: enhance MatchCard component for improved score display
+- refactor: update bracket visualization logic for improved clarity
+- refactor: streamline match allocation logic and improve UI components
+- refactor: update shuffle tournament reset logic to preserve player registrations
+- refactor: remove explicit ELO assignment for player creation
+- refactor: improve logger configuration for development environment
+- refactor: update configuration and clean up settings logic
+- refactor: enhance server connectivity checks in match allocation service
+- refactor: remove default player ELO references from Settings component
+- refactor: standardize player rating terminology and improve match details
+- refactor: update default ELO fallback and improve match details display
+- refactor: improve match details handling and UI updates
+- refactor: reorganize TeamMatch component layout for improved clarity
+- refactor: enhance match veto logic for simulation mode
+- refactor: improve code readability and structure in event and match handling
+- refactor: improve match enrichment functions for better readability and score handling
+- refactor: optimize server loading and event handling in ServerEventsMonitor
+- refactor: update simulation timescale handling in settings
+- refactor: remove unused import and enhance settings page
+- refactor: streamline .gitignore and enhance player name generation in Development component
+- refactor: clean up fetchCS2Maps function and enhance EmptyState component usage
+- refactor: simplify EmptyState component usage in MapPoolsTab and MapsTab
+- refactor: update helper text and descriptions in Settings page for clarity
+- refactor: update tournament configuration in screenshot generation script
+- refactor: enhance player selection input behavior
+- refactor: increase chunk size warning limit in Vite configuration
+- refactor: update ESLint rules and clean up component imports
+- refactor: improve type safety and code clarity in various components
+- refactor: update ESLint configuration and clean up code
+- refactor: update input properties across modals to use slotProps
+- refactor: simplify Settings page layout and improve helper text
+- refactor: replace Snackbar with SnackbarContext for error handling
+- refactor: improve database reset logic for development use
+- refactor: clean up MapActionsModal and MapModal components, enhance Players page with player links
+- refactor: update terminology from standings to leaderboard for consistency
+- refactor: improve code readability and clarify tournament logic
+- refactor: clean up whitespace and improve error handling in shuffle tournament helpers
+- refactor: update DashboardStats layout and improve pie chart configurations
+- refactor: enhance DashboardStats, ELOProgressionChart, and PerformanceMetricsChart components with theme integration
+- refactor: update OnboardingChecklist and Settings components for clarity and usability
+- refactor: enhance Bracket and TournamentStandings components for improved shuffle tournament handling
+- refactor: update development server script and enhance DashboardStats component
+- refactor: remove automatic navigation after tournament start, allowing user to navigate manually
+- refactor: standardize log message prefixes and improve clarity
+- refactor: standardize log messages and improve timestamp handling
+- refactor: update logging format and improve timestamp handling
+
+### Docs
+
+- docs: streamline index page content for clarity
+- docs: enhance index page and improve CSS for light mode
+- docs: update match management guide and enhance CSS for consistency
+- docs: enhance documentation structure and clarity
+- docs: update links and add related projects section
+- docs: update shuffle tournament setup instructions for clarity and PR integration
+- docs: enhance shuffle tournament POC documentation with setup instructions and clarifications
+- docs: update README to reflect new tournament formats and features
+
+### Chore/Release
+
+- chore: bump version to 1.7.5 and update changelog
+- chore: enhance Docker release script to support dynamic test platforms
+- chore: improve Docker Buildx builder validation in release script
+- chore: use Rancher Desktop or default Docker context in release script
+- chore: update yarn.lock with dependency version adjustments
+- chore: update preview images for documentation
+- chore: update local Docker environment configuration for development
+- chore: update documentation links to new domain
+- chore: update dashboard preview image for improved visual representation
+- chore: update Dockerfile and yarn.lock for dependency management and build configuration
+- chore: update yarn.lock to reflect dependency changes and optimizations
+- chore: update Dockerfile to reflect new build paths for backend and frontend
+- chore: update package.json and yarn.lock for improved workspace management
+- chore: remove deprecated dashboard components and related files
+- Remove client directory from .dockerignore to allow inclusion in Docker builds, enhancing the build process for the application.
+
+### Merges
+
+- Merge pull request #90 from sivert-io/release
+- Merge pull request #89 from sivert-io/mac-build
+- Merge pull request #88 from sivert-io/fix-builderx
+- Merge pull request #87 from sivert-io/chore/rancher-desktop-release
+- Merge pull request #79 from sivert-io/35-feature-new-tournament-type
+- Merge pull request #60 from sivert-io/59-feature-improve-log-framework-messages
+- Merge pull request #62 from sivert-io/copilot/sub-pr-60-again
+- Merge pull request #61 from sivert-io/copilot/sub-pr-60
+- Merge pull request #64 from sivert-io/copilot/sub-pr-60-yet-again
+- Merge pull request #65 from sivert-io/copilot/sub-pr-60-one-more-time
+- Merge pull request #63 from sivert-io/copilot/sub-pr-60-another-one
+- Merge pull request #58 from sivert-io/fix/remove-docker-commands-and-reverse-changelog-order
+- Merge pull request #57 from sivert-io/feat/discord-webhook-and-changelog
+
+---
+
+## v1.2.0 (2025-11-28) — **MINOR**
+
+> **MINOR release**
+
+### Features
+
+- feat: add disk space check and test skip option to release script
+- feat: enhance team selection step with server validation and alerts
+- feat: update tournament type and format guidelines in UI
+- feat: enhance tournament template functionality with team management
+- feat: display selected maps preview in Templates component
+- feat: update MapPoolStep to conditionally display map preview
+- feat: enhance tournament server availability checks and UI feedback
+- feat: add SaveTemplateModal and integrate template saving functionality
+- feat: implement tournament templates feature
+- feat: add Discord support community link
+- feat: require DISCORD_WEBHOOK_URL before release
+- feat: add Discord webhook notifications for releases (secure)
+- feat: add Discord webhook notifications for releases
+- feat: Update ESLint configuration and clean up components
+- feat: Add Server Allocation Status guide and update documentation structure
+- feat: Refactor demo download functionality and introduce MapAccordion component
+- feat: Add Docker rebuild commands and update contributing documentation
+- feat: Introduce MapDemoDownloads component for demo file downloads
+- feat: Add Docker commands to package.json for local development
+- feat: Add download button for match demos in MatchDetailsModal, MatchInfoCard, and TeamMatchHistory
+
+### Fixes
+
+- fix: improve git operations in release.sh for reliability
+- fix: address PR review comments - improve SPA navigation, rename functions, fix server refresh
+- fix: resolve linting errors and improve code quality
+- fix: Apply code review suggestions from PR #41
+- fix: Enable re-releasing same version in release script
+
+### Refactors
+
+- refactor: improve test reliability and performance in authentication and UI tests
+- refactor: enhance authentication and dashboard tests for improved reliability
+- refactor: remove unused props and imports in tournament components
+- refactor: streamline VetoInterface component by consolidating team name logic
+- refactor: simplify Dashboard component by removing unused elements
+- refactor: improve code readability and formatting in Templates component
+- refactor: clean up MapPoolStep component for improved readability
+- refactor: update type definitions and clean up unused settings props
+- refactor: Enhance server initialization and graceful shutdown handling
+- refactor: Improve demo upload handling in demos route
+
+### Docs
+
+- docs: update mkdocs-material to 9.7.0 and add admonition styling
+- docs: Update contributing guide with custom port rebuild instructions
+- docs: Expand Docker development section in contributing guide
+- docs: Update Docker Compose files to support customizable host ports
+- docs: Add comprehensive demo upload setup guide and improve demo upload implementation
+
+### Chore/Release
+
+- chore: bump version to 1.2.0
+- chore: update yarn.lock to reflect new dependencies and versions
+- chore: remove package-lock.json to streamline dependency management
+- chore: update release script to include test step and adjust step numbering
+- chore: update Docker commands in package.json to include image pruning
+
+### Merges
+
+- Merge pull request #56 from sivert-io/docs/update-admonitions-and-mkdocs-version
+- Merge pull request #55 from sivert-io/feat/release-script-improvements
+- Merge pull request #54 from sivert-io/release
+- Merge pull request #53 from sivert-io/fix/improve-release-script-git-operations
+- Merge pull request #51 from sivert-io/feat/tournament-templates
+- Merge pull request #50 from sivert-io/feat/add-discord-support-link
+- Merge pull request #41 from sivert-io/docs/demo-upload-setup-and-improvements
+- Merge pull request #49 from sivert-io/copilot/sub-pr-41
+- Merge pull request #48 from sivert-io/feat/require-discord-webhook-url
+- Merge pull request #47 from sivert-io/feat/discord-webhook-secure
+- Merge pull request #45 from sivert-io/feat/discord-release-announcements
+- Merge pull request #40 from sivert-io/fix/release-script-rerelease-support
+
+### Other
+
+- Initial plan
+- Initial plan
+- security: remove exposed Discord webhook URL and webhook functionality (#46)
+
+## v1.1.1 (2025-11-26) — **PATCH**
+
+### Features
+
+- feat: Enhance avatar fetching with timeout and improve error logging
+- feat: Implement real Steam IDs for player testing in Development and test helpers
+- feat: Add Steam avatar integration for team players
+
+### Fixes
+
+- fix: Add stash handling for uncommitted changes in release script
+- fix: Add OrbStack support and Docker cleanup to release script
+
+### Chore/Release
+
+- chore: bump version to 1.1.1
+- chore: update yarn.lock to reflect dependency changes
+- chore: update yarn.lock
+- chore: remove Docker Release GitHub Action workflow
+
+### Merges
+
+- Merge pull request #39 from sivert-io/fix/release-script-stash-handling
+- Merge pull request #38 from sivert-io/fix/orbstack-buildx-support
+- Merge pull request #37 from sivert-io/release
+- Merge pull request #36 from sivert-io/feature/steam-avatar-integration
+- Merge pull request #27 from sivert-io/update-yarn-lock
+- Merge pull request #26 from sivert-io/remove-docker-release-workflow
+
+---
+
+## v1.1.0 (2025-11-23) — **MINOR**
+
+> **MINOR release**
+
+### Features
+
+- feat: enhance testing framework and add new API tests
+- feat: add cleanup method for polling intervals on shutdown
+- feat: improve server allocation and match status updates
+- feat: enhance match server assignment and status handling
+- feat: refine Veto logic and enhance testing for CS Major formats
+- feat: enhance Veto tests for CS Major formats and custom orders
+- feat: update veto orders to comply with CS Major standards
+- feat: add version display and automated release process
+- feat: add comprehensive tests for Veto functionality
+- feat: enhance demo upload logging and configuration
+- feat: add endpoint for reporting match results via server plugin
+- feat: enhance match recovery and demo upload functionality
+- feat: implement map pool enable/disable functionality
+- feat: implement map synchronization feature from GitHub repository
+- feat: enhance map selection UI and add server configuration alert
+- feat: enhance map selection and display in MapPoolModal and MapPoolStep
+- feat: add maps prop to TournamentForm and TournamentTypeFormatStep for enhanced map validation
+- feat: implement automatic map import from GitHub and enhance map pool management
+- feat: refine map pool selection and initialization logic
+- feat: enhance veto state management with allMaps reconstruction
+- feat: optimize map display logic in VetoInterface
+- feat: improve map pool selection logic and initialization
+- feat: enhance VetoInterface with dynamic map loading and fallback handling
+- feat: implement map pool default setting and fetch CS2 maps from wiki
+- feat: add comprehensive documentation for Maps and Map Pools management
+- feat: add comprehensive tests for Maps and Map Pools functionality
+- feat: complete customizable map pool implementation
+- feat: enhance theme and tournament components
+- feat: add map and map pool components with modals for management
+- feat: implement maps and map pools management
+- feat: add Playwright E2E tests with comprehensive coverage
+- feat: add Playwright E2E tests with comprehensive coverage
+- feat: add Playwright E2E tests with tags and HTML reporting
+- feat: add PostgreSQL support with database abstraction layer
+- feat: load environment variables from .env file in Docker configuration
+- feat: update Docker configuration and enhance development setup
+- feat: enhance Docker build process for multi-platform support
+- feat: enhance match details and scoreboard components with derived series wins
+- feat: introduce MapChipList component for improved map display in match details
+- feat: refactor MatchInfoCard and introduce new components for improved match display
+- feat: enhance TeamMatch component with tournament status and dynamic title
+- feat: implement live stats and map results in MatchDetailsModal and MatchInfoCard
+- feat: add match report upload functionality and enhance connection handling
+- feat: normalize player data handling and enhance match connection updates
+- feat: update quick start documentation for CS2 Server Manager
+- feat: add CS2 Server Manager documentation and integration
+- feat: implement live match stats and connection status in MatchInfoCard
+- feat: enhance match connection handling and improve event logging
+- feat: set dark theme and background color in index.html
+- feat: add theme color meta tag for improved mobile experience
+- feat: log all events to a separate file for comprehensive event tracking
+- feat: enhance layout and login components for improved user experience
+- feat: add settings page for webhook URL and Steam API key configuration
+- feat: enhance match interaction and tournament status handling
+- feat: add documentation button to layout for improved user access
+- feat: enhance Brackets Viewer with custom features and improved functionality
+- feat: add Brackets Viewer components and localization support
+- feat: integrate Brackets Viewer for tournament visualizations
+- feat: implement double elimination support in ModernBracketVisualization
+- feat: enhance layout styling for BracketVisualization and ModernBracketVisualization components
+- feat: update project author information and enhance documentation configuration
+- feat: update project configuration and enhance documentation
+- feat: enhance player management and UI components
+- feat: add new components for team management and enhance match details display
+- feat: add development documentation and enhance match configuration generation
+- feat: enhance database logging and match configuration generation
+- feat: display map list in TeamMatch component and improve match config logging
+- feat: add serverId to match response and improve logging
+- feat: enhance ESLint configuration and improve component performance
+- feat: enhance ESLint configuration and improve type safety in components
+- feat: enhance match notifications and update HTML script reference
+- feat: emit tournament and bracket updates on key actions
+- feat: enhance tournament and veto interfaces with validation and UI improvements
+- feat: add funding configuration for project support
+- feat: update README for improved clarity and feature overview
+- feat: add current map display and update match data handling
+- feat: update MkDocs theme and styles for improved visual consistency
+- feat: update MkDocs configuration and documentation for improved clarity
+- feat: update CS2 map pool and documentation for veto selection
+- feat: restructure documentation and navigation for clarity
+- feat: add MkDocs documentation and deployment workflow
+- feat: enhance README with new features and setup instructions
+- feat: implement map veto system and player management enhancements
+- feat: enhance demo upload functionality with MatchZy integration
+- feat: add AdminMatchControls component for enhanced match management
+- feat: add RestartTournamentButton component and enhance tournament management
+- Enhance BatchServerModal for dynamic port management - Introduced ports array to allow custom port assignments for multiple servers - Implemented validation for port numbers and adjusted UI for better user experience - Updated server creation logic to utilize individual ports instead of a single starting port - Added password visibility toggle for improved usability.
+- Add batch server creation tool - Created BatchServerModal for bulk server creation - Supports creating multiple servers with sequential ports - Auto-generates IDs with suffix (e.g., server_1, server_2) - Auto-generates names with numbering (e.g., Server #1, #2) - Live preview of servers before creation - Individual error reporting per server - Support for 1-50 servers at once - Perfect for LAN setups with servers on same machine
+- feat: add LogViewer component for monitoring application logs
+- feat: comprehensive tournament automation and team experience enhancements
+- Add tournament management components and hooks for enhanced functionality. Introduce TournamentDialogs for confirmation actions, TournamentForm for tournament creation and editing, and TournamentLive for live tournament status display. Implement hooks for tournament data handling and validation, ensuring robust user interactions and improved UI flow. Update API integration for tournament operations, enhancing overall user experience and maintainability.
+- Add TournamentChangePreviewModal for change review before saving tournament updates. Enhance Tournament page to detect changes and show confirmation modals for saving, regenerating, and resetting tournaments. Update API routes for bracket regeneration and tournament reset functionality, ensuring proper error handling and user notifications.
+- Enhance Bracket and Match functionality by introducing a MatchDetailsModal component for displaying detailed match information. Update BracketVisualization to support match click events and improve match data structure with additional properties. Refactor Matches page to integrate match details and enhance user experience with live match timers and player statistics.
+- Implement tournament management features including a new Tournament page, Bracket visualization, and Matches page. Add API endpoints for tournament creation, retrieval, and bracket generation. Update database schema to support tournament data and enhance socket integration for real-time updates. Refactor routing in App.tsx to accommodate new tournament-related components.
+- Add server management features including a new Servers page, ServerModal component for creating and editing servers, and API integration for server status checks. Update routing in App.tsx to include the Servers page and enhance backend with server status routes.
+
+### Fixes
+
+- fix: ensure modal closes after saving in TeamModal and enhance UI tests for webhook alerts
+- fix: sync yarn lockfile and pin yarn version to 4.11.0
+- fix: restore correct quick-start.md version from b0e9206 after rebase reverted it
+- fix: remove duplicate derivedSeriesWins declaration in MatchDetailsModal
+- fix: display correct side badge for viewing team in veto interface
+- fix: resolve all build and lint errors
+- fix: enhance fallback mechanism for map image URLs in MatchDetailsModal and VetoInterface
+- fix: improve map image URL handling in VetoInterface
+- fix: update port configuration in BatchServerModal for sequential server creation
+- fix: refine TeamModal button styles and layout
+- fixed reload_admins - removed extra css
+- fix: add missing i18next dependencies
+- fix: ensure public directory exists before vite build
+- fix: address Copilot review suggestions
+- fix: adjust Accordion behavior in MatchDetailsModal and reorder MatchRosterAccordion in MatchInfoCard
+- fix: update default sound notification file for consistency
+- fix: remove duplicate Brackets Viewer CSS import and streamline styles
+- fix: update BracketsViewerVisualization and Bracket components for improved handling of match positions and debugging
+- fix: correct Docker compose file name in README for accuracy
+- fix: update base URL environment variable for webhook integration
+- fix: improve tournament reset logging and streamline match status handling
+- fix: adjust sound notification volume and update HTML script reference
+
+### Refactors
+
+- refactor: enhance polling and error handling in CS Major UI tests
+- refactor: enhance match polling and error handling in CS Major veto tests
+- refactor: streamline tournament setup and enhance UI testing for CS Major veto
+- refactor: improve test setup and enhance API test reliability
+- refactor: remove unused fetch-cs2-maps script and clean up package.json
+- refactor: implement Copilot suggestions for test reliability
+- refactor: clean up conditional rendering in VetoInterface component
+- refactor: optimize current map data handling in MatchInfoCard
+- refactor: update map image sources and enhance server verification in BatchServerModal
+- refactor: clean up imports and optimize MatchInfoCard component
+- refactor: clean up whitespace and improve readability in teams.spec.ts
+- refactor: update route handlers to use async database queries
+- refactor: update Dockerfile to install all dependencies
+- refactor: enhance socket event handling in useBracket and useTeamMatchData hooks
+- refactor: wrap logout button in Tooltip for improved user experience
+- refactor: improve BracketVisualization and ModernBracketVisualization components
+- refactor: update API endpoints and enhance server status handling
+- refactor: streamline event handling and enhance match event processing
+- refactor: centralize match loading logic and enhance match data handling
+- refactor: clarify veto requirements and improve match allocation logic
+- refactor: improve match status handling and UI updates in TeamMatch component
+- refactor: update admin command names and descriptions for clarity
+- refactor: update RCON command prefixes and descriptions for consistency
+- refactor: centralize type definitions for match and team entities
+- refactor: update match status terminology and enhance README documentation
+- refactor: implement team link copy functionality with toast notifications
+- refactor: update modal titles and button labels for consistency
+- Refactor tournament components to enhance editing and review functionality. Introduce cancel and edit options in TournamentForm and TournamentReview, allowing users to manage tournament settings more effectively. Implement change detection in the Tournament page to prevent unsaved changes, improving user experience. Remove unused AdminTools component and related service files for cleaner codebase.
+- Refactor AdminTools component to enhance server management and command execution features. Introduce new command categories for match control, settings, and team management. Implement validation for tournament types and team counts, ensuring proper setup for various tournament formats. Update API routes for executing commands with parameters, improving error handling and response clarity. Enhance UI with accordion components for better organization and user experience.
+- Refactor Caddyfile for improved routing and update Dockerfile for Node.js integration. Enhance API and WebSocket proxying, implement SPA routing with fallback to index.html, and adjust Docker setup to use Node.js as the base image, ensuring compatibility with better-sqlite3. Rebuild native modules for the Node.js runtime.
+- Refactor database queries to use specific type definitions for improved type safety. Introduce new types for database rows in `database.types.ts` and update relevant service and route files to utilize these types, enhancing code clarity and maintainability.
+- Refactor and enhance the application structure by introducing a new layout component for improved navigation and user experience. Update modal components for server and team management, integrating confirmation dialogs for delete actions. Revise README.md to reflect new features and improve documentation. Implement utility functions for match data formatting and enhance type definitions for better type safety across the application.
+- Refactor README.md to streamline prerequisites and setup instructions. Consolidate sections for production and local development, enhance API documentation, and update roadmap for automated tournament features.
+
+### Docs
+
+- docs: update contributing guidelines and setup instructions for local development
+- docs: streamline quick start guide and update requirements for tournament platform setup
+- docs: enhance server setup and troubleshooting documentation for CS2
+- docs: update README and documentation for enhanced MatchZy plugin and setup instructions
+- docs: update quick start guide and troubleshooting section for improved clarity and setup instructions
+- docs: enhance server setup documentation for MatchZy installation
+- docs: update README and screenshots for double-elimination bracket enhancements
+- docs: update screenshots layout for improved markdown compatibility
+- docs: enhance mkdocs configuration and add match details screenshot
+- docs: add screenshots and enhance README for MatchZy Auto Tournament
+- docs: update roadmap for MatchZy Auto Tournament
+- docs: enhance documentation for CS2 server setup and tournament guidance
+- docs: add CNAME file for custom domain configuration
+- docs: enhance documentation formatting and clarity
+- docs: update prerequisites in quick-start.md for clarity
+- docs: update map veto documentation for clarity and consistency
+- docs: update README to clarify prerequisites for installation
+- docs: update site URLs in mkdocs.yml and README for consistency
+- docs: update Docker commands in documentation for consistency
+- docs: refine button styles in extra.css for enhanced visual consistency
+- docs: update button styles in extra.css for improved visual consistency
+- docs: update MatchZy plugin requirement notice in README for clarity
+- docs: enhance button styles in extra.css for improved UI consistency
+- docs: update feature descriptions in index.md for improved clarity
+- docs: restructure index documentation for clarity and navigation
+- docs: update MatchZy plugin requirements and installation instructions
+- docs: update README and quick-start guide to include modified MatchZy plugin requirements
+- docs: enhance README with detailed environment setup instructions
+- docs: update URLs in documentation for production clarity
+- Add package-lock.json and update dependencies; enhance tournament management with new admin tools and visualization components. Introduce support for round robin and swiss tournament formats, and implement admin actions for match control. Update README.md to reflect new features and improve documentation.
+- Enhance Docker and Caddy integration for streamlined deployment. Update .env.example with Docker-specific notes and modify docker-compose.yml to expose Caddy on port 3069. Introduce Caddyfile for routing configuration, allowing single port access for frontend and API. Revise Dockerfile to install Caddy and adjust health checks accordingly. Update README.md to reflect new access points and clarify Docker usage for production environments.
+- Implement tournament starting functionality with automatic server allocation. Update API routes to handle tournament start requests, including success and error responses. Enhance Bracket and Tournament pages with UI elements for starting tournaments, including confirmation dialogs and loading indicators. Revise environment variable documentation for clarity and add a new service for match allocation management.
+- Update README.md to enhance the description of the MatchZy API, emphasizing its automated tournament management capabilities for CS2, and improving clarity for users.
+- Enhance project structure and functionality by adding a React frontend with team management features, including login, dashboard, and team modal components. Update Dockerfile for multi-stage builds, integrate ESLint for code quality, and refine README.md to reflect new setup instructions and features. Include environment variable configurations in .env.example and improve API utility functions for better authentication handling.
+- Add team management functionality with API endpoints for creating, updating, retrieving, and deleting teams. Update database schema to include teams table and integrate team routes into the application. Enhance README.md to reflect new team management features.
+- Add LICENSE, CONTRIBUTING.md, CODE_OF_CONDUCT.md, and issue templates for better project governance and contribution guidelines. Update README.md to include license information and prerequisites for development.
+- Add initial Docker setup with Dockerfile, docker-compose.yml, .dockerignore, and .env.example. Update README.md for Docker deployment instructions and environment variable configuration.
+- Remove package-lock.json, update README.md to reflect Bun as the package manager, and add an icon for the MatchZy Auto Tournament project.
+- Add README.md for MatchZy Auto Tournament API documentation, detailing features, setup, usage, architecture, authentication, API endpoints, tech stack, roadmap, and contribution guidelines.
+- Remove outdated documentation files: API_EXAMPLES.md, EVENTS_REFERENCE.md, MATCH_EXAMPLES.md, RCON_EXAMPLES.md, and WEBHOOK_SETUP.md.
+
+### Chore/Release
+
+- chore: bump version to 1.1.0
+- Update manual testing guide and roadmap for CS Major formats
+- Update docs/features/map-veto.md
+- chore: update Docker release workflow permissions
+- chore: remove .pnp.cjs and .pnp.loader.mjs files
+- chore: remove PnP files and update ESLint configuration
+- chore: update contribution guidelines and documentation for development setup
+- chore: update package.json to use yarn commands for development and build scripts
+- chore: update yarn.lock to reflect dependency changes and optimizations
+- chore: update stale workflow configuration for GitHub Actions
+- chore: add GitHub Actions workflow to manage stale issues and PRs
+- chore: enhance Docker release script for local and remote builds
+- chore: update token generation and documentation for environment variables
+- chore: simplify database configuration and update documentation
+- chore: transition to PostgreSQL as the sole database for all setups
+- chore: enhance Docker setup and documentation for local development
+- chore: update development Docker setup to use PostgreSQL by default
+- chore: remove unnecessary Brackets Viewer CSS import for cleaner code
+- chore: update .env.example for clarity and configuration management
+- chore: enhance Docker documentation and setup instructions
+- chore: update mkdocs configuration for build output location
+- chore: update project structure and remove unused assets
+- chore: remove outdated Docker and script documentation
+- chore: enhance Docker setup and documentation for improved usability
+- chore: update Docker configuration and documentation for improved setup
+- chore: update Dockerfile and documentation for improved installation process
+- chore: clean up mkdocs.yml and documentation files
+- chore: update environment variables and enhance match configuration security
+- chore: make dev command use --host by default for network access
+- chore: update .env.example to include WEBHOOK_URL configuration and clarify BASE_URL usage
+- chore: change default notification sound to drum beat
+- Update Caddyfile for MatchZy Auto Tournament configuration, enhancing API and WebSocket proxying. Adjust routing for SPA with fallback to index.html. Modify LICENSE to reflect updated copyright ownership. Update Login component's logo alt text for clarity.
+- Remove client directory from .dockerignore to allow inclusion in Docker builds, enhancing the build process for the application.
+
+### Merges
+
+- Merge pull request #25 from sivert-io/release
+- Merge pull request #24 from sivert-io/22-feature-allow-custom-veto-formatting
+- Merge pull request #23 from sivert-io/feat/version-display-and-release-automation
+- Merge pull request #21 from sivert-io/fix/yarn-lockfile-sync
+- Merge pull request #18 from sivert-io/14-bug-wrong-starting-side-after-veto
+- Merge pull request #20 from sivert-io/fix-build-and-lint-errors
+- Merge pull request #11 from sivert-io/feature/10-feature-customizable-map-pool
+- Merge pull request #17 from sivert-io/15-feature-improve-quick-start-guide
+- Merge pull request #16 from sivert-io/15-feature-improve-quick-start-guide
+- Merge pull request #12 from rpkaul/main
+- Merge pull request #9 from sivert-io/fix/playwright-test-selectors
+- Merge pull request #8 from sivert-io/feature/playwright-tests
+- Merge pull request #4 from sivert-io/2-bug-latest-tag-doesnt-have-a-linuxamd64-image
+- Merge pull request #3 from sivert-io/2-bug-latest-tag-doesnt-have-a-linuxamd64-image
+
+### Other
+
+- fix(docker): fix Caddy install by switching to GitHub release tarballs
+- style: refine color variables in extra.css for improved theme consistency
+- init
+

@@ -1,0 +1,84 @@
+---
+title: GitHub
+description: Turn on Sign in with GitHub.
+icon: GitBranch
+---
+
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+
+Users sign in with their GitHub account and link it to Steam once. Auto Tournament asks GitHub only for the `read:user` scope, which is read access to the public profile. Set up [Steam](/guides/sign-in/steam) first. See [Sign-in providers](/guides/sign-in) for how linking and admin access work.
+
+<Steps>
+
+<Step>
+
+### Create a GitHub OAuth app
+
+1. On GitHub, click your profile picture at the top right, then **Settings**.
+2. In the left menu, click **Developer settings** at the bottom, then **OAuth Apps**.
+3. Click **New OAuth App**. If you have no OAuth apps yet, the button is called **Register a new application**.
+4. Fill in the form:
+   - **Application name**: for example `Auto Tournament`. Users see this name when they sign in.
+   - **Homepage URL**: your `FRONTEND_BASE_URL`, for example `https://tournament.example.com`.
+   - **Authorization callback URL**: see the next step.
+   - Leave **Enable Device Flow** off.
+5. Click **Register application**.
+6. Copy the **Client ID**.
+7. Click **Generate a new client secret** and copy the secret. GitHub shows it only once.
+
+To own the app as an organization instead, open the organization, then **Settings** > **Developer settings** > **OAuth Apps**.
+
+</Step>
+
+<Step>
+
+### Set the callback URL
+
+In **Authorization callback URL**, enter:
+
+```text
+FRONTEND_BASE_URL/api/auth/github/callback
+```
+
+For example `https://tournament.example.com/api/auth/github/callback`. If you already registered the app, change it on the app's page and click **Update application**.
+
+</Step>
+
+<Step>
+
+### Add the values to `.env`
+
+```bash title=".env"
+AUTH_GITHUB_ENABLED=true
+GITHUB_CLIENT_ID=your-github-client-id
+GITHUB_CLIENT_SECRET=your-github-client-secret
+```
+
+The button only appears when all three are set. `GITHUB_TOKEN` is a different setting, used for **Sync CS2 Maps**. It has nothing to do with sign-in.
+
+</Step>
+
+<Step>
+
+### Restart the app
+
+```bash
+docker compose up -d --force-recreate matchzy-tournament
+```
+
+</Step>
+
+<Step>
+
+### Test the button
+
+1. Open `FRONTEND_BASE_URL/login` in a private browser window.
+2. Click **Sign in with GitHub** and click **Authorize** on GitHub.
+3. The first time, you see **Connect your Steam account**. Click **Connect with Steam** and sign in with Steam.
+4. Sign out, then click **Sign in with GitHub** again. You are now signed in as your Steam account without the Steam step.
+
+If GitHub shows "The redirect_uri is not associated with this application", the callback URL in step 2 does not match `FRONTEND_BASE_URL` exactly.
+
+</Step>
+
+</Steps>
