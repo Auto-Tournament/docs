@@ -15,4 +15,4 @@ yarn dev
 The site runs as a Docker container on the docs host. A cron job runs
 `scripts/auto_update.sh` every five minutes; it rebuilds and restarts the
 container when `main` has a new commit. The container listens on
-`127.0.0.1:31235`, and a Cloudflare tunnel points `docs.autotournament.gg` at it.
+port 31235, and the astro Cloudflare tunnel routes `docs.autotournament.gg` to `http://dev.lan:31235`.

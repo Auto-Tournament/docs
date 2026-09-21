@@ -8,5 +8,6 @@ services:
     container_name: autotournament-docs
     restart: unless-stopped
     ports:
-      # The Cloudflare tunnel on this host points docs.autotournament.gg here.
-      - "127.0.0.1:31235:3000"
+      # The astro Cloudflare tunnel routes docs.autotournament.gg to dev.lan:31235.
+      # Its connectors run on several LAN hosts, so bind on all interfaces.
+      - "0.0.0.0:31235:3000"
