@@ -1,0 +1,14 @@
+{
+  "title": "Auto Tournament",
+  "pages": [
+    "index",
+    "---Getting started---",
+    "...getting-started",
+    "---Guides---",
+    "...guides",
+    "---Modules---",
+    "...modules",
+    "---Reference---",
+    "...reference"
+  ]
+}

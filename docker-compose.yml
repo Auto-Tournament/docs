@@ -1,0 +1,12 @@
+services:
+  docs:
+    build:
+      context: .
+      args:
+        # Set by scripts/auto_update.sh at deploy time.
+        GIT_COMMIT_SHA: ${GIT_COMMIT_SHA:-dev}
+    container_name: autotournament-docs
+    restart: unless-stopped
+    ports:
+      # The Cloudflare tunnel on this host points docs.autotournament.gg here.
+      - "127.0.0.1:31235:3000"

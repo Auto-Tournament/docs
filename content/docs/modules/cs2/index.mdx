@@ -1,0 +1,37 @@
+---
+title: CS2 overview
+description: How the CS2 game module works and what you need for it.
+icon: Crosshair
+---
+
+The CS2 module lets Auto Tournament run Counter-Strike 2 matches. It is built into the app today.
+
+## The parts
+
+| Part | Where it runs | Required |
+| --- | --- | --- |
+| Auto Tournament | Your app server, in Docker | Yes |
+| CS2 dedicated server | A machine you control, usually Linux | Yes, one or more |
+| Metamod:Source and CounterStrikeSharp | On each CS2 server | Yes, MatchZy Enhanced needs them |
+| [MatchZy Enhanced](/modules/cs2/matchzy-enhanced) | On each CS2 server | Yes |
+| [CS2 Server Manager](/modules/cs2/server-manager) | On the Linux machine with the CS2 servers | No, but recommended |
+
+MatchZy Enhanced is a fork of the MatchZy plugin, made for Auto Tournament. It adds more events, a match report, simulation mode and a retry queue for events. Auto Tournament does not support the original MatchZy plugin.
+
+## How a match gets to a server
+
+1. You add a server on the **Servers** page with its host, port and RCON password.
+2. Auto Tournament sends a few settings over RCON: a server ID, a token and a setup URL.
+3. MatchZy Enhanced downloads its full setup from Auto Tournament: where to send events, where to upload demos, and the default match settings. It saves this setup, so it survives a restart.
+4. When a match is ready, Auto Tournament tells the server to load it. The server downloads the match config (teams, players, maps, rules) from Auto Tournament.
+5. During the match, the plugin sends events to Auto Tournament: players connecting, round ends, map results, the series result.
+6. After the match, the plugin uploads the demo if recording is on.
+
+The server authenticates to Auto Tournament with `SERVER_TOKEN`. If you change `SERVER_TOKEN`, click **Retry** on each server on the **Servers** page so it gets the new token.
+
+## Which setup to choose
+
+- **You have a Linux machine for game servers:** use [CS2 Server Manager](/modules/cs2/server-manager). It installs CS2, Metamod, CounterStrikeSharp and MatchZy Enhanced on several servers and keeps them updated.
+- **You already run CS2 servers, or use a game host:** install [MatchZy Enhanced](/modules/cs2/matchzy-enhanced) yourself.
+
+Before you start, read [Server requirements](/modules/cs2/server-requirements).

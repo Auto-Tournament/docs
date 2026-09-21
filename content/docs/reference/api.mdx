@@ -1,0 +1,88 @@
+---
+title: API
+description: Use the HTTP API from bots and scripts, with API tokens.
+icon: Code
+---
+
+The web app uses the same HTTP API that you can use. A bot or a script can do everything an admin can do in the browser: read scores, create teams, start a tournament.
+
+## API docs on your own install
+
+Every install has interactive API docs:
+
+- `/api-docs` shows all endpoints, with a button to try them. For example `http://localhost:3069/api-docs`.
+- `/api-docs.json` is the OpenAPI file. Use it to generate a client in your language.
+
+Paths, methods and the needed access are complete for every endpoint. Request and response bodies are only described for some endpoints so far.
+
+## Create a token
+
+People sign in with Steam and get a session cookie. Programs use an **API token** instead.
+
+1. Create a secret:
+
+```bash
+openssl rand -hex 32
+```
+
+2. Add it to `.env`. Choose the variable by what the program needs:
+
+```bash title=".env"
+# Full admin: can create matches, start tournaments and send RCON commands
+API_TOKENS=discord-bot:paste-the-secret-here
+
+# Read only: GET, HEAD and OPTIONS
+API_TOKENS_READONLY=scoreboard:paste-another-secret-here
+```
+
+3. Recreate the app container:
+
+```bash
+docker compose up -d --force-recreate matchzy-tournament
+```
+
+Each entry is `label:secret` or only `secret`. Separate several entries with commas or spaces. The label shows in the logs, so you can see which program made a call. The secret is never logged. Secrets shorter than 16 characters are ignored, with a warning in the log at start.
+
+<Callout type="warn">
+  A token in `API_TOKENS` has full admin rights, including RCON on your servers. Use `API_TOKENS_READONLY` when the program only reads.
+</Callout>
+
+## Use a token
+
+Send it in one of these headers:
+
+```bash
+curl -H "Authorization: Bearer $TOKEN" http://localhost:3069/api/matches
+curl -H "X-API-Token: $TOKEN" http://localhost:3069/api/matches
+```
+
+Check which token you use and what it can do:
+
+```bash
+curl -H "Authorization: Bearer $TOKEN" http://localhost:3069/api/auth/admin/me
+```
+
+| Status | Meaning |
+| --- | --- |
+| `401` | The token is wrong, or no tokens are set. |
+| `403` | The token is read-only and you tried to change something. |
+
+To remove a token, delete it from `.env` and recreate the container. To change a token, add the new one next to the old one, move the program to the new one, then remove the old one.
+
+## Useful endpoints
+
+These need no token:
+
+| Endpoint | Returns |
+| --- | --- |
+| `GET /api/matches` | All matches with teams, scores and server. |
+| `GET /api/matches/:slug` | One match. |
+| `GET /api/team/:teamId/match` | The current match of a team. |
+| `GET /api/tournament/bracket` | The bracket. |
+| `GET /health` | If the app is running. |
+
+For everything else, see `/api-docs` on your install.
+
+## Example bot
+
+The repository has a working Discord bot that you can copy: [examples/discord-bot](https://github.com/sivert-io/matchzy-auto-tournament/tree/main/examples/discord-bot).

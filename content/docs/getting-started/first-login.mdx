@@ -1,0 +1,53 @@
+---
+title: First login
+description: Become admin and check the basic settings.
+icon: LogIn
+---
+
+## Sign in as the first admin
+
+1. Open Auto Tournament in the browser.
+2. Click **Sign in with Steam**.
+3. On a new install, the first Steam user who signs in becomes admin.
+
+This only works while the database has no players. When more than one player exists, nobody becomes admin this way.
+
+## If you are not admin
+
+This happens when someone else signed in first, or when you upgraded from an old version that has players but no admin. Add your Steam64 ID to `.env`:
+
+```bash title=".env"
+ADMIN_STEAM_IDS=76561198000000001
+```
+
+Recreate the app container so it reads the new value:
+
+```bash
+docker compose up -d --force-recreate matchzy-tournament
+```
+
+Sign in again. Auto Tournament applies `ADMIN_STEAM_IDS` on every start, so you can also use it if you lose admin access later. Separate several IDs with commas. The list only adds admins. Removing an ID from the list does not remove admin from that player.
+
+<Callout>
+  Your Steam64 ID is the 17-digit number that starts with `7656`. You find it in the URL of your Steam profile if you have no custom URL, or on sites like steamid.io.
+</Callout>
+
+## Check the webhook URL
+
+Game servers send match events and demos to the **webhook URL**. On the first start it is set from `FRONTEND_BASE_URL`.
+
+1. Open **Settings**.
+2. Open the **Integrations & Webhooks** tab.
+3. Check that **Webhook URL** is an address your game servers can reach. It must not be `localhost` if the game servers run on another machine.
+
+## Sync the map list
+
+On the same tab, click **Sync CS2 Maps**. This downloads the list of CS2 maps. It only adds new maps and keeps the ones you have.
+
+## Other sign-in methods
+
+Admins can also sign in with Discord, GitHub or Keycloak. You turn these on with environment variables, see [Configuration](/reference/configuration#sign-in-providers). Admin rights always belong to a Steam ID, so use **Link Steam** in the menu to connect your Steam account to the other login.
+
+## Next
+
+[Connect your first CS2 server](/getting-started/connect-server).

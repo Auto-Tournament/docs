@@ -1,0 +1,178 @@
+---
+title: Troubleshooting
+description: Fixes for the most common problems.
+icon: Wrench
+---
+
+## Where to look first
+
+App log:
+
+```bash
+docker compose logs -f matchzy-tournament
+```
+
+In the app, **Admin Tools** has a **Server Events Monitor** that shows events from each server as they arrive, and the **Application Logs**.
+
+Server log, with CS2 Server Manager:
+
+```bash
+sudo csm logs 1 200
+```
+
+## Login
+
+### Login does not work, or you are logged out after each page load
+
+- `FRONTEND_BASE_URL` must be exactly the address in your browser, including `http://` or `https://` and the port.
+- With an `https://` address, cookies are only sent over HTTPS. Behind a reverse proxy, the proxy must send `X-Forwarded-Proto`. See [Reverse proxy](/guides/reverse-proxy).
+- `STEAM_API_KEY` must be set for Steam login.
+
+### You are not admin
+
+Set `ADMIN_STEAM_IDS` to your Steam64 ID and recreate the container. See [First login](/getting-started/first-login#if-you-are-not-admin).
+
+### Everyone is logged out after a restart
+
+Set `SESSION_SECRET` in `.env`.
+
+## Server warnings
+
+The **Servers** page shows a status for each server. Hover over a warning to see the details.
+
+### Offline or RCON failed
+
+Auto Tournament cannot reach the server over RCON.
+
+- Check that the server is running (`sudo csm status` with CS2 Server Manager).
+- Check the host, port and RCON password on the **Servers** page.
+- Check that the firewall allows TCP on the game port from the Auto Tournament machine.
+- If Auto Tournament runs in Docker on the same machine as the server, use the LAN IP, not `localhost`.
+
+### Server can't reach MAT (webhook), or no events
+
+RCON works, but the server cannot send events back.
+
+1. On the CS2 machine, run `curl <webhook-url>/api/events/test`. It must answer `"success":true`.
+2. If it fails, fix the **Webhook URL** in **Settings** > **Integrations & Webhooks**, DNS or the firewall.
+3. Check that MatchZy is loaded: run `css_plugins list` in the server console.
+4. Click **Retry** on the server.
+
+### IP banned
+
+The server blocked Auto Tournament after too many wrong RCON passwords.
+
+1. Fix the RCON password on the **Servers** page first. Otherwise the ban comes back.
+2. Remove the ban on the game server. With CS2 Server Manager:
+
+```bash
+csm list-bans 1
+sudo csm unban-all 1
+```
+
+Use `0` instead of the server number for all servers. To remove one IP: `sudo csm unban 1 <ip>`.
+
+### CS2 update required
+
+Valve released a CS2 update and the server is behind. Auto Tournament does not load new matches on outdated servers.
+
+```bash
+sudo csm update-game
+sudo csm restart
+```
+
+Without CS2 Server Manager, update the server with SteamCMD and restart it. Then click **Refresh Status**. Install the update monitor so this happens on its own, see [CS2 Server Manager](/modules/cs2/server-manager#automatic-updates).
+
+### Plugin DB down
+
+MatchZy Enhanced cannot reach **its own** database on the game server. This is not the Auto Tournament database.
+
+- With CS2 Server Manager and its MySQL container: run `sudo csm`, open **Tools** and choose **MatchZy DB: verify/repair**.
+- With your own MySQL: check `game/csgo/cfg/MatchZy/database.json` (with CS2 Server Manager: `/home/cs2servermanager/overrides/game/csgo/cfg/MatchZy/database.json`), that the database host is reachable, and the user and password.
+
+Restart the server and click **Refresh Status**.
+
+### Version mismatch
+
+The servers run different versions of MatchZy Enhanced. Update all of them to the same version:
+
+```bash
+sudo csm update-plugins
+```
+
+### The same server shows up several times
+
+Several servers share one MySQL database with an old MatchZy Enhanced, or without a scope name. See [Several servers and one database](/modules/cs2/matchzy-enhanced#several-servers-and-one-database).
+
+## Tournaments and matches
+
+### Elimination does not accept my team count
+
+Single and double elimination need 2, 4, 8, 16, 32, 64 or 128 teams. Use round robin (2 to 32) or Swiss (4 to 64) for other counts.
+
+### The veto does not start, or the map pool is rejected
+
+Map veto needs a pool of exactly 7 maps. Use **Active Duty** or make a pool with 7 maps on **Maps & Map Pools**. Players must open their own team page and be signed in with Steam to see the veto buttons.
+
+### Maps are missing
+
+Open **Settings** > **Integrations & Webhooks** and click **Sync CS2 Maps**. If GitHub rate-limits you, set `GITHUB_TOKEN` in `.env`.
+
+### A match is stuck after a restart
+
+Open **Admin Tools** and click **Run Match Recovery Now**. See [Running matches](/guides/running-matches#after-a-restart).
+
+### A match shows NEEDS ADMIN DECISION
+
+The series ended level. Open the match and choose the winner. See [Running matches](/guides/running-matches#a-match-needs-a-decision).
+
+### The next match starts slowly on a server
+
+After a series ends, the plugin keeps players on the server for a short time, and 60 seconds more when a demo is uploaded. The next match loads after that. See [Simulation mode](/guides/simulation-mode#speed) for the settings.
+
+### Demo uploads fail
+
+- Check that GOTV is on (`tv_enable 1`) on the server.
+- Behind nginx, set `client_max_body_size 0`. See [Reverse proxy](/guides/reverse-proxy).
+
+## CS2 Server Manager
+
+### A server does not start
+
+Run it in the foreground to see the error:
+
+```bash
+sudo csm debug 1
+```
+
+Try the other launcher:
+
+```bash
+sudo csm start --alternate
+```
+
+Run `sudo csm doctor` to find common problems.
+
+### `steamclient.so` is missing
+
+The server fails with a Steamworks or `steamclient.so` error. Link the file and restart:
+
+```bash
+sudo -u cs2servermanager mkdir -p /home/cs2servermanager/.steam/sdk64
+sudo -u cs2servermanager ln -sf /home/cs2servermanager/.local/share/Steam/steamcmd/linux64/steamclient.so /home/cs2servermanager/.steam/sdk64/steamclient.so
+sudo csm restart
+```
+
+Change `cs2servermanager` if you chose another user in the installer.
+
+### Game files are broken
+
+Rebuild one server from the main install:
+
+```bash
+sudo csm reinstall 2
+```
+
+### `Plugin uses old SourceHook Metamod build`
+
+Metamod is too new for the current CounterStrikeSharp. Run `sudo csm update-plugins`, which installs the Metamod version that works.

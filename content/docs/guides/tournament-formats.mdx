@@ -1,0 +1,79 @@
+---
+title: Tournament formats
+description: What each format does, team limits, and how ties are decided.
+icon: Network
+---
+
+Auto Tournament has five tournament types. The first four use fixed teams. Shuffle uses single players and makes new teams every round.
+
+| Type | Teams | Rounds |
+| --- | --- | --- |
+| Single elimination | 2, 4, 8, 16, 32, 64 or 128 | One loss and the team is out |
+| Double elimination | 2, 4, 8, 16, 32, 64 or 128 | Two losses and the team is out |
+| Round robin | 2 to 32 | Every team plays every other team |
+| Swiss | 4 to 64 | `ceil(log2(teams))` rounds, for example 3 rounds for 8 teams |
+| Shuffle | At least 2 × team size players | One round per map you pick |
+
+For the four team formats you also pick the match format: best of 1, best of 3 or best of 5. All of them use [map veto](/guides/running-matches#map-veto). Shuffle always plays one map per match and has no veto.
+
+## Single elimination
+
+A normal knockout bracket. The winner of each match goes to the next round. The loser is out. The team count must be a power of two. If you have 6 teams, add 2 teams or use round robin or Swiss.
+
+## Double elimination
+
+Teams start in the upper bracket. After the first loss a team moves to the lower bracket. After the second loss it is out. The team count must be a power of two.
+
+Match names show where a match is: **UB R1 M1** is upper bracket, round 1, match 1. **LB R2 M1** is in the lower bracket.
+
+**Grand Final Mode** decides the end:
+
+- **Simple** (default): one grand final between the upper bracket winner and the lower bracket winner.
+- **None**: no grand final. The upper bracket final decides the champion.
+
+## Round robin
+
+Every team plays every other team once. Standings decide the winner. A series can end in a draw in round robin.
+
+## Swiss
+
+Every team plays in every round. Teams with the same record play each other.
+
+- Round 1 is made when you create the tournament. Each next round is paired when the round before it is finished. Until then its matches show **Waiting for pairing**.
+- Inside a group with the same record, the top team plays the bottom team.
+- Teams do not play the same opponent twice, unless there is no other way to pair the round.
+- With an odd number of teams, one team gets a **BYE** each round. A bye counts as a win. No team gets a second bye before every team has had one.
+- Standings are sorted by wins, then fewest losses, then Buchholz (the total wins of your opponents), then round difference.
+- When the last round is done, the team at the top of the standings wins.
+
+## Shuffle
+
+Shuffle is for events without fixed teams, such as a LAN or a community night. Players compete alone. Before each round, Auto Tournament makes new teams that are as even as possible, based on each player's rating.
+
+- Pick the maps. Each map is one round.
+- Pick the team size, from 2 to 10 players per team.
+- Register the players. You need at least 2 × team size, for example 10 players for 5v5.
+- If the player count does not split evenly, some players sit out a round. Players who sat out are picked first next round.
+- The leaderboard sorts players by match wins, then rating, then average damage per round (ADR).
+
+## Match rules
+
+These rules apply to every format.
+
+### Max rounds
+
+**Max Rounds per Map** is 1 to 30, default 24. A team wins the map when it has more than half. With 24 the first team to 13 wins. With 4 the first team to 3 wins.
+
+### Overtime
+
+When a map is tied at max rounds:
+
+- **Enabled**: normal overtime until one team is ahead. You can limit the number of overtime periods.
+- **Disabled – draws allowed**: the map ends as a draw.
+- **Disabled – no draws (damage tiebreak)**: no overtime, but the map always has a winner. The plugin compares total damage, then kills, then headshot kills, then utility damage. If all are equal, it uses a fixed coin flip based on the match and map number. This needs MatchZy Enhanced 1.4.30 or newer.
+
+### When a series ends level
+
+A series can be level after all maps, for example when draws are allowed. Auto Tournament then compares maps won, then total rounds won, then damage.
+
+In single and double elimination, if the series is still level, the match gets the status **Needs admin decision**. An admin opens the match and picks the winner. The bracket then continues as normal. In round robin and Swiss the series ends as a draw.

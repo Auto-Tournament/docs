@@ -1,0 +1,85 @@
+---
+title: Running matches
+description: Map veto, live matches, results, and admin actions.
+icon: Swords
+---
+
+## How a match runs
+
+1. **Veto.** Both teams do the map veto on their team pages.
+2. **Server.** Auto Tournament picks a free server and loads the match. If no server is free, the match waits.
+3. **Warmup.** Players join with the `connect` command from the team page or the match page. Each player is put on the right team. Players type `.ready` in chat.
+4. **Live.** The match starts when all players are ready. The **Matches** page shows the score, the round and the phase (live, halftime, overtime, paused).
+5. **Result.** When the series ends, Auto Tournament saves the result and moves the bracket forward. If demo recording is on, the server uploads the demo. You can download it from the match.
+6. **Next match.** The server resets and is free for the next match. There is a short wait after a series ends before the server resets, so players can see the result.
+
+## Map veto
+
+Veto is used for every best of 1, 3 and 5 match. The map pool must have exactly 7 maps. Team A is the first team in the match.
+
+**Best of 1**
+
+1. Team A bans 2 maps.
+2. Team B bans 3 maps.
+3. Team A bans 1 map.
+4. Team B picks the starting side on the last map.
+
+**Best of 3**
+
+1. Team A bans 1 map. Team B bans 1 map.
+2. Team A picks map 1. Team B picks the side on map 1.
+3. Team B picks map 2. Team A picks the side on map 2.
+4. Team B bans 1 map. Team A bans 1 map.
+5. Team B picks the side on map 3, the last map.
+
+**Best of 5**
+
+1. Team A bans 1 map. Team B bans 1 map.
+2. Team A picks map 1. Team B picks the side.
+3. Team B picks map 2. Team A picks the side.
+4. Team A picks map 3. Team B picks the side.
+5. Team B picks map 4. Team A picks the side.
+6. The last map is map 5.
+
+If a team cannot finish the veto, check that both teams use the right team page link and are signed in with Steam. As a last option, an admin can use **Skip veto**.
+
+## Admin controls
+
+Open a match on the **Matches** page to see **Admin controls**:
+
+| Action | What it does |
+| --- | --- |
+| Pause match / Unpause match | Admin pause. Players cannot unpause it. |
+| Swap teams | Switch the sides of the teams (CT and T). |
+| Restart round | Restart the current round. The economy is reset. |
+| Restore backup | Go back to the start of a round you choose. |
+| Add round time | Add seconds to the current round. |
+| Broadcast message | Send a chat message to all players on the server. |
+| Skip veto | Skip the veto and load the first map. |
+| End warmup | Start the match without waiting for `.ready`. |
+| End match | End the match now and save the current score. |
+| Restart match | Load the match again from the start. All progress is lost. |
+| Reallocate server | Move a match that is not live yet to another server. |
+| Force cancel match | Cancel the match even if the server is offline, and free the server. |
+
+The **Admin Tools** page has the same kind of actions for one or more servers at once, a server event monitor, and the app logs.
+
+## A match needs a decision
+
+In single and double elimination, a series can end level on maps, rounds and damage. The match then shows **NEEDS ADMIN DECISION**. Open the match and choose the winner. The bracket then continues as normal.
+
+The same action works for a match that is stuck live or loaded.
+
+## After a restart
+
+If the app or a server restarted during a match, the match state can be out of date.
+
+1. Fix any warnings on the **Servers** page first.
+2. Open **Admin Tools** and click **Run Match Recovery Now**.
+3. Open the match again and check the state.
+
+If players cannot join a match that is not live yet, use **Reallocate server** to move it to another server.
+
+## Matches outside a tournament
+
+For a scrim or a show match, open **Matches** and click **Create Manual Match**. Choose the teams, the maps and the rules. Choose a server, or leave it empty so Auto Tournament picks a free one. Manual matches do not change the bracket.

@@ -1,0 +1,33 @@
+---
+title: What are modules
+description: Game modules and format modules, what is built in today, and what 3.0 changes.
+icon: Blocks
+---
+
+Auto Tournament splits its work into two kinds of **modules**:
+
+- A **game module** knows one game. It knows how to talk to the game servers, load a match, read events and results, and which maps exist. CS2 is a game module.
+- A **format module** knows one kind of tournament. It knows how to build the bracket or the pairings, which match comes next, and who wins. Swiss is a format module.
+
+The core of Auto Tournament does the rest: teams, players, the web app, the API, sign-in, server allocation and live updates. Any game module works with any format module.
+
+## Today
+
+Today there is one game module, **CS2**, and five formats: single elimination, double elimination, round robin, Swiss and shuffle. All of them are built into the app. You cannot add or remove modules yet, and you do not need to install anything to use them.
+
+The CS2 module needs two things on the game side:
+
+- [MatchZy Enhanced](/modules/cs2/matchzy-enhanced), a plugin on each CS2 server. It is required.
+- [CS2 Server Manager](/modules/cs2/server-manager), a tool that installs and runs CS2 servers. It is optional, but it is the easiest way to get servers.
+
+## Planned for 3.0
+
+<Callout type="warn" title="Planned, not released">
+  This section describes plans for version 3.0. Details can change before release. Nothing here works in the current version.
+</Callout>
+
+- **Game-neutral core.** The core no longer contains CS2 code. CS2 becomes a normal game module, and more games can be added as modules.
+- **Formats as modules.** The five current formats become format modules. New formats can be added the same way.
+- **New name everywhere.** The Docker image, repository and log lines move from "MatchZy Auto Tournament" to "Auto Tournament".
+
+Until 3.0, follow the [CS2 module](/modules/cs2) pages to set up your servers.

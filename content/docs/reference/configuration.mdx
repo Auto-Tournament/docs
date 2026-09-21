@@ -1,0 +1,101 @@
+---
+title: Configuration
+description: All environment variables for Auto Tournament.
+icon: Settings
+---
+
+You configure Auto Tournament with environment variables in the `.env` file next to `docker-compose.yml`. After a change, recreate the app container:
+
+```bash
+docker compose up -d --force-recreate matchzy-tournament
+```
+
+Most other settings, such as match rules, the webhook URL and the hostname format, are in the app under **Settings**.
+
+<Callout>
+  The variable names still use `MATCHZY_` in some places. They keep these names until 3.0.
+</Callout>
+
+## Required
+
+| Variable | What it does |
+| --- | --- |
+| `SESSION_SECRET` | Secret for login sessions. Without it, everyone is logged out on each restart. Create one with `openssl rand -base64 32`. |
+| `SERVER_TOKEN` | Shared secret between Auto Tournament and your CS2 servers. Servers send it with events and demo uploads. Create one with `openssl rand -base64 24 \| tr -d '=+/'`. |
+| `FRONTEND_BASE_URL` | The address people open in the browser, for example `https://tournament.example.com`. Used for login redirects and cookies. With `https://` cookies are only sent over HTTPS. The webhook URL starts with this value. |
+| `STEAM_API_KEY` | Steam Web API key. Needed for Steam login and to look up Steam profile URLs. Get one at [steamcommunity.com/dev/apikey](https://steamcommunity.com/dev/apikey). |
+
+## Docker and database
+
+| Variable | Default | What it does |
+| --- | --- | --- |
+| `HOST_PORT` | `3069` | The port on your machine. Only used by `docker-compose.yml`. |
+| `DB_USER` | `postgres` | Database user. |
+| `DB_PASSWORD` | `postgres` | Database password. |
+| `DB_NAME` | `matchzy_tournament` | Database name. |
+| `DATABASE_URL` | Built from `DB_*` | Full PostgreSQL address. `docker-compose.yml` sets it for you. |
+| `DB_HOST`, `DB_PORT` | `postgres` in Docker, port `5432` | Only used when `DATABASE_URL` is not set. |
+| `PORT` | `3000` | Internal API port. `docker-compose.yml` sets it. Do not change it. |
+| `NODE_ENV` | `production` in Docker | `docker-compose.yml` sets it. |
+
+Set `DB_USER`, `DB_PASSWORD` and `DB_NAME` before the first start. The database is created with these values, and changing them later does not change the existing database.
+
+## Admins and sign-in
+
+| Variable | Default | What it does |
+| --- | --- | --- |
+| `ADMIN_STEAM_IDS` | empty | Steam64 IDs that are always admin, separated by commas. Applied on every start. It only adds admins. |
+| `AUTH_STEAM_ENABLED` | `true` | Steam login. It also needs `STEAM_API_KEY`. |
+| `BACKEND_BASE_URL` | `FRONTEND_BASE_URL` | Base address for login callbacks, if the API has another public address than the web app. |
+
+### Sign-in providers
+
+Discord, GitHub and Keycloak are for admins who do not want to use Steam. Admin rights always belong to a Steam ID, so the admin must also link a Steam account.
+
+| Variable | What it does |
+| --- | --- |
+| `AUTH_DISCORD_ENABLED` | `true` to turn on Discord login. |
+| `DISCORD_CLIENT_ID`, `DISCORD_CLIENT_SECRET` | From your Discord application. Redirect URL: `FRONTEND_BASE_URL` + `/api/auth/discord/callback`. |
+| `AUTH_GITHUB_ENABLED` | `true` to turn on GitHub login. |
+| `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET` | From your GitHub OAuth app. Callback URL: `FRONTEND_BASE_URL` + `/api/auth/github/callback`. |
+| `AUTH_KEYCLOAK_ENABLED` | `true` to turn on Keycloak (OpenID Connect) login. |
+| `KEYCLOAK_ISSUER_URL` | The realm address, for example `https://sso.example.com/realms/tournament`. |
+| `KEYCLOAK_CLIENT_ID`, `KEYCLOAK_CLIENT_SECRET` | From your Keycloak client. Redirect URI: `FRONTEND_BASE_URL` + `/api/auth/keycloak/callback`. |
+| `KEYCLOAK_CALLBACK_PATH` | Change the callback path. Default `/api/auth/keycloak/callback`. |
+| `KEYCLOAK_IDP_HINT` | Send users straight to one identity provider in Keycloak. Use the provider alias. |
+| `AUTH_KEYCLOAK_LABEL` | Name of the provider on the login page. Default `Keycloak`. |
+| `AUTH_KEYCLOAK_BUTTON_LABEL`, `AUTH_KEYCLOAK_BUTTON_BG_COLOR`, `AUTH_KEYCLOAK_BUTTON_TEXT_COLOR`, `AUTH_KEYCLOAK_BUTTON_HOVER_BG_COLOR` | Text and colors of the Keycloak login button. |
+
+## API tokens
+
+| Variable | What it does |
+| --- | --- |
+| `API_TOKENS` | Tokens with full admin rights, for bots and scripts. |
+| `API_TOKENS_READONLY` | Tokens that can only read (`GET`, `HEAD`, `OPTIONS`). |
+
+See [API](/reference/api) for the format.
+
+## Game servers
+
+| Variable | Default | What it does |
+| --- | --- | --- |
+| `API_BASE_URL` | `FRONTEND_BASE_URL` | Starting value for the webhook URL, if the game servers must use another address than the browser. After the first start, change it in **Settings** instead. Also used as the server address in `/api-docs`. |
+| `ALLOW_UNAUTHENTICATED_EVENTS` | `false` | Accept game events without a token. Only for servers set up by hand or by a very old version. While it is on, anyone who can reach the API can send fake results. Turn it off again after you click **Retry** on your servers. |
+| `MATCHZY_ENABLE_SIMULATION_IN_PROD` | `false` | Allow [simulation mode](/guides/simulation-mode). Only for test installs. |
+| `GITHUB_TOKEN` | empty | GitHub token for **Sync CS2 Maps**. Only needed if you hit the GitHub rate limit. |
+
+## Logging
+
+| Variable | Default | What it does |
+| --- | --- | --- |
+| `LOG_LEVEL` | `info` | `trace`, `debug`, `info`, `warn`, `error` or `fatal`. `debug` also turns on database logs. |
+| `LOG_HTTP_REQUESTS` | `true` | Log every HTTP request. With `false`, only errors are logged. |
+| `LOG_DB_VERBOSE` | off | Log every database query. On with `LOG_LEVEL=debug`. |
+| `LOG_DB_VALUES` | off | Also log database results (with secrets hidden). On with `LOG_LEVEL=debug`. Set `false` to keep it off. |
+| `LOG_RCON_VERBOSE` | `false` | Also log RCON commands that work. |
+
+## Other
+
+| Variable | Default | What it does |
+| --- | --- | --- |
+| `CORS_ORIGIN` | `*` | Allowed origins for live updates (WebSocket). |

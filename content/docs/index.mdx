@@ -1,0 +1,44 @@
+---
+title: Auto Tournament
+description: A self-hosted web app for running game tournaments on your own servers.
+icon: House
+---
+
+Auto Tournament runs tournaments on game servers that you own. You create the teams and the bracket. Auto Tournament picks a free server, loads each match, runs the map veto in the browser, and moves the bracket forward when a match ends.
+
+Today it supports Counter-Strike 2 (CS2). The project was called **MatchZy Auto Tournament** (MAT) before. You will still see the old name in the Docker image, the GitHub repository and some log lines. Those keep the old name until version 3.0.
+
+## Who it is for
+
+- LAN organisers who run CS2 events on their own servers.
+- Small leagues and communities that want brackets, veto and results in one place.
+- Groups of friends who want a quick 5v5 or 2v2 with balanced teams.
+
+You host everything yourself. Auto Tournament is one Docker image plus a PostgreSQL database.
+
+## What it does
+
+- Single elimination, double elimination, round robin, Swiss and shuffle tournaments.
+- Map veto for best of 1, 3 and 5, done on a web page for each team.
+- Finds a free server, loads the match, and frees the server when the match ends.
+- Live scores and server status in the browser.
+- Player ratings and leaderboards.
+- Demo recording, uploaded to Auto Tournament for download.
+- An HTTP API with API tokens, for bots and scripts.
+- A simulation mode for testing a tournament with bots.
+
+## Start here
+
+<Cards>
+  <Card title="Install" href="/getting-started/install" description="Run Auto Tournament with Docker Compose." />
+  <Card title="Connect a CS2 server" href="/getting-started/connect-server" description="Add your first game server." />
+  <Card title="Run a first tournament" href="/getting-started/first-tournament" description="Create teams, a bracket and start it." />
+  <Card title="Tournament formats" href="/guides/tournament-formats" description="How each format works and its limits." />
+  <Card title="Modules" href="/modules" description="Game modules and format modules, now and in 3.0." />
+  <Card title="Troubleshooting" href="/reference/troubleshooting" description="Fixes for the most common problems." />
+</Cards>
+
+## Get help
+
+- Ask in the [Discord server](https://discord.gg/n7gHYau7aW).
+- Report bugs on [GitHub](https://github.com/sivert-io/matchzy-auto-tournament/issues).

@@ -1,0 +1,84 @@
+---
+title: Run a first tournament
+description: Create teams, generate a bracket and start the tournament.
+icon: Trophy
+---
+
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+
+Before you start, you need at least one server that shows as online on the **Servers** page. See [Connect a CS2 server](/getting-started/connect-server).
+
+<Callout type="warn">
+  Auto Tournament has one tournament at a time. When you create a new tournament, the old one and its matches are deleted. Player rating history is kept.
+</Callout>
+
+<Steps>
+
+<Step>
+
+### Create teams
+
+1. Open **Teams**.
+2. Click **Create Team**, or **Import JSON** to add many teams at once.
+3. Give each team a name, a tag and its players (Steam ID and name).
+
+You need at least 2 teams. Single and double elimination need 2, 4, 8, 16, 32, 64 or 128 teams. See [Teams and players](/guides/teams-and-players) for the import format.
+
+</Step>
+
+<Step>
+
+### Create the tournament
+
+1. Open **Tournament** and click **Create Tournament**.
+2. Enter a name.
+3. Choose the tournament type, for example **Single Elimination**. See [Tournament formats](/guides/tournament-formats).
+4. Choose the match format: **Best of 1**, **Best of 3** or **Best of 5**.
+5. Set **Max Rounds per Map** and **Overtime**. The defaults (24 rounds, overtime on) match normal competitive CS2.
+
+</Step>
+
+<Step>
+
+### Choose teams and maps
+
+1. Select the teams.
+2. Choose a map pool. Map veto needs a pool of exactly 7 maps. The **Active Duty** pool works if you are not sure.
+3. Click **Save & Generate Brackets**.
+
+Check the result on the **Bracket** page. You can change settings and generate again until you start.
+
+</Step>
+
+<Step>
+
+### Share the team pages
+
+Each team has a public page at `/team/<team-id>`, for example `https://tournament.example.com/team/navi`. Open **Public Links** in the menu to copy all links, and send each team its link.
+
+On the team page, players see their next match, do the map veto and get the `connect` command for the server. Veto buttons and server details are only shown to players on the team who are signed in with Steam.
+
+</Step>
+
+<Step>
+
+### Start
+
+Click **Start Tournament**. For each match that can be played:
+
+1. The two teams do the map veto on their team pages.
+2. Auto Tournament picks a free server and loads the match.
+3. Players join the server and type `.ready` in chat.
+4. The match goes live. You see the score on the **Matches** page.
+5. When the match ends, the winner moves on in the bracket and the server is free for the next match.
+
+If there are more matches than servers, the extra matches wait until a server is free.
+
+</Step>
+
+</Steps>
+
+## Next
+
+- [Running matches](/guides/running-matches): what to do when a match gets stuck.
+- [Simulation mode](/guides/simulation-mode): test a full tournament with bots.

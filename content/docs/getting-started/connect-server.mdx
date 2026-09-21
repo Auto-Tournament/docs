@@ -1,0 +1,55 @@
+---
+title: Connect a CS2 server
+description: Prepare a CS2 server and add it to Auto Tournament.
+icon: Server
+---
+
+Auto Tournament does not run the game. It controls CS2 dedicated servers that you run yourself. Each server needs the **MatchZy Enhanced** plugin, which reports match events back to Auto Tournament.
+
+## How the connection works
+
+The server and Auto Tournament talk in both directions:
+
+- **Auto Tournament to server**: RCON on the server's game port (TCP). Auto Tournament uses it to set up the plugin and load matches.
+- **Server to Auto Tournament**: HTTP to the webhook URL. The plugin sends match events, results and demos this way.
+
+Both directions must work. Most setup problems are a firewall or a wrong address in one of them.
+
+## 1. Get a server with MatchZy Enhanced
+
+Pick one:
+
+- **CS2 Server Manager (recommended).** A command-line tool that installs several CS2 servers on one Linux machine with the plugin already set up. See [CS2 Server Manager](/modules/cs2/server-manager).
+- **Manual install.** Install Metamod:Source, CounterStrikeSharp and MatchZy Enhanced on a server you already have. See [MatchZy Enhanced](/modules/cs2/matchzy-enhanced).
+
+Write down the host (IP or domain), the game port (default `27015`) and the RCON password of each server.
+
+## 2. Test that the server can reach Auto Tournament
+
+Run this on the machine where the CS2 server runs. Use your webhook URL (see [First login](/getting-started/first-login#check-the-webhook-url)):
+
+```bash
+curl http://192.168.1.50:3069/api/events/test
+```
+
+The answer must contain `"success":true`. If the command fails, fix the network or the webhook URL before you continue.
+
+## 3. Add the server
+
+1. Open **Servers** in the menu.
+2. Click **Add Server**.
+3. Fill in **Server Name**, **Host / IP Address**, **Port** and **RCON Password**.
+4. Click **Test connectivity** to check both directions.
+5. Save.
+
+Auto Tournament now sets up the plugin over RCON. After a short time the server shows as online. If it shows a warning, hover over it to see which direction fails, and check [Troubleshooting](/reference/troubleshooting#server-warnings).
+
+Repeat for each server, or use **Batch Add** for many servers at once. A tournament can run as many matches at the same time as you have free servers.
+
+## After you change something
+
+When you change a server config, update the plugin or update CS2, restart the server. Then click **Refresh Status** on the **Servers** page, and **Retry** on any server that is not set up so Auto Tournament sets it up again.
+
+## Next
+
+[Run a first tournament](/getting-started/first-tournament).

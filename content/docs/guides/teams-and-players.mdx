@@ -1,0 +1,86 @@
+---
+title: Teams and players
+description: Create teams, import rosters, and share team pages.
+icon: Users
+---
+
+## Create a team
+
+1. Open **Teams** and click **Create Team**.
+2. Enter the team name and a short tag, for example `NAVI`.
+3. Add players. For each player, enter a Steam ID and a name.
+4. Save.
+
+The team ID is made from the name. It is part of the public team page address.
+
+You can enter a player as a Steam64 ID or a Steam profile URL. Custom profile URLs (vanity URLs) need a Steam Web API key, set with `STEAM_API_KEY` in `.env` or under **Steam Integration** in **Settings**.
+
+## Import teams
+
+On the **Teams** page, click **Import JSON** and paste a list like this:
+
+```json
+[
+  {
+    "name": "Team Pinger",
+    "tag": "PING",
+    "players": [
+      { "steamId": "76561199486434142", "name": "Simpert", "elo": 1800 },
+      { "steamId": "76561198765432109", "name": "Player2", "discordId": "123456789012345678" }
+    ]
+  }
+]
+```
+
+- `elo` is the starting rating. It is optional. The default is 1500.
+- `discordId` is optional. Invalid Discord IDs are ignored, and the player is imported without one.
+
+## Import players
+
+Shuffle tournaments use players, not teams. On the **Players** page, click **Import JSON/CSV**.
+
+JSON:
+
+```json
+[
+  { "steamId": "76561199486434142", "name": "Simpert", "initialELO": 1800 },
+  { "steamId": "76561198765432109", "name": "Player2" }
+]
+```
+
+CSV, with a header line:
+
+```text
+steamId,name,initialELO
+76561199486434142,Simpert,1800
+76561198765432109,Player2,
+```
+
+`steamId` and `name` are required. `initialELO` and `avatarUrl` are optional.
+
+## Player registration
+
+By default, anyone who signs in with Steam gets a player record. To only allow players that an admin created or imported, turn off **Player registration** in **Settings**.
+
+## Team pages
+
+Every team has a public page at `/team/<team-id>`. Open **Public Links** in the menu to copy all of them. Send each team its link before the tournament.
+
+Anyone can open the page. It shows the team's matches, live scores and the bracket. These parts are only shown to players on the team who are signed in with Steam:
+
+- The map veto buttons.
+- The server address and `connect` command.
+
+## Ratings
+
+Every player has a rating that changes after each match. New players start at 1500 unless you set another value. Shuffle tournaments use the rating to make even teams. The **Leaderboard** page shows all players.
+
+## Replace a player during a match
+
+If a player cannot play, you can add a backup player to a running match:
+
+1. Open the match on the **Matches** page.
+2. Scroll to **Add Player** in the match details.
+3. Search for the player and choose the team.
+
+Auto Tournament adds the player to the match on the server.

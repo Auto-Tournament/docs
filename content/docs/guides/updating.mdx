@@ -1,0 +1,75 @@
+---
+title: Updating
+description: Back up the database, update the image, and roll back if needed.
+icon: RefreshCw
+---
+
+Run all commands in the folder with your `docker-compose.yml` and `.env`.
+
+## 1. Back up the database
+
+The update does not delete your data, but make a backup first:
+
+```bash
+mkdir -p backups
+docker compose exec -T postgres sh -c 'pg_dump -U "$POSTGRES_USER" "$POSTGRES_DB"' > "backups/autotournament-$(date +%F-%H%M%S).sql"
+```
+
+The command reads the database user and name from the container, so it also works if you changed `DB_USER` or `DB_NAME`.
+
+## 2. Pull the new image and restart
+
+```bash
+docker compose pull
+docker compose up -d
+```
+
+`up -d` replaces the app container with the new image and keeps the database volume. Database changes run on their own when the app starts.
+
+## 3. Check that it works
+
+```bash
+docker compose logs -f matchzy-tournament
+```
+
+Wait until the log shows that the server started, then press `Ctrl+C` and run:
+
+```bash
+curl -fsS http://localhost:3069/health
+```
+
+If the app does not start, the log usually shows the reason. The most common causes are a missing value in `.env` or a database that cannot be reached.
+
+## Use a fixed version
+
+`latest` always pulls the newest release. To choose when you update, and to make it easy to go back, use a version number in `docker-compose.yml`:
+
+```yaml title="docker-compose.yml"
+services:
+  matchzy-tournament:
+    image: sivertio/matchzy-auto-tournament:2.4.13
+```
+
+Versions are listed on the [releases page](https://github.com/sivert-io/matchzy-auto-tournament/releases). The image tag has no `v` in front.
+
+## Go back to an older version
+
+1. Set the older version in `image:` in `docker-compose.yml`.
+2. Run:
+
+```bash
+docker compose pull
+docker compose up -d
+```
+
+A newer version can change the database. If the older version does not start after that, restore the backup you made before the update into an empty database.
+
+## After you update
+
+- If you lost admin access, set `ADMIN_STEAM_IDS`. See [First login](/getting-started/first-login#if-you-are-not-admin).
+- Update MatchZy Enhanced on your servers too, so all servers run the same version. See [MatchZy Enhanced](/modules/cs2/matchzy-enhanced#update).
+- To free disk space from old images:
+
+```bash
+docker image prune -f
+```
