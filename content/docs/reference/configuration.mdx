@@ -23,7 +23,7 @@ Most other settings, such as match rules, the webhook URL and the hostname forma
 | Variable | What it does |
 | --- | --- |
 | `SESSION_SECRET` | Secret for login sessions. Without it, everyone is logged out on each restart. Create one with `openssl rand -base64 32`. |
-| `SERVER_TOKEN` | Shared secret between Auto Tournament and your CS2 servers. Servers send it with events and demo uploads. Create one with `openssl rand -base64 24 \| tr -d '=+/'`. |
+| `SERVER_TOKEN` | Shared secret between Auto Tournament and your CS2 servers. Servers send it with events, demo uploads and match config downloads. Create one with `openssl rand -base64 24 \| tr -d '=+/'`. |
 | `FRONTEND_BASE_URL` | The address people open in the browser, for example `https://tournament.example.com`. Used for login redirects and cookies. With `https://` cookies are only sent over HTTPS. The webhook URL starts with this value. |
 | `STEAM_API_KEY` | Steam Web API key. Needed for Steam login and to look up Steam profile URLs. Get one at [steamcommunity.com/dev/apikey](https://steamcommunity.com/dev/apikey). |
 
