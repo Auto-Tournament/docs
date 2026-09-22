@@ -1,0 +1,77 @@
+---
+title: Game search (IGDB)
+description: Let players search for the games they play, with covers and names from IGDB.
+icon: Gamepad2
+---
+
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+
+When players pick the games they play, Auto Tournament can search a game catalogue and show covers and names pulled from [IGDB](https://www.igdb.com/). Without any keys, search still works using a built-in list of installed game modules and popular esports titles — IGDB just adds a much wider catalogue with cover art.
+
+## Is it free?
+
+Yes, for non-commercial use, under the Twitch Developer Service Agreement. See [IGDB's account creation page](https://api-docs.igdb.com/#account-creation) for details. If you're using IGDB commercially, IGDB offers a separate partnership — see the same page.
+
+<Steps>
+
+<Step>
+
+### Create a Twitch account with 2FA
+
+IGDB authenticates through Twitch. You need a Twitch account with Two-Factor Authentication enabled.
+
+</Step>
+
+<Step>
+
+### Register an application
+
+1. Go to the [Twitch Developer Console](https://dev.twitch.tv/console/apps) and register a new application.
+2. For **OAuth Redirect URLs**, enter `http://localhost`. IGDB doesn't use this value, but Twitch requires one.
+3. Set **Client Type** to **Confidential**.
+
+</Step>
+
+<Step>
+
+### Copy the Client ID and Client Secret
+
+1. On the application's page, click **Manage**.
+2. Copy the **Client ID**.
+3. Click **New Secret** and copy the **Client Secret**. Twitch shows it only once.
+
+</Step>
+
+<Step>
+
+### Add the keys in Settings
+
+1. Open **Settings** in Auto Tournament.
+2. Find the **IGDB** card.
+3. Paste the Client ID and Client Secret, then click **Save**.
+4. Click **Test connection** to confirm the keys work.
+
+</Step>
+
+</Steps>
+
+## Using environment variables instead
+
+If you'd rather set the keys through your deployment's environment, use:
+
+```bash title=".env"
+IGDB_CLIENT_ID=your-igdb-client-id
+IGDB_CLIENT_SECRET=your-igdb-client-secret
+```
+
+Environment variables take priority over the values saved in Settings.
+
+## Troubleshooting
+
+**Test connection fails:**
+
+- Generate a new Client Secret in the Twitch Developer Console and save it again.
+- Check that the application's **Client Type** is set to **Confidential**.
+- Check that the server running Auto Tournament can reach `id.twitch.tv` and `api.igdb.com`.
+
+IGDB's rate limit is 4 requests per second. Auto Tournament caches searches, so normal use stays far below that.
