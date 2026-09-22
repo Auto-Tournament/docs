@@ -32,7 +32,10 @@ Run `sudo csm` with no command to open the menu. Run `csm help` for a short list
 | `csm update-game` | Update CS2 on all servers after a Valve update. Stops and starts the servers. |
 | `csm update-server <server>` | Update CS2 on one server. |
 | `csm update-plugins` | Download Metamod, CounterStrikeSharp and the CS2 plugin, copy them and your overrides to all servers, and restart them. |
-| `csm monitor` | Run the update monitor once. |
+| `csm monitor` | Run the update monitor once. It updates stopped servers and idle running servers. |
+| `csm updates hold on\|off` | Stop or allow automatic updates by the monitor, for example during an event. Saved across reboots. |
+| `csm updates status` | Show whether updates are on hold and the idle grace period. |
+| `csm updates grace <minutes>` | How long a server must be idle before the monitor updates it. The default is 10. |
 | `csm install-monitor-cron [interval]` | Run the update monitor from root's cron. The default interval is `*/5` (every 5 minutes). |
 | `csm remove-monitor-cron` | Remove the update monitor cron job. |
 
