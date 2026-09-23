@@ -106,11 +106,11 @@ Check that the file in `backups/` is not empty.
 Then rescue the demos and event logs your current container is holding, which are in the wrong folder and will go away with the container:
 
 ```bash
-docker compose cp matchzy-tournament:/data/demos ./data/demos
-docker compose cp matchzy-tournament:/data/logs ./data/logs
+mkdir -p data
+docker compose cp matchzy-tournament:/data/. ./data/
 ```
 
-Either command failing with "no such file or directory" just means there is nothing of that kind to rescue. `./data` is the folder 3.0 reads them from, so files you copy there are picked up after the update.
+The trailing `/.` matters: it copies what is *inside* the old folder, so you end up with `data/demos` and `data/logs` rather than `data/data`. "No such file or directory" means there is nothing to rescue, which is fine. `./data` is where 3.0 reads them from, so whatever lands there is picked up after the update.
 
 If you have uploaded map images you care about, save copies now as well — they live inside the container and are not on a volume.
 
