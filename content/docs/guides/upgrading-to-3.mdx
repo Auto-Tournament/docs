@@ -29,7 +29,7 @@ Nothing in your `docker-compose.yml` has to change except the image name, and ev
 
 - The Compose service is still `matchzy-tournament`, and the containers are still `matchzy-tournament-api` and `matchzy-postgres`.
 - The database is still `matchzy_tournament`, on the same volume.
-- Every environment variable in your `.env` keeps its name and its meaning. 3.0 needs no new ones.
+- Every environment variable in your `.env` keeps its name and its meaning, and 3.0 adds no required ones. The new things you can turn on, such as game search, are configured in the app's own settings.
 - The app still listens on port 3069.
 
 ### You do not have to change the image name
