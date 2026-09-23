@@ -58,11 +58,9 @@ In 2.4.x the app worked out the wrong folder for demos and event logs when runni
 
 ### Uploaded map images never appeared
 
-Uploaded map images were written one folder above the one `/map-images` is served from, so the image was accepted and then never showed up. 3.0 writes to the right folder and moves any left in the old one when it starts.
+Uploaded map images were written one folder above the one `/map-images` is served from, so the image was accepted and then never showed up. Worse, both folders were inside the container rather than on a volume, so whatever was there went away with the container anyway.
 
-<Callout title="Map images are still not on a volume" type="warn">
-  `/app/public` is inside the container, not on a mounted volume, so uploaded map images are lost when the container is replaced — before and after this fix. Keep your own copies and re-upload after an update.
-</Callout>
+3.0 stores them under `./data/map-images`, on the volume you already mount, and serves `/map-images` from there. Uploads show up, and they survive updates. Images your current container is still holding are in the container, so [copy them out before you update](#write-down-your-version-and-back-up) — the map records already point at them, so they start rendering once they land on the volume.
 
 ### Match configs are no longer public
 
@@ -112,7 +110,14 @@ docker compose cp matchzy-tournament:/data/. ./data/
 
 The trailing `/.` matters: it copies what is *inside* the old folder, so you end up with `data/demos` and `data/logs` rather than `data/data`. "No such file or directory" means there is nothing to rescue, which is fine. `./data` is where 3.0 reads them from, so whatever lands there is picked up after the update.
 
-If you have uploaded map images you care about, save copies now as well — they live inside the container and are not on a volume.
+Do the same for uploaded map images, which 2.4.x kept in a third folder inside the container:
+
+```bash
+mkdir -p data/map-images
+docker compose cp matchzy-tournament:/public/map-images/. ./data/map-images/
+```
+
+Again, "No such file or directory" just means you never uploaded any. `./data/map-images` is where 3.0 keeps them from now on, so anything you copy across is served straight away — including images 2.4.x accepted but never showed.
 
 </Step>
 
