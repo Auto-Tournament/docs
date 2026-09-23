@@ -1,0 +1,222 @@
+---
+title: Manual reporting
+description: Run a tournament for a game Auto Tournament cannot watch. Captains report the score, the opponent agrees, an admin settles the rest.
+icon: ClipboardCheck
+---
+
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+
+<Callout title="Not released yet" type="warn">
+  Manual reporting arrives in 3.0, which is in development. The current release is 2.4.x and runs Counter-Strike 2 only.
+</Callout>
+
+## What it is
+
+Counter-Strike 2 tells Auto Tournament what happened: the server reports every round and the final score. Rocket League, chess and a hall full of people on consoles do not. There is no server to allocate, no webhook and no live score.
+
+What those games do have is two teams who know the result. **Manual reporting** is that path. A captain types the score in, the other team's captain agrees, and the match finishes the same way a Counter-Strike 2 match does — the bracket moves on, ratings change, and Swiss pairs the next round.
+
+Manual reporting is a game module, like [CS2](/modules/cs2). You do not install it. It is there, and a tournament uses it as soon as you pick a game it runs.
+
+## Which games
+
+The setup wizard offers Counter-Strike 2 and fourteen titles that are reported manually:
+
+Rocket League, Valorant, League of Legends, Dota 2, Overwatch 2, Trackmania, chess, EA Sports FC, Super Smash Bros. Ultimate, Street Fighter 6, Tekken 8, osu!, Team Fortress 2 and Age of Empires II.
+
+Picking any of them changes the rest of the wizard: there are no servers to add, no map pool to choose and no veto to play.
+
+## Create the tournament
+
+<Steps>
+
+<Step>
+
+### Pick the game
+
+Open **Tournament**. The first step is **Game**. Pick the game you are running.
+
+The game is fixed once the tournament exists. To run a different one, delete the tournament and start again.
+
+</Step>
+
+<Step>
+
+### Name it
+
+Give the tournament a name, and pick how ratings change, as usual.
+
+</Step>
+
+<Step>
+
+### Choose the format and the reporting rules
+
+Pick the bracket and the number of teams. Below them is a **Manual reporting** box with the settings for this game:
+
+| Setting | What it does |
+| --- | --- |
+| Series length | How many games a series is. The first team to win more than half of them takes the match. |
+| Call the game | What to call the game in the report form. Leave it empty to use the catalogue name. |
+| Draws | Whether a game, and so a series, may end level. Leave it off for a bracket, where somebody has to go through. |
+| Before a result counts | **The opponent agrees**: the other captain has to confirm. **The report stands**: one captain's report settles the match on its own. |
+| Minutes to answer | How long the opponent has. 1440 is a day. 0 means no deadline. |
+| At the deadline | **Take the report**, or **Ask an admin**. |
+
+</Step>
+
+<Step>
+
+### Pick the teams
+
+Choose the teams as usual. There is no **Maps and veto** step for a manually reported game.
+
+</Step>
+
+<Step>
+
+### Create and start
+
+Check the review, click **Create Tournament**, then **Start Tournament**. Every first-round match goes live at once — there is no server to wait for.
+
+</Step>
+
+</Steps>
+
+## Captains
+
+Only a **captain** may report a result or answer one. A team with no captain cannot report, and the report panel does not appear for anybody on it.
+
+Upgrading from 2.x creates no captains, because 2.x had no such thing. Appoint one for every team before the first match.
+
+<Steps>
+
+<Step>
+
+### Open the team
+
+Open **Teams** and click the team.
+
+</Step>
+
+<Step>
+
+### Make somebody a captain
+
+The **Captains** card lists everybody on the roster. Click the toggle next to the player you want. Click it again to take the role away.
+
+</Step>
+
+</Steps>
+
+A captain must already be on the team's roster. Add the player to the team first.
+
+A team can have more than one captain. Any of them can report, and any of them can answer the opponent's report.
+
+## Report a result
+
+The captain opens their team page while the match is live. The match card carries a **Report the result** panel.
+
+<Steps>
+
+<Step>
+
+### Enter the score
+
+Click **Report the result** and enter each game's score. A best-of-1 has one row, a best-of-3 has three.
+
+</Step>
+
+<Step>
+
+### Fill in the extra fields
+
+If the tournament asks for [custom fields](#custom-fields), they are on the same form.
+
+</Step>
+
+<Step>
+
+### Send it
+
+Click **Report**. The panel then says it is waiting for the opponent.
+
+</Step>
+
+</Steps>
+
+Until the opponent answers, the reporting captain can click **Withdraw** and start again. Either captain can report first; a second report replaces the first and the opponent answers that one instead.
+
+## Confirm, or disagree
+
+The other team's captain sees the reported score on their own team page, with the values filed with it.
+
+| Button | What happens |
+| --- | --- |
+| Confirm | The result stands. The match completes and the bracket moves on. |
+| Dispute | The match goes to an admin, with the reason the captain gives. Nothing is decided until the admin decides it. |
+
+A team cannot confirm its own report.
+
+If the tournament is set to **The report stands**, there is nothing to confirm: the first report completes the match.
+
+## Deadlines
+
+With **Minutes to answer** set, a report has a deadline. The panel shows it. When it passes with no answer, Auto Tournament does what the tournament asked for:
+
+| At the deadline | What happens |
+| --- | --- |
+| Take the report | The result is taken as reported. The bracket moves on with nobody waiting. |
+| Ask an admin | The match is handed to an admin and appears on the **Disputes** page. |
+
+Set **Minutes to answer** to 0 for no deadline. The report then waits until somebody answers it.
+
+## Disputes
+
+The **Disputes** page is the admin's desk. It shows two kinds of match:
+
+- a report the opponent disagreed with, and
+- a report nobody answered before the deadline, on a tournament set to **Ask an admin**.
+
+The page is only in the menu when the tournament can have a dispute. A Counter-Strike 2 tournament never can, because its results come from the game.
+
+Open a row to see every version of the result — including withdrawn and replaced ones — the values filed with the one that stands, and the reason for the dispute. Then:
+
+| Control | What it does |
+| --- | --- |
+| Let the report stand | The reported result is applied as it is. |
+| Set the result myself | Enter your own score. It is stored as its own version, so the disagreement and your ruling are both on the record. |
+| Reopen the match | Put the match back to live so the captains can report again. |
+
+Reopening is refused when a later match has already started or a player has been rated since. Auto Tournament says which, so you know what to do next.
+
+## Custom fields
+
+A manually reported game produces no statistics of its own. If you want goals, laps or a rating recorded, ask for them: **custom stat fields** belong to the tournament, and a reporter fills them in with the score.
+
+Each field has:
+
+| Part | What it is |
+| --- | --- |
+| Key | The short, stable name (`goals`). It is what a value is stored against. |
+| Label | What a reporter reads ("Goals"). |
+| Type | A whole number, a number, or a short text. |
+| Asked of | Each player, or each side. |
+| Required | Whether a report is refused unless both teams have filled it in. |
+
+Renaming a **label** keeps everything already recorded. Changing a **key** does not: the old field, and every value filed against it, is deleted.
+
+Only the values from a **confirmed** report count as tournament statistics. A number one captain typed in that the other has not agreed to stays on the match, where the two of them and an admin can see it.
+
+Set the fields with `PUT /api/game/manual/tournaments/:tournamentId/fields` and an admin token. See the [API reference](/reference/api).
+
+## What the pages show
+
+Pages that show Counter-Strike 2 numbers leave them out for a manually reported tournament rather than showing empty columns:
+
+- The **leaderboard** drops the ADR column and the "top by ADR" card, and shows the tournament's custom fields instead, totalled per team and per player.
+- A **player's profile** drops kills, deaths, assists, headshot percentage, damage, the performance chart and the demo link. Rating, results and match history stay.
+- A **match** has no Maps section, and its series score reads "Games won" rather than "Maps won".
+- The **tournament overview** has no map veto and no overtime line.
+
+Nothing changes for a Counter-Strike 2 tournament.
