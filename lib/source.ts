@@ -11,7 +11,6 @@ const docs = defineDocs({
     postprocess: {
       includeProcessedMarkdown: true,
     },
-    lastModified: true,
   },
   meta: {
     schema: metaSchema,
