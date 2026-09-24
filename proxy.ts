@@ -12,7 +12,17 @@ const { rewrite: rewriteSuffix } = rewritePath(
 );
 
 export default function proxy(request: NextRequest) {
-  const result = rewriteSuffix(request.nextUrl.pathname);
+  const { pathname } = request.nextUrl;
+
+  // URLs already under the markdown content route (e.g. links pages emit
+  // themselves, like /llms.mdx/docs/guides/settings/content.md) also end in
+  // ".md", so rewriteSuffix would otherwise match them again and rewrite
+  // them a second time into a broken, doubled path. Leave those alone.
+  if (pathname.startsWith(docsContentRoute)) {
+    return NextResponse.next();
+  }
+
+  const result = rewriteSuffix(pathname);
   if (result) {
     return NextResponse.rewrite(new URL(result, request.nextUrl));
   }
