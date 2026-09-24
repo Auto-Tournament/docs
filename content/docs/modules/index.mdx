@@ -1,6 +1,6 @@
 ---
 title: What are modules
-description: What a game module is, which ones exist, and what 3.0 changes.
+description: Game modules, game packs, and how to add a game to your instance.
 icon: Blocks
 ---
 
@@ -13,15 +13,33 @@ The core of Auto Tournament does everything else: teams, players, brackets and p
 | Module | What it does | Games |
 | --- | --- | --- |
 | [CS2](/modules/cs2) | Talks to the game servers. Loads the match, reads every round, records the result and the demo. | Counter-Strike 2 |
-| [Manual reporting](/guides/manual-reporting) | No server to talk to. A captain reports the score, the opponent agrees, an admin settles a dispute. | 17 titles, and any game you find through search |
+| [Manual reporting](/guides/manual-reporting) | No server to talk to. A captain reports the score, the opponent agrees, an admin settles a dispute. | Every game you add as a pack, and any game you find through search |
 
 <Callout type="warn" title="Manual reporting arrives in 3.0">
   The current release is 2.4.x and runs Counter-Strike 2 only. Manual reporting is in 3.0, which is in beta.
 </Callout>
 
-## You do not install anything
+## Modules and game packs
 
-Both modules are built into the app. There is no module to download, no file to import, and nothing to enable.
+There are two different things here, and it helps to keep them apart:
+
+- A **module** is code. The two above are built into the app. There is nothing to download or enable.
+- A **game pack** is a file. It describes one game — its name, its tile, which stats a captain fills in — and runs on the manual reporting module. It contains no code, which is why you can add one from anywhere.
+
+A fresh install comes with a set of game packs already added: Rocket League, Valorant, League of Legends, Dota 2, Deadlock, Overwatch 2, Rainbow Six Siege, Battlefield 6, Call of Duty, Team Fortress 2, Trackmania, chess, Minecraft, EA Sports FC, Super Smash Bros. Ultimate, Street Fighter 6, Tekken 8, osu! and Age of Empires II. They are ordinary packs: you can remove any of them, and a game you removed stays removed.
+
+### Add a game
+
+Open **Modules** in the menu.
+
+- **Browse** lists the games in the community list, [Auto-Tournament/packs](https://github.com/Auto-Tournament/packs). Pick one and click **Add**. Nothing is fetched until you open Browse.
+- **Import a pack** takes a pack file you already have. Pick the `.json` file and its `.svg` tile together.
+
+The game then shows up in the setup wizard like any other.
+
+Want a game that is not in the list? A pack is a short JSON file and a square SVG. The [packs repository](https://github.com/Auto-Tournament/packs) explains the format; open a pull request there and every instance can add it.
+
+## Which module runs a tournament
 
 What decides which module runs is **the game you pick when you create the tournament**. Pick Counter-Strike 2 and the CS2 module runs it: you get the Servers page, map pools, the veto and live scores. Pick Rocket League and manual reporting runs it: no servers, no maps, and a report form on each team's match page instead.
 
@@ -45,11 +63,12 @@ Manual reporting needs nothing at all. See [Manual reporting](/guides/manual-rep
 - **The core no longer contains CS2 code.** Everything that knows about Counter-Strike 2 — servers, maps, the veto, round events, demos — moved behind a boundary the rest of the app cannot reach across. The core runs a whole tournament without it.
 - **Manual reporting is a second module**, so games Auto Tournament cannot watch are first-class: the bracket moves on, ratings change and Swiss pairs the next round exactly as they do for CS2.
 - **The app follows the game.** Pages, menus and dashboard cards that belong to one game only appear when that game is the one running.
+- **Games are packs.** The platform no longer carries a list of games in its code. Every game except Counter-Strike 2 is a pack you can add or remove from the **Modules** page.
 - **New name everywhere.** The Docker image, repository and log lines move from "MatchZy Auto Tournament" to "Auto Tournament".
 
 ## Later
 
-Installing your own modules is not in 3.0. The plan is a **Modules page** where you browse a community list of games and add one to your instance. For a game reported by the people playing it, that is a file with a name, a tile and a set of stats in it, and no code at all. A game the platform watches the way it watches CS2 needs real code, and comes later.
+A game the platform *watches* — reading rounds off a server the way it does for CS2 — needs real code, not a pack. Installing that kind of module yourself is planned. Today the CS2 module is built in.
 
 No date yet. When there is one it will be in the [changelog](/reference/changelog).
 
