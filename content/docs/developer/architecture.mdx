@@ -16,7 +16,7 @@ Other folders: `docker/` (the Dockerfile and Compose files), `tests/` (Playwrigh
 The published image runs two processes, started by `/app/start.sh`:
 
 - **Node** runs the API on port `3000` inside the container.
-- **Caddy** listens on port `3069`. It serves the built web app from `/app/public` and forwards `/api/*`, `/api-docs*`, `/socket.io/*` and `/health` to Node.
+- **Caddy** listens on port `3069`. It serves the built web app from `/app/public` and forwards `/api` and everything under it, `/api-docs` and everything under it, `/socket.io` and everything under it, and `/health` to Node.
 
 If either process stops, the container stops, so Docker's restart policy can start it again. This is why the web app, the API and the WebSocket all use port `3069`, and why `PORT=3000` must not change.
 
