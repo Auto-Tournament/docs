@@ -58,14 +58,14 @@ CS2 Server Manager can do this for you, see
 
 ## Plugin DB down
 
-Auto Tournament CS2 (formerly MatchZy Enhanced) cannot reach **its own**
+Auto Tournament CS2 cannot reach **its own**
 database on the game server. This is not the Auto Tournament database.
 
 - With CS2 Server Manager and its MySQL container: run `sudo csm`, open
-  **Tools** and choose **MatchZy DB: verify/repair**.
-- With your own MySQL: check `game/csgo/cfg/MatchZy/database.json` (with CS2
+  **Tools** and choose **Auto Tournament CS2 DB: verify/repair**.
+- With your own MySQL: check `game/csgo/cfg/AutoTournamentCS2/database.json` (with CS2
   Server Manager:
-  `/home/cs2servermanager/overrides/game/csgo/cfg/MatchZy/database.json`),
+  `/home/cs2servermanager/overrides/game/csgo/cfg/AutoTournamentCS2/database.json`),
   that the database host is reachable, and the user and password.
 
 Restart the server and click **Refresh Status**.

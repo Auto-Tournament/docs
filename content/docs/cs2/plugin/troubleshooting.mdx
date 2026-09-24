@@ -9,18 +9,18 @@ For problems on the Auto Tournament side, see the main [Troubleshooting](/refere
 ## Where to look
 
 - The server console, and the server log. With CS2 Server Manager: `sudo csm logs 1 200`.
-- The plugin's own log of match phase changes: `addons/counterstrikesharp/plugins/MatchZy/logs/matchzy_breadcrumbs.log`.
+- The plugin's own log of match phase changes: `addons/counterstrikesharp/plugins/AutoTournamentCS2/logs/at_breadcrumbs.log`.
 - In Auto Tournament, **Admin Tools** > **Server Events Monitor** shows the events that arrive from each server.
 
 Since version 1.4.28, logs do not contain tokens or passwords. You can share them when you ask for help.
 
 ## The plugin does not load
 
-Run `css_plugins list` in the server console. MatchZy must be in the list.
+Run `css_plugins list` in the server console. Auto Tournament CS2 must be in the list.
 
 - If CounterStrikeSharp itself is missing, fix Metamod and CounterStrikeSharp first.
 - If the log shows `Plugin uses old SourceHook Metamod build`, Metamod is too new. Install Metamod `2.0.0.1411`. With CS2 Server Manager, run `sudo csm update-plugins`.
-- Check that `MatchZy.dll` is at `game/csgo/addons/counterstrikesharp/plugins/MatchZy/MatchZy.dll`, not one folder deeper. The zip has a top folder that you must not copy.
+- Check that `AutoTournamentCS2.dll` is at `game/csgo/addons/counterstrikesharp/plugins/AutoTournamentCS2/AutoTournamentCS2.dll`, not one folder deeper. The zip has a top folder that you must not copy.
 
 ## No events arrive in Auto Tournament
 
@@ -32,12 +32,12 @@ Run `css_plugins list` in the server console. MatchZy must be in the list.
 
 2. Search the server log for `Remote log URL set`. The line shows the event URL the plugin uses. It must point to your Auto Tournament webhook URL. If it is empty or wrong, click **Retry** on the server in Auto Tournament.
 3. Send a test event with `css_testevent`, and watch the **Server Events Monitor**.
-4. Check the retry queue with `matchzy_get_pending_events`. A growing number means the events cannot get through.
-5. Check that `matchzy_events_enabled` is `true`.
+4. Check the retry queue with `at_get_pending_events`. A growing number means the events cannot get through.
+5. Check that `at_events_enabled` is `true`.
 
 ## The same server shows up several times
 
-Several servers share one MySQL database, and the plugin cannot tell them apart. Update every server to version 1.4.28 or newer, and give each server its own `+matchzy_config_scope <name>` start argument. Then click **Retry** on each server. See [Several servers on one database](/cs2/plugin/install#several-servers-on-one-database).
+Several servers share one MySQL database, and the plugin cannot tell them apart. Update every server to version 1.4.28 or newer, and give each server its own `+at_config_scope <name>` start argument. Then click **Retry** on each server. See [Several servers on one database](/cs2/plugin/install#several-servers-on-one-database).
 
 Look for this line at startup. Each server must show a different name:
 
@@ -51,24 +51,24 @@ If the log warns that no scope was found, add the start argument.
 
 The plugin cannot reach its own database. This is not the Auto Tournament database.
 
-- Check `game/csgo/cfg/MatchZy/database.json`: the host, port, database name, user and password.
+- Check `game/csgo/cfg/AutoTournamentCS2/database.json`: the host, port, database name, user and password.
 - Check that the MySQL server is reachable from the CS2 machine.
-- With CS2 Server Manager: run `sudo csm`, open **Tools** and choose **MatchZy DB: verify/repair**.
+- With CS2 Server Manager: run `sudo csm`, open **Tools** and choose **Auto Tournament CS2 DB: verify/repair**.
 
 Restart the server after a fix.
 
 ## The server loads the wrong match, or no match
 
-- A match loaded during postgame waits until the series resets. The reply ends with `queued_match=<id>`. `matchzy_tournament_next_match` shows it. Run `matchzy_clear_queued_match` to drop it.
+- A match loaded during postgame waits until the series resets. The reply ends with `queued_match=<id>`. `auto_tournament_next_match` shows it. Run `at_clear_queued_match` to drop it.
 - The match config must have `maplist`, `num_maps`, `team1` and `team2`. The server log names the missing field. See [Match config and maps](/cs2/plugin/match-config).
 
 ## No demo
 
 - GOTV must be on (`tv_enable 1`). The plugin turns it on before recording.
-- `matchzy_demo_recording_enabled` must be `true`.
-- Check `matchzy_demo_upload_url`. Auto Tournament sets it for each match.
+- `at_demo_recording_enabled` must be `true`.
+- Check `at_demo_upload_url`. Auto Tournament sets it for each match.
 - Look for `demo_upload_fail` in the **Server Events Monitor**. Behind nginx, set `client_max_body_size 0`, see [Reverse proxy](/guides/reverse-proxy).
 
 ## CS2 update required
 
-Valve released a CS2 update. The plugin reports it with a `cs2_update_required` event and the log line `[MATCHZY_UPDATE_AVAILABLE]`. Update the game and restart the server. With CS2 Server Manager, see [Plugins and updates](/cs2/server-manager/updates).
+Valve released a CS2 update. The plugin reports it with a `cs2_update_required` event and the log line `[AT_UPDATE_AVAILABLE]`. Update the game and restart the server. With CS2 Server Manager, see [Plugins and updates](/cs2/server-manager/updates).

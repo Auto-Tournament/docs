@@ -1,6 +1,6 @@
 ---
 title: Configuration
-description: Config files and all matchzy_ settings of the plugin.
+description: Config files and all at_ settings of the plugin.
 icon: Settings
 ---
 
@@ -10,11 +10,11 @@ Use this page when you want a different default on one server, or when you run t
 
 ## Config files
 
-The files are in `game/csgo/cfg/MatchZy/`. With CS2 Server Manager, put your own copies in the overrides folder instead, see [Config files and database](/cs2/server-manager/configuration).
+The files are in `game/csgo/cfg/AutoTournamentCS2/`. With CS2 Server Manager, put your own copies in the overrides folder instead, see [Config files and database](/cs2/server-manager/configuration).
 
 | File | Used for |
 | --- | --- |
-| `config.cfg` | The plugin runs it when it loads. Put your `matchzy_*` defaults here. |
+| `config.cfg` | The plugin runs it when it loads. Put your `at_*` defaults here. |
 | `database.json` | Database settings: SQLite (default) or MySQL. |
 | `admins.json` | Steam64 IDs of plugin admins. |
 | `warmup.cfg` | Runs when warmup starts. |
@@ -28,10 +28,10 @@ The files are in `game/csgo/cfg/MatchZy/`. With CS2 Server Manager, put your own
 After you edit `config.cfg`, run this in the server console to load it again without a restart:
 
 ```text
-matchzy_reload_config
+at_reload_config
 ```
 
-Settings in the `cvars` block of a match config override `config.cfg` for that match. With `matchzy_reset_cvars_on_series_end true` (default), they go back to the old values when the series ends.
+Settings in the `cvars` block of a match config override `config.cfg` for that match. With `at_reset_cvars_on_series_end true` (default), they go back to the old values when the series ends.
 
 ## Who is an admin
 
@@ -39,8 +39,8 @@ A player can use admin commands if one of these is true:
 
 - The Steam64 ID is in the `admins` list of the loaded match config. Auto Tournament fills this in.
 - The player has a matching CounterStrikeSharp permission, or `@css/root`, in `addons/counterstrikesharp/configs/admins.json`.
-- The Steam64 ID is in `cfg/MatchZy/admins.json`.
-- `matchzy_everyone_is_admin` is `true`. Use this only for testing.
+- The Steam64 ID is in `cfg/AutoTournamentCS2/admins.json`.
+- `at_everyone_is_admin` is `true`. Use this only for testing.
 
 Commands from the server console and RCON always work.
 
@@ -52,68 +52,68 @@ The **Default** column shows the value after the shipped `config.cfg` has run. W
 
 | Setting | Default | What it does |
 | --- | --- | --- |
-| `matchzy_autostart_mode` | `1` | Mode after the plugin loads: `0` none, `1` match mode, `2` practice mode. |
-| `matchzy_kick_when_no_match_loaded` | `false` | Kick everyone and block joins while no match is loaded. |
-| `matchzy_knife_enabled_default` | `true` | Play a knife round by default. Admins toggle it with `.roundknife`. |
-| `matchzy_playout_enabled_default` | `false` | Play all rounds (playout) by default. Admins toggle it with `.playout`. |
-| `matchzy_whitelist_enabled_default` | `false` | Only allow players from the match config. Admins toggle it with `.whitelist`. |
-| `matchzy_minimum_ready_required` | `0` | Ready players needed to start. `0` means everyone who is connected. |
-| `matchzy_allow_force_ready` | `true` | Allow admins to use `.forceready`. |
-| `matchzy_reset_cvars_on_series_end` | `true` | Restore settings from the match config `cvars` block when the series ends. |
+| `at_autostart_mode` | `1` | Mode after the plugin loads: `0` none, `1` match mode, `2` practice mode. |
+| `at_kick_when_no_match_loaded` | `false` | Kick everyone and block joins while no match is loaded. |
+| `at_knife_enabled_default` | `true` | Play a knife round by default. Admins toggle it with `.roundknife`. |
+| `at_playout_enabled_default` | `false` | Play all rounds (playout) by default. Admins toggle it with `.playout`. |
+| `at_whitelist_enabled_default` | `false` | Only allow players from the match config. Admins toggle it with `.whitelist`. |
+| `at_minimum_ready_required` | `0` | Ready players needed to start. `0` means everyone who is connected. |
+| `at_allow_force_ready` | `true` | Allow admins to use `.forceready`. |
+| `at_reset_cvars_on_series_end` | `true` | Restore settings from the match config `cvars` block when the series ends. |
 
 ### Ready and auto-ready
 
 | Setting | Default | What it does |
 | --- | --- | --- |
-| `matchzy_autoready_enabled` | `false` | Mark players ready on their own when they join a team. |
-| `matchzy_autoready_start_delay` | `5` | Countdown in seconds before the match starts when everyone is auto-ready. |
-| `matchzy_autoready_check_delay` | `0.3` | Seconds to wait after a player joins a team before the ready check. |
-| `matchzy_autoready_ready_delay` | `2` | Seconds before auto-ready marks a player ready. |
+| `at_autoready_enabled` | `false` | Mark players ready on their own when they join a team. |
+| `at_autoready_start_delay` | `5` | Countdown in seconds before the match starts when everyone is auto-ready. |
+| `at_autoready_check_delay` | `0.3` | Seconds to wait after a player joins a team before the ready check. |
+| `at_autoready_ready_delay` | `2` | Seconds before auto-ready marks a player ready. |
 
-The `matchzy_autoready_simulation_*` settings are for testing the plugin itself. Leave them off.
+The `at_autoready_simulation_*` settings are for testing the plugin itself. Leave them off.
 
 ### Pauses
 
 | Setting | Default | What it does |
 | --- | --- | --- |
-| `matchzy_use_pause_command_for_tactical_pause` | `false` | Make `.pause` a tactical timeout instead of a normal pause. |
-| `matchzy_both_teams_unpause_required` | `true` | Both teams must type `.unpause` after a player pause. |
-| `matchzy_max_pauses_per_team` | `0` | Pauses per team. `0` is no limit. |
-| `matchzy_pause_duration` | `0` | Longest pause in seconds. `0` is no limit. |
-| `matchzy_enable_tech_pause` | `true` | Allow `.tech`. |
-| `matchzy_tech_pause_flag` | `""` | Permission needed for `.tech`. Empty means everyone. |
-| `matchzy_tech_pause_duration` | `300` | Length of a technical pause in seconds. |
-| `matchzy_max_tech_pauses_allowed` | `2` | Technical pauses per team. |
-| `matchzy_stop_command_available` | `false` | Allow `.stop` to restore the current round. The built-in value is `true`, the shipped `config.cfg` turns it off. |
-| `matchzy_stop_command_no_damage` | `false` | Block `.stop` after a player has damaged the other team. |
-| `matchzy_pause_after_restore` | `true` | Pause the match after a round is restored. |
+| `at_use_pause_command_for_tactical_pause` | `false` | Make `.pause` a tactical timeout instead of a normal pause. |
+| `at_both_teams_unpause_required` | `true` | Both teams must type `.unpause` after a player pause. |
+| `at_max_pauses_per_team` | `0` | Pauses per team. `0` is no limit. |
+| `at_pause_duration` | `0` | Longest pause in seconds. `0` is no limit. |
+| `at_enable_tech_pause` | `true` | Allow `.tech`. |
+| `at_tech_pause_flag` | `""` | Permission needed for `.tech`. Empty means everyone. |
+| `at_tech_pause_duration` | `300` | Length of a technical pause in seconds. |
+| `at_max_tech_pauses_allowed` | `2` | Technical pauses per team. |
+| `at_stop_command_available` | `false` | Allow `.stop` to restore the current round. The built-in value is `true`, the shipped `config.cfg` turns it off. |
+| `at_stop_command_no_damage` | `false` | Block `.stop` after a player has damaged the other team. |
+| `at_pause_after_restore` | `true` | Pause the match after a round is restored. |
 
 ### Side choice, give up and forfeit
 
 | Setting | Default | What it does |
 | --- | --- | --- |
-| `matchzy_side_selection_enabled` | `true` | Timer for the side choice after the knife round. When it runs out, the side is picked for the team. |
-| `matchzy_side_selection_time` | `60` | Seconds for the side choice. |
-| `matchzy_side_selection_reminder_interval` | `10` | Seconds between reminders during the side choice. |
-| `matchzy_gg_enabled` | `false` | Allow `.gg`, a team vote to give up the match. |
-| `matchzy_gg_threshold` | `0.8` | Part of the team that must type `.gg` (0.0 to 1.0). |
-| `matchzy_gg_min_score_diff` | `0` | Rounds a team must be behind before it can use `.gg`. `0` turns the check off. |
-| `matchzy_ffw_enabled` | `false` | Forfeit a team that fully disconnects. |
-| `matchzy_ffw_time` | `240` | Seconds before the missing team forfeits. |
-| `matchzy_ffw_check_interval` | `10` | Seconds between forfeit warnings. |
+| `at_side_selection_enabled` | `true` | Timer for the side choice after the knife round. When it runs out, the side is picked for the team. |
+| `at_side_selection_time` | `60` | Seconds for the side choice. |
+| `at_side_selection_reminder_interval` | `10` | Seconds between reminders during the side choice. |
+| `at_gg_enabled` | `false` | Allow `.gg`, a team vote to give up the match. |
+| `at_gg_threshold` | `0.8` | Part of the team that must type `.gg` (0.0 to 1.0). |
+| `at_gg_min_score_diff` | `0` | Rounds a team must be behind before it can use `.gg`. `0` turns the check off. |
+| `at_ffw_enabled` | `false` | Forfeit a team that fully disconnects. |
+| `at_ffw_time` | `240` | Seconds before the missing team forfeits. |
+| `at_ffw_check_interval` | `10` | Seconds between forfeit warnings. |
 
 ### Demos and series end
 
 | Setting | Default | What it does |
 | --- | --- | --- |
-| `matchzy_demo_recording_enabled` | `true` | Record a demo when the match goes live. Needs GOTV. |
-| `matchzy_demo_path` | `MatchZy/` | Demo folder, relative to `csgo/`. Must end with `/`. |
-| `matchzy_demo_name_format` | `{TIME}_{MATCH_ID}_{MAP}_{TEAM1}_vs_{TEAM2}` | Demo file name without `.dem`. Also knows `{MAPNUMBER}`. |
-| `matchzy_demo_upload_url` | `""` | Upload each demo to this URL after the map. Empty turns uploads off. |
-| `matchzy_demo_upload_header_key`, `matchzy_demo_upload_header_value` | `""` | Optional header sent with the upload. |
-| `matchzy_series_end_kick_delay_no_demo` | `5` | Extra seconds before players are kicked at series end, without demos. |
-| `matchzy_series_end_kick_delay_demo_no_upload` | `10` | The same, with demos but no upload URL. |
-| `matchzy_series_end_kick_delay_demo_upload` | `60` | The same, with demo upload, so the upload can finish. |
+| `at_demo_recording_enabled` | `true` | Record a demo when the match goes live. Needs GOTV. |
+| `at_demo_path` | `AutoTournamentCS2/` | Demo folder, relative to `csgo/`. Must end with `/`. |
+| `at_demo_name_format` | `{TIME}_{MATCH_ID}_{MAP}_{TEAM1}_vs_{TEAM2}` | Demo file name without `.dem`. Also knows `{MAPNUMBER}`. |
+| `at_demo_upload_url` | `""` | Upload each demo to this URL after the map. Empty turns uploads off. |
+| `at_demo_upload_header_key`, `at_demo_upload_header_value` | `""` | Optional header sent with the upload. |
+| `at_series_end_kick_delay_no_demo` | `5` | Extra seconds before players are kicked at series end, without demos. |
+| `at_series_end_kick_delay_demo_no_upload` | `10` | The same, with demos but no upload URL. |
+| `at_series_end_kick_delay_demo_upload` | `60` | The same, with demo upload, so the upload can finish. |
 
 The series end delays add to `mp_match_restart_delay`. The next match on the server loads after this wait.
 
@@ -121,21 +121,21 @@ The series end delays add to `mp_match_restart_delay`. The next match on the ser
 
 | Setting | Default | What it does |
 | --- | --- | --- |
-| `matchzy_chat_prefix` | `[{Green}MatchZy{Default}]` | Prefix for plugin chat messages. |
-| `matchzy_admin_chat_prefix` | `[{Red}ADMIN{Default}]` | Prefix for `.asay` messages. |
-| `matchzy_chat_messages_timer_delay` | `13` | Seconds between reminder messages, such as the list of players who are not ready. |
-| `matchzy_hostname_format` | `{TEAM1} vs {TEAM2}` | Server name during a match. Set `""` to keep your own name. |
-| `matchzy_match_start_message` | `""` | Message when the match starts. Use `$$$` for a new line. |
-| `matchzy_show_credits_on_match_start` | `true` | Show the MatchZy credits line when the match starts. |
-| `matchzy_center_html_notifications` | `false` | Show important events (match live, pause, side choice) in the center of the screen. |
-| `matchzy_notification_duration_global` | `5` | Seconds a center message stays for everyone. |
-| `matchzy_notification_duration_player` | `6` | Seconds a center message stays for one player. |
-| `matchzy_enable_damage_report` | `true` | Show a damage report after each round. |
+| `at_chat_prefix` | `[{Green}Auto Tournament{Default}]` | Prefix for plugin chat messages. |
+| `at_admin_chat_prefix` | `[{Red}ADMIN{Default}]` | Prefix for `.asay` messages. |
+| `at_chat_messages_timer_delay` | `13` | Seconds between reminder messages, such as the list of players who are not ready. |
+| `at_hostname_format` | `{TEAM1} vs {TEAM2}` | Server name during a match. Set `""` to keep your own name. |
+| `at_match_start_message` | `""` | Message when the match starts. Use `$$$` for a new line. |
+| `at_show_credits_on_match_start` | `true` | Show the Auto Tournament CS2 credits line when the match starts. |
+| `at_center_html_notifications` | `false` | Show important events (match live, pause, side choice) in the center of the screen. |
+| `at_notification_duration_global` | `5` | Seconds a center message stays for everyone. |
+| `at_notification_duration_player` | `6` | Seconds a center message stays for one player. |
+| `at_enable_damage_report` | `true` | Show a damage report after each round. |
 
 To turn center messages off for one match, add this to the match config:
 
 ```json
-{ "cvars": { "matchzy_center_html_notifications": 0 } }
+{ "cvars": { "at_center_html_notifications": 0 } }
 ```
 
 ### Warmup on an idle server
@@ -144,22 +144,22 @@ These apply only while no match is loaded. The plugin saves them per server.
 
 | Setting | Default | What it does |
 | --- | --- | --- |
-| `matchzy_warmup_enable` | `0` | Turn the settings below on. |
-| `matchzy_warmup_message_html` | empty | Center message during warmup. `clear` removes it. |
-| `matchzy_warmup_respawn` | `0` | Respawn after death. |
-| `matchzy_warmup_ignore_win_conditions` | `0` | Ignore win conditions. |
-| `matchzy_warmup_roundtime_minutes` | `10` | Round time in minutes, 1 to 120. |
-| `matchzy_warmup_startmoney`, `matchzy_warmup_maxmoney` | `16000` | Start money and max money, 0 to 60000. |
-| `matchzy_warmup_buy_anywhere` | `0` | Buy anywhere on the map. |
-| `matchzy_warmup_infinite_ammo` | `0` | Infinite ammo. |
+| `at_warmup_enable` | `0` | Turn the settings below on. |
+| `at_warmup_message_html` | empty | Center message during warmup. `clear` removes it. |
+| `at_warmup_respawn` | `0` | Respawn after death. |
+| `at_warmup_ignore_win_conditions` | `0` | Ignore win conditions. |
+| `at_warmup_roundtime_minutes` | `10` | Round time in minutes, 1 to 120. |
+| `at_warmup_startmoney`, `at_warmup_maxmoney` | `16000` | Start money and max money, 0 to 60000. |
+| `at_warmup_buy_anywhere` | `0` | Buy anywhere on the map. |
+| `at_warmup_infinite_ammo` | `0` | Infinite ammo. |
 
 ### Practice mode
 
 | Setting | Default | What it does |
 | --- | --- | --- |
-| `matchzy_smoke_color_enabled` | `false` | Color smokes by player. |
-| `matchzy_save_nades_as_global_enabled` | `false` | Save lineups for everyone instead of per player. |
-| `matchzy_max_saved_last_grenades` | `512` | Grenade history per map and player. `0` turns it off. |
+| `at_smoke_color_enabled` | `false` | Color smokes by player. |
+| `at_save_nades_as_global_enabled` | `false` | Save lineups for everyone instead of per player. |
+| `at_max_saved_last_grenades` | `512` | Grenade history per map and player. `0` turns it off. |
 
 ### Auto Tournament connection
 
@@ -167,66 +167,66 @@ Auto Tournament sets these for you. Set them by hand only without Auto Tournamen
 
 | Setting | What it does |
 | --- | --- |
-| `matchzy_server_id` | ID of this server in Auto Tournament. Sent with events and reports. |
-| `matchzy_bootstrap_url`, `matchzy_bootstrap_token` | Setup URL and token. The plugin downloads its setup from there. |
-| `matchzy_remote_log_url` | URL for match events. Empty turns events off. |
-| `matchzy_remote_log_header_key`, `matchzy_remote_log_header_value` | Header sent with each event, for example `X-MatchZy-Token`. |
-| `matchzy_report_endpoint`, `matchzy_report_token`, `matchzy_report_server_id` | Where to push match reports, and how to sign them. |
-| `matchzy_remote_backup_url`, `matchzy_remote_backup_header_key`, `matchzy_remote_backup_header_value` | Upload round backups to this URL. Empty turns it off. |
-| `matchzy_events_enabled` | Main switch for events and the retry queue. Default `true`. |
-| `matchzy_event_retry_interval` | Seconds between retries of failed events. Default `30`. |
-| `matchzy_event_cleanup_interval` | Seconds between cleanups of old sent events. Default `3600`. |
-| `matchzy_config_scope` | Name that keeps this server's saved settings apart in a shared database. Set it as a start argument, `+matchzy_config_scope <name>`. |
+| `at_server_id` | ID of this server in Auto Tournament. Sent with events and reports. |
+| `at_bootstrap_url`, `at_bootstrap_token` | Setup URL and token. The plugin downloads its setup from there. |
+| `at_remote_log_url` | URL for match events. Empty turns events off. |
+| `at_remote_log_header_key`, `at_remote_log_header_value` | Header sent with each event, for example `X-Auto-Tournament-Token`. |
+| `at_report_endpoint`, `at_report_token`, `at_report_server_id` | Where to push match reports, and how to sign them. |
+| `at_remote_backup_url`, `at_remote_backup_header_key`, `at_remote_backup_header_value` | Upload round backups to this URL. Empty turns it off. |
+| `at_events_enabled` | Main switch for events and the retry queue. Default `true`. |
+| `at_event_retry_interval` | Seconds between retries of failed events. Default `30`. |
+| `at_event_cleanup_interval` | Seconds between cleanups of old sent events. Default `3600`. |
+| `at_config_scope` | Name that keeps this server's saved settings apart in a shared database. Set it as a start argument, `+at_config_scope <name>`. |
 
 These are read-only status values that Auto Tournament reads:
 
-- `matchzy_tournament_status`: `idle`, `loading`, `warmup`, `knife`, `playing`, `paused`, `halftime`, `postgame` or `error`.
-- `matchzy_tournament_match`: the match that is loaded.
-- `matchzy_tournament_next_match`: a match that waits for the current series to reset.
-- `matchzy_tournament_updated`: Unix time of the last status change.
+- `auto_tournament_status`: `idle`, `loading`, `warmup`, `knife`, `playing`, `paused`, `halftime`, `postgame` or `error`.
+- `auto_tournament_match`: the match that is loaded.
+- `auto_tournament_next_match`: a match that waits for the current series to reset.
+- `auto_tournament_updated`: Unix time of the last status change.
 
 ### CS2 updates
 
 | Setting | Default | What it does |
 | --- | --- | --- |
-| `matchzy_safeautoupdater_enabled` | `true` | Ask Steam if the server is up to date, and report when an update is needed. |
-| `matchzy_safeautoupdater_action` | `warn_only` | `warn_only` only reports. `restart` kicks players and shuts the server down, but only when no match is running (idle, postgame or error). |
-| `matchzy_safeautoupdater_offline_backoff_seconds` | `1800` | Seconds to wait after a failed check, for servers without internet. |
+| `at_safeautoupdater_enabled` | `true` | Ask Steam if the server is up to date, and report when an update is needed. |
+| `at_safeautoupdater_action` | `warn_only` | `warn_only` only reports. `restart` kicks players and shuts the server down, but only when no match is running (idle, postgame or error). |
+| `at_safeautoupdater_offline_backoff_seconds` | `1800` | Seconds to wait after a failed check, for servers without internet. |
 
-When an update is needed, the plugin writes `[MATCHZY_UPDATE_AVAILABLE]` to the server log and sends a `cs2_update_required` event. CS2 Server Manager reads this log line, see [Plugins and updates](/cs2/server-manager/updates).
+When an update is needed, the plugin writes `[AT_UPDATE_AVAILABLE]` to the server log and sends a `cs2_update_required` event. CS2 Server Manager reads this log line, see [Plugins and updates](/cs2/server-manager/updates).
 
 ### Debugging
 
 | Setting | Default | What it does |
 | --- | --- | --- |
-| `matchzy_debug_console` | `true` | Detailed logs in the server console. |
-| `matchzy_debug_chat` | `false` | Debug messages in the game chat. Very noisy. |
-| `matchzy_crash_debug_breadcrumbs` | `true` | Write match phase changes to `addons/counterstrikesharp/plugins/MatchZy/logs/matchzy_breadcrumbs.log`. The built-in value is `false`, the shipped `config.cfg` turns it on. |
-| `matchzy_everyone_is_admin` | `false` | Every player is admin. For testing only. |
+| `at_debug_console` | `true` | Detailed logs in the server console. |
+| `at_debug_chat` | `false` | Debug messages in the game chat. Very noisy. |
+| `at_crash_debug_breadcrumbs` | `true` | Write match phase changes to `addons/counterstrikesharp/plugins/AutoTournamentCS2/logs/at_breadcrumbs.log`. The built-in value is `false`, the shipped `config.cfg` turns it on. |
+| `at_everyone_is_admin` | `false` | Every player is admin. For testing only. |
 
 ## Examples
 
 A tournament server that only accepts loaded matches:
 
 ```text
-matchzy_autostart_mode 1
-matchzy_kick_when_no_match_loaded true
-matchzy_demo_recording_enabled true
+at_autostart_mode 1
+at_kick_when_no_match_loaded true
+at_demo_recording_enabled true
 ```
 
 Fast scrims with auto-ready:
 
 ```text
-matchzy_autoready_enabled true
-matchzy_autoready_start_delay 5
-matchzy_minimum_ready_required 2
+at_autoready_enabled true
+at_autoready_start_delay 5
+at_minimum_ready_required 2
 ```
 
 Give up and forfeit:
 
 ```text
-matchzy_gg_enabled true
-matchzy_gg_min_score_diff 6
-matchzy_ffw_enabled true
-matchzy_ffw_time 240
+at_gg_enabled true
+at_gg_min_score_diff 6
+at_ffw_enabled true
+at_ffw_time 240
 ```

@@ -6,23 +6,14 @@ icon: Plug
 
 Auto Tournament CS2 is a CounterStrikeSharp plugin. It runs inside each CS2 server. It loads matches from Auto Tournament, runs warmup, ready-up, the knife round and pauses, and sends events, results and demos back.
 
-The plugin was called **MatchZy Enhanced** before. It is the same plugin with a new name.
+Auto Tournament CS2 is forked from MatchZy by shobhit-pathak.
 
-- Source and releases: [github.com/Auto-Tournament/cs2-plugin](https://github.com/Auto-Tournament/cs2-plugin). The old addresses, such as `github.com/sivert-io/MatchZy-Enhanced`, redirect there.
+- Source and releases: [github.com/Auto-Tournament/cs2-plugin](https://github.com/Auto-Tournament/cs2-plugin).
 - Bugs and questions: [GitHub issues](https://github.com/Auto-Tournament/cs2-plugin/issues).
 
-## What is still called MatchZy
+## What it adds
 
-Only the project name changed. These keep the old name for now, so existing servers keep working:
-
-- The plugin still shows up as **MatchZy** in the server's plugin list (`css_plugins list`).
-- All settings and console commands start with `matchzy_` or `css_`.
-- The files are in `addons/counterstrikesharp/plugins/MatchZy/` and `cfg/MatchZy/`.
-- The release file is `MatchZy-<version>.zip`.
-
-## How it relates to MatchZy
-
-The plugin is based on [MatchZy](https://github.com/shobhit-pathak/MatchZy), the CS2 match plugin by WD-. It keeps the MatchZy match flow, chat commands and config files, and adds what a tournament platform needs:
+The plugin keeps the upstream match flow, chat commands and config files, and adds what a tournament platform needs:
 
 - More match events, so Auto Tournament can follow a match in real time.
 - A match report: the full match state as JSON, pushed to Auto Tournament.
@@ -32,7 +23,7 @@ The plugin is based on [MatchZy](https://github.com/shobhit-pathak/MatchZy), the
 - A simulation mode with bots, for testing.
 - For players: optional auto-ready, pause limits, a timer on the side choice after the knife round, `.gg` to give up, and forfeit when a whole team leaves.
 
-Auto Tournament does not support the original MatchZy plugin. The [upstream MatchZy docs](https://shobhit-pathak.github.io/MatchZy/) are still useful background, but this plugin does not always behave the same way.
+Auto Tournament does not support the plugin it was forked from, and this plugin does not always behave the same way.
 
 ## How it works with Auto Tournament
 

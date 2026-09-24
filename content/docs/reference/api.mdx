@@ -38,7 +38,7 @@ API_TOKENS_READONLY=scoreboard:paste-another-secret-here
 3. Recreate the app container:
 
 ```bash
-docker compose up -d --force-recreate matchzy-tournament
+docker compose up -d --force-recreate auto-tournament
 ```
 
 Each entry is `label:secret` or only `secret`. Separate several entries with commas or spaces. The label shows in the logs, so you can see which program made a call. The secret is never logged. Secrets shorter than 16 characters are ignored, with a warning in the log at start.

@@ -57,7 +57,7 @@ FRONTEND_BASE_URL=https://tournament.example.com
 ### Restart the app
 
 ```bash
-docker compose up -d --force-recreate matchzy-tournament
+docker compose up -d --force-recreate auto-tournament
 ```
 
 </Step>
@@ -71,7 +71,7 @@ Open `FRONTEND_BASE_URL/login`. Click **Sign in with Steam** and sign in. On a n
 If the button is missing, the key is empty or Steam rejected it. Auto Tournament checks the key and hides the button when it does not work. Check the key and look at the logs:
 
 ```bash
-docker compose logs matchzy-tournament | grep -i steam
+docker compose logs auto-tournament | grep -i steam
 ```
 
 </Step>
