@@ -1,0 +1,141 @@
+---
+title: Skins
+description: Weapon paints, knives, gloves and agents, and the database tables they read.
+icon: Palette
+---
+
+<Callout title="Ban risk" type="warn">
+  Valve can ban a server's game server login token (GSLT) for running a skin changer. Only use skins on servers where you accept that risk. This is why skins are a separate package that you must choose to install.
+</Callout>
+
+Skins give players the weapon paints, knife, gloves and agent they pick. Ready Up reads each player's choices from Postgres. It does not come with a picker. A web picker in Auto Tournament is planned. Until then you write the rows yourself.
+
+## Status
+
+- Skins will ship as the `ready-up-skins` plugin, in the `ready-up-full` bundle only. See [Install](/cs2/ready-up/install#packages).
+- Today the skins code is still built into the core. Moving it to its own plugin is planned. Its engine signatures will then move to a separate file, `engine-surface.skins.json`, that only ships with skins. A server without skins will not even look for them.
+- Until then, skins only do something when `readyup_db.json` points at a database with loadout rows. To turn skins off completely, start the server with `READYUP_DISABLE_SKINS=1`.
+
+## What works
+
+| Item | How it is applied |
+| --- | --- |
+| Weapon paints | Paint, wear, seed, name tag and StatTrak on each weapon a player gets. |
+| Knives | The knife model, and its paint. |
+| Gloves | The glove model. Gloves need a paint row too, or they are skipped. |
+| Agents | The player model for CT and T. |
+
+Ready Up applies skins in the same server frame a weapon is created, before any client sees it. Picked-up weapons keep the skin of the player who first owned them.
+
+Many older paints (for example Redline, AWP Asiimov, Howl) were made for the CS:GO weapon models. Ready Up switches those weapons to their legacy model, so the paint looks right. Fade, Printstream and other CS2 paints do not need this.
+
+StatTrak counting needs engine game events. The rest of skins does not.
+
+If a Ready Up admin has no knife row, they get a Butterfly Knife.
+
+## When a change takes effect
+
+- Ready Up keeps each player's loadout for 45 seconds. It fetches it again in the background when the player connects, about once a second while they play, and on game events. The game never waits for the database.
+- A change applies to the next weapon the player gets: a buy, the round start, or picking up their own drop. Weapons already in hand keep their look.
+- Gloves and agent change on the next spawn.
+
+## Database tables
+
+Ready Up creates these tables when it connects. It only reads them, except for the StatTrak counter. A picker only has to write them. It may create the same tables, but must not change column types or primary keys.
+
+Every table has these keys:
+
+| Column | Type | Meaning |
+| --- | --- | --- |
+| `steamid64` | `BIGINT` | The player's Steam64 ID. |
+| `weapon_team` | `SMALLINT` | `2` = T, `3` = CT, `0` = both. A row for one team wins over the `0` row. |
+
+The agents table has one row per player instead, with a column per side.
+
+### readyup_weapon_skins
+
+Paints for weapons, knives and gloves.
+
+```sql
+CREATE TABLE IF NOT EXISTS readyup_weapon_skins (
+  steamid64 BIGINT NOT NULL,
+  weapon_team SMALLINT NOT NULL,
+  weapon_defindex INT NOT NULL,
+  paint_id INT NOT NULL,
+  wear REAL NOT NULL DEFAULT 0.000001,
+  seed INT NOT NULL DEFAULT 0,
+  nametag TEXT NULL,
+  stattrak_enabled BOOLEAN NOT NULL DEFAULT FALSE,
+  stattrak_count INT NOT NULL DEFAULT 0,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  PRIMARY KEY (steamid64, weapon_team, weapon_defindex));
+```
+
+| Column | Notes |
+| --- | --- |
+| `weapon_defindex` | Item index from `items_game.txt`. For example AK-47 `7`, AWP `9`, M4A4 `16`, M4A1-S `60`, USP-S `61`, Glock-18 `4`, Desert Eagle `1`. A knife uses the knife's index (Karambit `507`), gloves use the glove index (Sport Gloves `5030`). |
+| `paint_id` | Paint kit ID, for example Redline `282`, AWP Asiimov `279`, Fade `38`. `0` or less means no paint. |
+| `wear` | 0 to 1. Factory New is below 0.07. |
+| `seed` | Pattern seed, 0 to 1000. |
+| `nametag` | Optional. Up to 160 bytes. |
+| `stattrak_enabled`, `stattrak_count` | Ready Up adds 1 to `stattrak_count` for each kill. Treat the count as owned by the server. |
+
+### readyup_weapon_knives
+
+```sql
+CREATE TABLE IF NOT EXISTS readyup_weapon_knives (
+  steamid64 BIGINT NOT NULL,
+  weapon_team SMALLINT NOT NULL,
+  knife_classname TEXT NOT NULL,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  PRIMARY KEY (steamid64, weapon_team));
+```
+
+`knife_classname` is one of these (item index in brackets): `weapon_bayonet` (500), `weapon_knife_css` (503), `weapon_knife_flip` (505), `weapon_knife_gut` (506), `weapon_knife_karambit` (507), `weapon_knife_m9_bayonet` (508), `weapon_knife_tactical` (509), `weapon_knife_falchion` (512), `weapon_knife_survival_bowie` (514), `weapon_knife_butterfly` (515), `weapon_knife_push` (516), `weapon_knife_cord` (517), `weapon_knife_canis` (518), `weapon_knife_ursus` (519), `weapon_knife_gypsy_jackknife` (520), `weapon_knife_outdoor` (521), `weapon_knife_stiletto` (522), `weapon_knife_widowmaker` (523), `weapon_knife_skeleton` (525), `weapon_knife_kukri` (526).
+
+An unknown value is ignored. The knife's paint is a `readyup_weapon_skins` row with the knife's index as `weapon_defindex`.
+
+### readyup_weapon_gloves
+
+```sql
+CREATE TABLE IF NOT EXISTS readyup_weapon_gloves (
+  steamid64 BIGINT NOT NULL,
+  weapon_team SMALLINT NOT NULL,
+  glove_defindex INT NOT NULL,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  PRIMARY KEY (steamid64, weapon_team));
+```
+
+`glove_defindex`: Broken Fang `4725`, Bloodhound `5027`, Sport `5030`, Driver `5031`, Hand Wraps `5032`, Moto `5033`, Specialist `5034`, Hydra `5035`.
+
+Gloves need a paint row in `readyup_weapon_skins` with `weapon_defindex` equal to `glove_defindex`. Without one, Ready Up skips the gloves, because unpainted gloves look wrong.
+
+### readyup_weapon_agents
+
+```sql
+CREATE TABLE IF NOT EXISTS readyup_weapon_agents (
+  steamid64 BIGINT PRIMARY KEY,
+  agent_ct TEXT NULL,
+  agent_t TEXT NULL,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now());
+```
+
+A value is either the full model path, such as `agents/models/ctm_fbi/ctm_fbi_variantb.vmdl`, or the short form `ctm_fbi/ctm_fbi_variantb`. Ready Up turns the short form into `agents/models/<value>.vmdl`. Empty or `NULL` means the default model. Do not use the old `characters/models/...` paths. They are empty stubs in CS2.
+
+## Example rows
+
+The Ready Up repo has example data in `scripts/seed-dev-skins.sql`. A minimal loadout, an AK-47 Redline on both sides:
+
+```sql
+INSERT INTO readyup_weapon_skins (steamid64, weapon_team, weapon_defindex, paint_id, wear, seed)
+VALUES (76561198000000000, 0, 7, 282, 0.05, 0);
+```
+
+## Where the item IDs come from
+
+Build a picker's list from the game files, not from a hard-coded list:
+
+- `scripts/items/items_game.txt` has the items, `paint_kits`, and which paint fits which weapon.
+- `resource/csgo_english.txt` has the display names.
+
+Both are inside `game/csgo/pak01_dir.vpk`.

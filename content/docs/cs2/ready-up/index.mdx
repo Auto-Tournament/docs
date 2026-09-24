@@ -1,0 +1,68 @@
+---
+title: Ready Up
+description: A native CS2 server plugin for scrims, pickups and tournament matches.
+icon: BadgeCheck
+---
+
+<Callout title="In development" type="warn">
+  Ready Up is not released yet. [Auto Tournament CS2](/cs2/plugin) is still the supported plugin, and you should keep using it for now. Ready Up will replace it in a later release. These pages describe how Ready Up works today and what is planned. Expect breaking changes.
+</Callout>
+
+Ready Up runs the match flow on a CS2 server. Players ready up, the match goes live, and results go back to Auto Tournament. It does the same job as [Auto Tournament CS2](/cs2/plugin), MatchZy and Get5. It is not a fork of any of them. It reuses their chat commands and event names where that makes sense, so moving over is easy.
+
+- Source: [github.com/Auto-Tournament/ready-up](https://github.com/Auto-Tournament/ready-up)
+- Bugs and questions: [GitHub issues](https://github.com/Auto-Tournament/ready-up/issues) or [Discord](https://discord.gg/n7gHYau7aW)
+- License: PolyForm Noncommercial 1.0.0, free for non-commercial use
+
+## What it does
+
+- Ready-up for scrims and pickups: players type `.r`, a short countdown runs, and the scrim goes live on its own.
+- Matches loaded from Auto Tournament, with a roster whitelist and team locks.
+- A knife round with a side pick (`.stay` / `.switch`).
+- Pauses that both teams must confirm to end, and a captain forfeit.
+- Practice mode with bot helpers.
+- A small panel in the middle of the screen that shows who is ready.
+- Admins stored in Postgres, so several servers share one list.
+- Webhooks and a heartbeat for Auto Tournament.
+
+Skins (weapon paints, knives, gloves, agents) are a separate, optional part. See [Skins](/cs2/ready-up/skins).
+
+## No Metamod or CounterStrikeSharp
+
+Auto Tournament CS2 needs Metamod:Source and CounterStrikeSharp. Ready Up needs neither.
+
+CS2 finds its server module, `libserver.so`, through the search paths in `gameinfo.gi`. Ready Up adds one line there, `Game csgo/readyup`, above `Game csgo`. CS2 then loads Ready Up's `libserver.so` first. Ready Up loads Valve's real `libserver.so` and passes everything through to it. This is the same trick Metamod uses.
+
+That means fewer moving parts. There is no .NET runtime, and no need to wait for Metamod and CounterStrikeSharp to catch up after a CS2 update. Metamod can still run next to Ready Up if you need it for other plugins. See [Install](/cs2/ready-up/install#metamod).
+
+## How it survives CS2 updates
+
+A CS2 update can move the engine functions a plugin calls. Ready Up keeps the number of places it touches the engine small, and checks each one.
+
+- Every engine function Ready Up calls or hooks is listed in one file, `gamedata/engine-surface.json`.
+- Each entry has a byte signature and one or more identity anchors. An anchor is a check such as "this function references the string `say_team`".
+- A function only counts as found when its signature matches exactly once and every anchor passes.
+- If a function is not found, only the features that need it turn off. Each one logs a single line. The rest of the server keeps running.
+- CI checks the file against every new public CS2 build, so a break is usually known before it reaches a server.
+- On a running server, `ru selftest` checks every hook, offset and feature, and ends with `PASS` or `FAIL`.
+
+The details are in [Engine surface](/cs2/ready-up/plugin-development/engine-surface).
+
+## Core and plugins
+
+Ready Up is being split into a small core and plugins. The core owns everything that touches the engine. Plugins only call a versioned C API, so a CS2 update needs a core fix only.
+
+| Part | What it does | Status |
+| --- | --- | --- |
+| Core | Loading, engine surface, hooks, events, chat and console commands, the plugin host | Works |
+| Match | Ready-up, scrims, knife round, pauses, match configs, webhooks, admins, practice | Works, but is still built into the core. Moving it to its own plugin is planned. |
+| Skins | Weapon paints, knives, gloves, agents | Works, but is still built into the core. Moving it to its own plugin is planned. |
+| `hello` | A small example plugin | Works. For developers only, never shipped. |
+
+The plugin host, API version 1.0 and hot reload (`ru plugin reload <name>`) work today. See [Plugin development](/cs2/ready-up/plugin-development/getting-started).
+
+## Next
+
+- [Install](/cs2/ready-up/install)
+- [Commands](/cs2/ready-up/commands)
+- [Scrims and matches](/cs2/ready-up/scrims-and-matches)

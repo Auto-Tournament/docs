@@ -1,0 +1,17 @@
+{
+  "title": "Ready Up",
+  "description": "The native CS2 server plugin that will replace Auto Tournament CS2",
+  "icon": "BadgeCheck",
+  "root": true,
+  "pages": [
+    "index",
+    "install",
+    "configuration",
+    "commands",
+    "scrims-and-matches",
+    "skins",
+    "troubleshooting",
+    "---Developers---",
+    "plugin-development"
+  ]
+}

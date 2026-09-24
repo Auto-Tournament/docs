@@ -1,0 +1,172 @@
+---
+title: Install
+description: Install Ready Up on a CS2 server and keep it working after CS2 updates.
+icon: Download
+---
+
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+
+<Callout title="Not released yet" type="warn">
+  There is no Ready Up release yet. This page describes the install for the first release. Package names are not final.
+</Callout>
+
+## What you need
+
+- A CS2 dedicated server on Linux (`linuxsteamrt64`). Windows servers are not supported.
+- glibc 2.31 or newer. That is all. OpenSSL, libpq and libcurl are built into Ready Up.
+- Python 3, to run the `gameinfo.gi` patcher.
+- Optional: a Postgres database, for admins, saved settings and skins.
+
+You do not need Metamod:Source or CounterStrikeSharp.
+
+## Packages
+
+Ready Up will ship as a core and plugins. You pick a bundle.
+
+| Package | Contains |
+| --- | --- |
+| `ready-up-core` | The loader, engine surface and plugin host. It does nothing for matches on its own. |
+| `ready-up-match` | Ready-up, scrims, knife round, pauses, match configs, webhooks, admins, practice. |
+| `ready-up-skins` | Weapon paints, knives, gloves and agents. |
+| `ready-up-essentials` | Bundle: core and match. Use this one. |
+| `ready-up-full` | Bundle: core, match and skins. |
+
+Skins ship separately on purpose. Valve can ban servers that run skin changers (a GSLT ban), so you must choose to download that package. The core and match packages do not include the skins plugin.
+
+<Callout title="Planned" type="info">
+  The split into these packages is planned. Right now the build is one zip, `readyup-<version>-linuxsteamrt64.zip`, with match and skins still built into the core. The steps below are the same for both.
+</Callout>
+
+## Install
+
+<Steps>
+
+<Step>
+
+### Download and extract
+
+Download the zip from [Releases](https://github.com/Auto-Tournament/ready-up/releases/latest). Extract it into the server's `game/csgo/` folder. You now have:
+
+- `game/csgo/readyup/bin/linuxsteamrt64/libserver.so`, the Ready Up core
+- `game/csgo/readyup/bin/linuxsteamrt64/engine-surface.json`
+- `game/csgo/readyup/bin/linuxsteamrt64/readyup.cfg.example`
+- `game/csgo/readyup/tools/patch_gameinfo.py` and `game/csgo/readyup/tools/install.sh`
+- `game/csgo/readyup/cfg-templates/ReadyUp/*.cfg`
+
+Plugins go in `game/csgo/readyup/plugins/`, for example `match.so` and `skins.so`, once they ship as separate files.
+
+</Step>
+
+<Step>
+
+### Add Ready Up to gameinfo.gi
+
+```bash
+cd game/csgo
+python3 readyup/tools/patch_gameinfo.py gameinfo.gi --game csgo/readyup
+```
+
+If the folder has a `gameinfo_branchspecific.gi`, run the patcher on that file too.
+
+The patcher adds `Game csgo/readyup` to the `SearchPaths` block, above `Game csgo`. It is safe to run more than once. It fixes a misplaced or duplicated line, and writes a backup (`gameinfo.gi.bak.<timestamp>`) whenever it changes the file.
+
+To only check the file, add `--check`. It exits with code `3` when the file needs a change.
+
+</Step>
+
+<Step>
+
+### Restart and check
+
+Restart the server. In the server console, run:
+
+```text
+ru selftest
+```
+
+The last line must be `selftest: PASS n/n`. See [Troubleshooting](/cs2/ready-up/troubleshooting) if it says `FAIL`.
+
+</Step>
+
+</Steps>
+
+### Install script
+
+`readyup/tools/install.sh` does the copy and the `gameinfo.gi` patch for you. It works on one or more servers:
+
+```bash
+readyup/tools/install.sh --dry-run /path/to/cs2   # show what it would do
+readyup/tools/install.sh /path/to/cs2 /path/to/other-cs2
+```
+
+It:
+
+- copies the new `libserver.so` next to the old one and renames it into place. A running server keeps its loaded copy. The old file is kept as `libserver.so.prev`.
+- creates `readyup.cfg` from the example only if it is missing.
+- copies missing mode configs to `game/csgo/cfg/ReadyUp/`.
+- patches `gameinfo.gi` and `gameinfo_branchspecific.gi`.
+
+It never stops or starts servers, never touches the database or `readyup_db.json`, and never uses sudo. Run it as the user that owns the server files.
+
+<Callout type="warn">
+  The `install.sh` in the root of the source repo is a different script. It is for development: it stops a server and wipes Ready Up's database state. Never run it on a real server.
+</Callout>
+
+## What gameinfo.gi must look like
+
+The order in `SearchPaths` matters. Ready Up must be above `Game csgo`, or CS2 loads its own `libserver.so` and Ready Up never runs.
+
+```text title="game/csgo/gameinfo.gi (part)"
+SearchPaths
+{
+    Game_LowViolence    csgo_lv
+    Game    csgo/readyup
+    Game    csgo
+    ...
+}
+```
+
+### Metamod
+
+Metamod can run next to Ready Up. Keep Metamod's line first and put Ready Up's line directly below it. Both stay above `Game csgo`:
+
+```text
+    Game    csgo/addons/metamod
+    Game    csgo/readyup
+    Game    csgo
+```
+
+Metamod then loads first and loads Ready Up as "the game". The other order, with Ready Up above Metamod, recursed at startup. The patcher uses the right order when it finds Metamod.
+
+## Database
+
+The database is optional. Without it, ready-up, scrims and matches still work. You need it for:
+
+- the shared admin list (`.ru admins`)
+- saved settings (`ru_match_token`, `ru_webhook_url` and others survive a restart)
+- recovery of a running match after a server restart
+- skins
+
+Ready Up uses Postgres. Point it at a database in `readyup_db.json`, see [Configuration](/cs2/ready-up/configuration#readyup_dbjson). Ready Up creates its tables on start.
+
+## Update
+
+Extract the new zip over the old install. The zip only contains files that Ready Up owns, so your `readyup.cfg`, `readyup_db.json` and `cfg/ReadyUp/` files stay. Restart the server.
+
+## After a CS2 update
+
+CS2 updates rewrite `gameinfo.gi` and remove Ready Up's line. The server then starts without Ready Up. After each CS2 update:
+
+1. Run the patcher again: `python3 readyup/tools/patch_gameinfo.py gameinfo.gi --game csgo/readyup` (and on `gameinfo_branchspecific.gi` if you have it).
+2. Restart the server.
+3. Run `ru selftest`.
+
+If a CS2 update breaks part of the engine surface, only the affected features turn off. `ru selftest` lists them. A fixed `engine-surface.json` can be dropped next to `libserver.so` without a new build, because the file on disk wins over the copy built into the core.
+
+## Use a different Valve libserver.so
+
+Ready Up loads Valve's module from `game/csgo/bin/linuxsteamrt64/libserver.so`. To load another file, set this environment variable before the server starts:
+
+```bash
+READYUP_REAL_SERVER_PATH=/full/path/to/libserver.so
+```

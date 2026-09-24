@@ -1,0 +1,187 @@
+---
+title: Engine surface
+description: How the core finds engine functions, how CI watches CS2 updates, and how to fix the core after one.
+icon: ScanSearch
+---
+
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+
+This page is for people who work on the core. Plugin authors do not need it: plugins never touch the engine.
+
+<Callout title="Paths are moving" type="info">
+  The core source is moving from `src/readyup/` to `core/src/`. This page names the current files. The move changes paths only, not the code.
+</Callout>
+
+## The rule
+
+If code depends on a byte pattern, an offset, a vtable index, a struct layout, a hook or an engine interface, it belongs in the core. Everything else is policy and belongs in a plugin.
+
+Every place the core touches Valve's `libserver.so` is listed in one file, `gamedata/engine-surface.json`. The CounterStrikeSharp gamedata is not used.
+
+- The file is built into the core at build time.
+- The release also puts a copy next to the core, `readyup/bin/linuxsteamrt64/engine-surface.json`. If that copy exists, it wins. So a signature can be fixed on a server without a new build.
+- If the file on disk does not parse, the core falls back to the built-in copy and logs why.
+
+## engine-surface.json
+
+The file has these sections:
+
+| Section | What it holds |
+| --- | --- |
+| `_meta` | The CS2 version and Steam build ID the file was made for. |
+| `functions` | Engine functions: a signature and identity anchors for each. |
+| `rtti` | Engine classes, found by their RTTI type name. |
+| `vtable_indices` | Virtual function slots the core patches or calls. |
+| `layouts` | Struct offsets, each tied to code that proves them. |
+
+### functions
+
+```json
+"Host_Say": {
+  "library": "server",
+  "hook": "funchook",
+  "linux": "55 48 89 E5 41 57 49 89 F7 41 56 41 55 41 89 D5",
+  "required": false,
+  "description": "Host_Say(controller, CCommand&, bool teamonly, int, const char*). Detoured (chat interception).",
+  "anchors": [
+    { "type": "string_ref", "string": "say_team", "window": 2048 },
+    { "type": "string_ref", "string": "%s %s @ %s: ", "window": 2560 }
+  ]
+}
+```
+
+| Key | Meaning |
+| --- | --- |
+| `linux` | The byte signature. `?` is a wildcard byte. |
+| `hook` | `"funchook"` if the core detours this function. |
+| `required` | If `true` and the function is not found, Ready Up turns itself off at load and the server runs as plain CS2. Keep this rare. |
+| `anchors` | Identity checks. All must pass. |
+
+A function resolves only if its signature matches **exactly once** and **every anchor passes**. Otherwise it is unresolved.
+
+### Anchor types
+
+An anchor proves that the match is the right function, not just a function with the same first bytes.
+
+| Type | Passes when |
+| --- | --- |
+| `string_ref` | The function body references the string within `window` bytes of its start. |
+| `caller_string` | A direct call to the function (or to a thunk that jumps to it, with `via_thunk`) has a reference to the string within `window` bytes before it. |
+| `callee_string` | A direct call in the first `window` bytes goes to a function that references the string. |
+| `global_string` | The function loads a global in its first 32 bytes, and that global is referenced near the string. For small accessors with no strings. |
+| `mov_disp` | The first `window` bytes have a `mov` with this displacement. Pins a struct offset to the code that reads it. |
+
+### rtti, vtable_indices and layouts
+
+A vtable slot is checked before the core patches or calls it:
+
+1. The class's vtable is found through its RTTI type name.
+2. The slot's target must equal the named `function`, or pass its own `anchors`.
+3. At runtime, the live object's vtable pointer must equal that vtable.
+
+A slot that fails is never patched.
+
+A layout, such as the `argc` and `argv` offsets of `CCommand`, is only trusted when the entry named in `verified_by` passes. That entry's anchors read exactly those offsets.
+
+## Features
+
+Every feature lists the engine surface it needs in `src/readyup/features.cpp`. For example, `ready_hud` needs the GameFrame hook, `LegacyGameEventListener` and the game event manager.
+
+- A feature is on only while all its needs are met.
+- If a need is known to be missing, the feature turns off and logs one line: `feature <name> DISABLED: needs <what>. Everything else keeps working.`
+- A need that is not known yet, such as the entity system before the first map, keeps the feature pending. It is off, with no log line.
+
+`ru selftest` shows this table under `[features]`. See [Troubleshooting](/cs2/ready-up/troubleshooting#features).
+
+When you add engine code, add its entries to `engine-surface.json` with at least one anchor each, and list them as needs of the feature that uses them.
+
+## Checking a CS2 build offline
+
+Two tools check the file against a copy of Valve's `libserver.so`, without a running server:
+
+```bash
+build/readyup_sigcheck /path/to/game/csgo/bin/linuxsteamrt64/libserver.so gamedata/engine-surface.json
+build/readyup_hookcheck /path/to/libserver.so gamedata/engine-surface.json
+```
+
+- `readyup_sigcheck` checks functions, RTTI names, vtable slots and layouts. It exits non-zero on any failure.
+- `readyup_hookcheck` resolves each `"hook": "funchook"` entry and prepares the detour on a copy of the binary, without installing it. It fails if the function's first instructions cannot be moved into a trampoline, for example because of a jump back into them.
+
+To get the files without a CS2 install:
+
+```bash
+scripts/ci/fetch-cs2-binaries.sh /tmp/cs2        # about 18 MB, no Steam login
+scripts/ci/verify-cs2.sh /tmp/cs2 build-sniper   # sigcheck + hookcheck + report.md
+```
+
+## The CI watcher
+
+Two GitHub workflows run the same checks:
+
+- **`build.yml`** runs on every push and pull request. It builds the release, runs the tests, then runs `readyup_sigcheck` and `readyup_hookcheck` against the current public CS2 build.
+- **`cs2-update-watch.yml`** runs every 15 minutes. It reads CS2's public build ID. When the build or `engine-surface.json` changed since the last run, it downloads only the needed Linux server files (depots 2347773 and 2347770, anonymous) and runs both checks.
+  - On a failure, it opens or updates an issue with the label `cs2-update`, and posts to Discord if that is set up.
+  - On a pass, it comments `CS2 build N verified`, and closes the open issue if there is one.
+  - It keeps its state (last build ID, file hash, result) on the `cs2-build` branch.
+
+## Fixing the core after a CS2 update
+
+<Steps>
+
+<Step>
+
+### See what broke
+
+Read the `cs2-update` issue, or run `scripts/ci/verify-cs2.sh` yourself. It lists each entry that no longer resolves, and why: no match, more than one match, or a failed anchor.
+
+</Step>
+
+<Step>
+
+### Find the function again
+
+Open the new `libserver.so` in a disassembler. Start from the anchors: find the string, then the code that references it, then the function. The `description` and the anchors in the entry say what to look for.
+
+</Step>
+
+<Step>
+
+### Update the entry
+
+Write a new signature that matches exactly once. Keep the anchors, or add better ones if the old ones no longer fit. Update `_meta` with the new CS2 version and build ID.
+
+</Step>
+
+<Step>
+
+### Check it
+
+```bash
+./build.sh
+build/readyup_sigcheck /tmp/cs2/game/csgo/bin/linuxsteamrt64/libserver.so gamedata/engine-surface.json
+build/readyup_hookcheck /tmp/cs2/game/csgo/bin/linuxsteamrt64/libserver.so gamedata/engine-surface.json
+```
+
+Then run `ru selftest` on a test server with the new build. It must end with `PASS`.
+
+</Step>
+
+<Step>
+
+### Ship it
+
+Open a pull request. The fixed `engine-surface.json` can also go to servers right away: put it next to the core and restart. Plugins do not need a rebuild.
+
+</Step>
+
+</Steps>
+
+If only a struct offset moved, check `layouts` and the `mov_disp` anchors. Game fields, such as `CCSPlayerPawn::m_EconGloves`, are looked up by name at runtime and do not need a change.
+
+## Skins
+
+The skins code uses its own set of functions (paints, knife subclass, models, bodygroups). They are described in `docs/skins-engine-surface.md` in the repo.
+
+<Callout title="Planned" type="info">
+  When skins moves to its own plugin, its entries move to `gamedata/engine-surface.skins.json`, which only ships with the skins package. A core without skins will then not look for them, and the matching API functions will return 0.
+</Callout>

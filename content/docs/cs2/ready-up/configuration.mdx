@@ -1,0 +1,189 @@
+---
+title: Configuration
+description: readyup.cfg, readyup_db.json, the mode configs and environment variables.
+icon: Settings
+---
+
+<Callout title="In development" type="warn">
+  Ready Up is not released yet. Keys can still change.
+</Callout>
+
+Ready Up reads three kinds of files:
+
+| File | Where | Used for |
+| --- | --- | --- |
+| `readyup.cfg` | `game/csgo/readyup/bin/linuxsteamrt64/` | Core settings: chat prefixes, HUD, debug flags. |
+| `readyup_db.json` | `game/csgo/readyup/bin/linuxsteamrt64/` | The Postgres connection. |
+| `cfg/ReadyUp/*.cfg` | `game/csgo/cfg/ReadyUp/` | Server settings for each mode (warmup, knife, live, practice). |
+
+Settings for Auto Tournament (token, webhook URL, heartbeat URL) are not in a file. They are console commands, see [Commands](/cs2/ready-up/commands#auto-tournament).
+
+## readyup.cfg
+
+The file sits next to the core, `libserver.so`. The installer creates it from `readyup.cfg.example` only if it is missing, so your changes survive updates.
+
+The format is one `key=value` per line. Lines that start with `#` or `//` are comments. Quote a value that has spaces. Booleans take `0`/`1` (also `n`/`y`, `f`/`t`).
+
+```text title="game/csgo/readyup/bin/linuxsteamrt64/readyup.cfg"
+debug=0
+banner=1
+welcome=1
+ready_hud=1
+chat_prefix=<DarkRed>[Ready Up]<Default>
+admin_prefix=<DarkRed>[Admin]<Default>
+hud_brand="Auto Tournament"
+```
+
+After you change the file, reload it without a restart. In the server console run `ru reload`, or as an admin type `.ru reload` in chat.
+
+### Chat
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `chat_prefix` | `<DarkRed>[Ready Up]<Default>` | Prefix of Ready Up's chat messages. Ready Up adds one space after it. |
+| `admin_prefix` | `<DarkRed>[Admin]<Default>` | Prefix shown in front of an admin's name in chat. |
+| `captain_prefix_team1` | `<LightBlue>[CAP]<Default>` | Prefix for the team 1 captain from the match config. |
+| `captain_prefix_team2` | `<Orange>[CAP]<Default>` | Prefix for the team 2 captain. |
+| `consume_ru_chat` | `0` | Hide `.ru ...` messages from chat after Ready Up handles them. |
+| `consume_ready_chat` | `0` | Hide `.r` and the other ready messages from chat after Ready Up handles them. |
+
+Prefixes take color tokens: `<Default>`, `<White>`, `<DarkRed>`, `<Green>`, `<LightYellow>`, `<LightBlue>`, `<Olive>`, `<Lime>`, `<Red>`, `<LightPurple>`, `<Purple>`, `<Grey>`, `<Yellow>`, `<Gold>`, `<Silver>`, `<Blue>`, `<DarkBlue>`, `<BlueGrey>`, `<Magenta>`, `<LightRed>`, `<Orange>`.
+
+```text
+chat_prefix="<Green>[PUG #1]<Default>"
+```
+
+### Welcome screen and HUD
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `welcome` | `1` | Show a welcome card to a player the first time they join CT or T on a map. Only that player sees it, for about 5 seconds. |
+| `ready_hud` | `1` | Show each player the ready panel during warmup and the knife side pick. See [The ready HUD](/cs2/ready-up/scrims-and-matches#the-ready-hud). |
+| `hud_brand` | `Auto Tournament` | Text in the header of the welcome card and the ready panel. |
+| `hud_logo_url` | empty | URL of a PNG shown in front of `hud_brand`. Empty means no image. |
+| `hud_tick_ms` | `0` | How often the ready panel is rebuilt, in milliseconds. `0` means every frame. |
+| `hud_resend_ms` | `0` | Minimum time between two sends of the same panel to a player, in milliseconds. `0` means every frame. |
+| `hud_duration_s` | `1` | How long each send stays up, in seconds (1 to 10). |
+
+Keep the three `hud_*` timing keys at their defaults. CS2 replays the panel's open animation on every send, and only a resend every frame gives a steady panel. Slower values make it blink.
+
+The logo must be a public PNG, already scaled to the size you want. SVG does not work, and the client ignores `width` and `height`. The CS2 client only renders a small part of HTML. Admins can test what works in game with `.ru hudtest 1` to `.ru hudtest 7`.
+
+### Scrims
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `scrim_knife` | `1` | In a scrim, play a knife round after everyone is ready. `0` goes straight to live. |
+| `knife_pick_seconds` | `60` | Seconds the knife winners have to pick a side in a scrim. Matches use `knifeDecisionSeconds` from the match config. |
+
+### Logging and debug
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `banner` | `1` | Print the Ready Up banner to the console at start. |
+| `debug` | `0` | Verbose logging in the server console. |
+| `chat_debug` | `0` | Also send debug lines to chat. Only works with `debug=1`. |
+| `dev_bots_ready` | `0` | For testing only. Bots on CT and T count as players and are always ready, so one person can test ready-up and pauses with bots. Never turn this on for a real match. Ready Up logs a warning while it is on. |
+
+`log_receiver_port` (default `35050`) is still read, but nothing uses it at the moment.
+
+## readyup_db.json
+
+The Postgres connection. The file sits next to the core. Ready Up works without it, but then there is no shared admin list, no saved settings, no match recovery after a restart and no skins.
+
+Either give a libpq connection string:
+
+```json title="game/csgo/readyup/bin/linuxsteamrt64/readyup_db.json"
+{
+  "conninfo": "host=127.0.0.1 port=5449 dbname=readyup user=readyup password=readyup sslmode=disable"
+}
+```
+
+Or give the parts. Ready Up builds the connection string from them:
+
+```json
+{
+  "host": "127.0.0.1",
+  "port": 5449,
+  "dbname": "readyup",
+  "user": "readyup",
+  "password": "change-me",
+  "sslmode": "disable"
+}
+```
+
+Ready Up never writes the password to the log. Several servers can share one database. They then share the admin list.
+
+For a local test database, the repo has a compose file that starts Postgres on `127.0.0.1:5449`:
+
+```bash
+docker compose -f compose.postgres.yml up -d
+```
+
+Ready Up creates these tables when it connects:
+
+| Table | Holds |
+| --- | --- |
+| `readyup_admins` | Admin Steam64 IDs and names. |
+| `readyup_settings` | Saved settings such as `ru_webhook_url`, and the active match for recovery. |
+| `readyup_weapon_skins`, `readyup_weapon_knives`, `readyup_weapon_gloves`, `readyup_weapon_agents` | Skin loadouts. See [Skins](/cs2/ready-up/skins). |
+
+<Callout title="Planned" type="info">
+  Once match and skins are separate plugins, each plugin will read its own settings from `cfg/ReadyUp/<plugin>.cfg`, then from a `[plugin]` section in `readyup.cfg`. `readyup.cfg` will keep only the core keys.
+</Callout>
+
+## cfg/ReadyUp/*.cfg
+
+These are normal CS2 config files with server settings for each mode. The release zip has them in `readyup/cfg-templates/ReadyUp/`. The install script copies missing ones to `game/csgo/cfg/ReadyUp/`. Edit the copies there.
+
+| File | Runs when |
+| --- | --- |
+| `warmup.cfg` | Warmup rules apply (scrim or match warmup). |
+| `idle.cfg` | The server goes idle. It runs `warmup.cfg`. |
+| `knife.cfg` | The knife round starts. |
+| `live.cfg` | The match goes live. |
+| `live_override.cfg` | At the end of `live.cfg`. Put your own changes here. |
+| `prac.cfg` | Practice mode starts. |
+
+`live.cfg`, `knife.cfg` and `prac.cfg` start from the MatchZy defaults.
+
+Two rules for `warmup.cfg`:
+
+- Do not add `mp_warmup_start`. Ready Up does not use CS2's own warmup, because its WARMUP text covers the ready panel. Ready Up makes its own warmup instead: players respawn, rounds do not end, and you can buy anywhere. `warmup.cfg` sets `mp_warmuptime 0` for this.
+- It sets `sv_hibernate_when_empty 0`. Keep that. A hibernating server runs no frames, and Ready Up does its work in frames.
+
+### When the files run
+
+By default Ready Up runs:
+
+- `knife.cfg` for the knife round,
+- `live.cfg` when a scrim goes live, and after the knife side pick,
+- `prac.cfg` when an admin turns practice on with `.prac`, and `idle.cfg` when they turn it off.
+
+For warmup it sets the warmup settings itself. A match without a knife round goes live with the match settings, without `live.cfg`.
+
+To run all mode files on every mode change, as MatchZy does, turn on cfg exec in the console:
+
+```text
+ru_cfg_exec_enable 1
+```
+
+The built-in warmup settings can be changed with the `ru_warmup_*` console commands, see [Commands](/cs2/ready-up/commands#warmup).
+
+## Environment variables
+
+Set these before the server starts. The first four override the matching `readyup.cfg` key.
+
+| Variable | What it does |
+| --- | --- |
+| `READYUP_DEBUG` | Overrides `debug`. |
+| `READYUP_BANNER` | Overrides `banner`. |
+| `READYUP_CHAT_DEBUG` | Overrides `chat_debug`. |
+| `READYUP_DEV_BOTS_READY` | Overrides `dev_bots_ready`. |
+| `READYUP_WELCOME=0` | Turns the welcome card off. |
+| `READYUP_DISABLE_SKINS=1` | Turns skins off. |
+| `READYUP_CRASH_HANDLER=0` | Turns the crash handler off. |
+| `READYUP_REAL_SERVER_PATH` | Path to Valve's `libserver.so`, if it is not in the usual place. |
+| `READYUP_PLUGINS=0` | Loads no plugins. |
+| `READYUP_PLUGINS_DIR` | Loads plugins from another folder. Used by tests. |
+| `READYUP_SELFTEST_AND_QUIT=1` | Runs the selftest after the first map and quits. For CI. See [Troubleshooting](/cs2/ready-up/troubleshooting#selftest-in-ci). |

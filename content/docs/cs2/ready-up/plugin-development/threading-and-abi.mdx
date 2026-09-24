@@ -1,0 +1,98 @@
+---
+title: Threading and ABI
+description: The rules a plugin must follow so that it is safe to load, run and hot reload.
+icon: Cpu
+---
+
+The core and a plugin are separate libraries built at different times. These rules keep them compatible and make hot reload safe.
+
+## Threads
+
+- Every plugin callback runs on the server's main thread, the one that runs the server frame. That includes load, unload, commands, events, ticks and posted tasks.
+- Call API functions only from that thread. When you call them from a callback, you are on it. Calls from other threads are refused and logged.
+- Two functions are safe from any thread: `log` and `post_to_game_thread`.
+- Chat, console commands and events can arrive on other threads inside the engine. The core only queues them there, and delivers them in the next server frame. So your code never runs inside an engine hook, and never while the core holds a lock. The cost is up to one frame of delay, about 15 ms at 64 tick.
+
+### Frame order
+
+Each server frame runs in this order:
+
+1. Valve's own frame.
+2. The core's frame work. For now this includes the built-in match and skins code.
+3. Pending plugin loads, unloads and reloads.
+4. Posted tasks, then commands, then events. Each queue runs first in, first out.
+5. `on_tick` callbacks, if the server is simulating.
+
+Queues also drain on frames that do not simulate.
+
+### Your own threads
+
+Worker threads, for example for a database or HTTP, belong to your plugin:
+
+- Start them in `readyup_plugin_load`.
+- Join them in `readyup_plugin_unload`. This is the one rule the core cannot enforce. After unload, your code is unmapped, and a thread still running in it crashes the server.
+- Hand results back with `post_to_game_thread`.
+
+### Limits
+
+The queues have a fixed size: 1024 commands, 1024 events and 4096 tasks. When a queue is full, the oldest events are dropped, and new commands and tasks are refused.
+
+## The C ABI
+
+1. **Plain C across the boundary.** No C++ classes, references, STL types, `std::string` or exceptions. You can write the plugin in C++, but catch every exception before you return to the core. The core also catches and logs anything thrown out of a callback, but a throw across the boundary is a plugin bug.
+2. **Fixed-width types and pointers only.** `int`, `uint32_t`, `uint64_t`, `double`. Enum values travel as `uint32_t`. `int` is used for booleans.
+3. **No ownership transfer.** Strings and structs passed to a callback are valid only during that call. Copy what you need. The core never frees plugin memory, and a plugin never frees core memory. `user` pointers are yours and the core never looks at them.
+4. **Only the three entry points cross.** A plugin exports `readyup_plugin_info`, `readyup_plugin_load` and `readyup_plugin_unload`, and hides every other symbol. It imports nothing from the core. Every core service is a function pointer in `ru_api`.
+
+### Build flags
+
+`readyup_add_plugin` in the repo's CMake sets these for you:
+
+| Flag | Why |
+| --- | --- |
+| `-fvisibility=hidden` (C and C++), hidden inline functions | Only the three entry points are exported. |
+| `-Wl,--no-undefined` | A symbol the plugin cannot resolve means it reached for core internals. The link fails instead of the load. |
+| `-fno-gnu-unique` (C++ with GCC) | `STB_GNU_UNIQUE` symbols make `dlclose` do nothing. A reload would then keep the old code without telling you. |
+
+After unloading, the core checks that the library is really gone from memory, and logs a warning if it is still mapped.
+
+## Versions
+
+`READYUP_PLUGIN_API_VERSION` is `(MAJOR << 16) | MINOR`.
+
+- **Minor**: new members are added to the end of `ru_api` or of a callback struct. Nothing is removed, reordered or changed in meaning. A plugin built for 1.0 runs on a 1.3 core.
+- A plugin that needs a 1.2 member can either require 1.2 in `ru_plugin_info.api_version` (older cores then refuse it), or check `RU_API_HAS(api, member)` at runtime and work without it.
+- **Major**: any incompatible change. The core refuses plugins with another major. Majors change rarely, and together with the plugins in the repo.
+- Every struct starts with `uint32_t struct_size`. Check it before you read fields that were added later.
+- A core supports its own major and every minor up to its own. Plugins in the repo are always built with the core they ship with. Other plugins only need a rebuild when the major changes.
+
+## Hot reload
+
+`ru plugin reload <name>` is an unload followed by a load of `csgo/readyup/plugins/<name>.so` from disk. The command only queues the request. It runs at the start of the next server frame, when no plugin code is on the stack, the engine is not inside a hook and the core holds no lock. So a plugin that runs `server_command("ru plugin reload x")` cannot unload itself in the middle of a callback.
+
+### What unload does
+
+1. Marks the plugin as unloading. The core stops sending it anything and refuses its `post_to_game_thread`.
+2. Calls `readyup_plugin_unload`. The plugin joins its threads and frees its memory.
+3. Removes every command, tick and subscription the plugin owns, and every task it posted.
+4. Closes the library, then checks that it is really gone.
+
+### What that guarantees
+
+- **No dangling hooks.** Plugins cannot hook the engine. Every hook belongs to the core and outlives any plugin.
+- **No stale callbacks.** Queued commands and events are looked up by registration when they are delivered. Anything queued for the old library is dropped, never sent to the new one. The host test checks this.
+- **No use after free.** The core never frees the plugin handle or the `ru_api` table, a few hundred bytes per reload. A thread that wrongly outlives unload finds the plugin marked dead, and its API calls do nothing.
+- **Failed loads leave nothing behind.** Bad exports, a version or name mismatch, or `load` returning non-zero all clean up fully.
+- **Crashes are attributed.** If the server crashes inside a plugin callback, the crash log says `crashed inside plugin "<name>"`.
+
+### State
+
+A reloaded plugin starts with no state. Keeping state across a reload with `stash_put` and `stash_get` is planned for API 1.1.
+
+<Callout title="Planned" type="info">
+  Once match is a plugin, reloading it during a live match will drop the in-memory match state. It will restore from the saved match state in Postgres, or from the stash. During development, reload between matches.
+</Callout>
+
+### Hibernation
+
+Reloads run in server frames. An empty server that hibernates runs no frames, so a queued reload waits until it wakes up. Use `sv_hibernate_when_empty 0` on development servers.

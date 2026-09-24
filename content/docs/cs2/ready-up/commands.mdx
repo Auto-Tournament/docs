@@ -1,0 +1,157 @@
+---
+title: Commands
+description: Chat commands for players and admins, and console and RCON commands.
+icon: SquareTerminal
+---
+
+<Callout title="In development" type="warn">
+  Ready Up is not released yet. Commands can still change.
+</Callout>
+
+Chat commands start with a dot, for example `.r`. Admin commands in chat start with `.ru`. In the server console and over RCON, the same commands start with `ru` and no dot, for example `ru start`.
+
+Type `ru` or `ru help` in the server console for the full list. In chat, `.ru help` shows a short list, and `.ru` alone shows the version.
+
+## Player commands
+
+| Command | What it does |
+| --- | --- |
+| `.r`, `.ready` | Mark yourself ready. Typing it again does not unready you. |
+| `.ur`, `.unready`, `.nr`, `.notready` | Mark yourself not ready. |
+| `.pause`, `.p` | Pause the match. |
+| `.tech` | The same as `.pause` for now. |
+| `.unpause`, `.up` | Ask to unpause. Both teams must type it. |
+| `.stay`, `.switch`, `.swap` | After the knife round: keep your side, or switch. Any player on the winning team can pick. |
+| `.ct`, `.t` | After the knife round: pick a side. |
+| `.gg` | Tell Auto Tournament you give up. It sends a `player_gg` event. |
+| `.ff`, `.forfeit` | Forfeit the match. Only the team captain from the match config can do this. |
+| `.help` | Show the player commands. |
+| `.ru state` | Show the mode, roster, who is ready, and flags. `.ru status` does the same. |
+| `.ru admins` | List the admins. |
+
+With no match loaded, only the ready commands work. The others say they need a live match. You must be on CT or T to ready up.
+
+With a match loaded, only players on the match roster can use these commands.
+
+### Practice
+
+These only work in practice mode.
+
+| Command | What it does |
+| --- | --- |
+| `.bot` | Add a frozen bot on the other team. |
+| `.cbot`, `.crouchbot` | Add a crouching bot. |
+| `.boost`, `.crouchboost` | The same as `.bot` and `.cbot` for now. |
+| `.nobots` | Kick all bots. |
+
+## Admin commands
+
+Admin commands need admin rights, see [Who is an admin](#who-is-an-admin). Anyone else who types one gets `not authorized`.
+
+| Command | What it does |
+| --- | --- |
+| `.ru start` | Start the loaded match now, even if not everyone is ready. |
+| `.ru restart` | Restart the match and go back to warmup. |
+| `.ru end` | End the match. Sends `series_end` with no winner, clears the match and resets the server. |
+| `.ru pause`, `.ru fp`, `.ru forcepause` | Pause as an admin. |
+| `.ru unpause`, `.ru up`, `.ru fup`, `.ru forceunpause` | Unpause right away. The teams do not need to confirm. |
+| `.ru side stay\|switch\|ct\|t` | Pick the side after the knife round for the winning team. |
+| `.ru recover [round]` | Ask Auto Tournament to restore the match. With a round number, restore to that round. |
+| `.prac`, `.tactics`, `.ru prac` | Turn practice mode on. Type it again to turn it off. Clears any loaded match. |
+| `.ru idle` | Go idle. Clears any loaded match. Scrim warmup stays off until `.ru scrim` or the next map. |
+| `.ru scrim` | Turn scrim warmup back on after `.ru idle`. |
+| `.ru reload` | Load `readyup.cfg` again. |
+| `.ru admins add <steamid64\|name>` | Add an admin. A name is a part of the name of a connected player. |
+| `.ru admins remove <steamid64\|name>` | Remove an admin. |
+| `.ru selftest` | Run the selftest. The full report goes to the server console, the result and the first failures go to chat. |
+| `.ru hudtest <1-7>` | Show a test panel to yourself for 10 seconds. `1` fonts, `2` images, `3` unicode, `4` SVG, `5` PNG, `6` another PNG, `7` your `hud_brand` header. |
+| `.ru plugin list` | List loaded plugins. |
+| `.ru plugin load\|unload\|reload <name>` | Load, unload or reload a plugin. See [Plugin development](/cs2/ready-up/plugin-development/getting-started#hot-reload). |
+| `.ru version` | Show the version. |
+
+## Who is an admin
+
+A player is an admin if one of these is true:
+
+- The Steam64 ID is in the `admins` list of the loaded match config. Auto Tournament fills this in.
+- The Steam64 ID is in the admin list that Auto Tournament serves at `ru_admins_url`.
+- The Steam64 ID is in the `readyup_admins` table in Postgres (`.ru admins add`).
+
+The server console and RCON are always allowed.
+
+The first admin in the database must be added from the server console, because no one in chat has rights yet:
+
+```text
+ru admins add 76561198000000000
+```
+
+## Console and RCON commands
+
+Run these in the server console or over RCON.
+
+### General
+
+| Command | What it does |
+| --- | --- |
+| `ru`, `ru help` | Show the build and all commands. |
+| `ru selftest` | Check the engine surface, hooks, schema, events, database, plugins and features. Ends with `PASS` or `FAIL`. See [Troubleshooting](/cs2/ready-up/troubleshooting#ru-selftest). |
+| `ru sigtest` | Check only the engine functions. Prints `OK`, `WARN` or `FAIL` for each. |
+| `ru state`, `ru status` | Show the mode, roster, ready players and flags. |
+| `ru reload` | Load `readyup.cfg` again. |
+| `ru admins`, `ru admins add\|remove <steamid64\|name>` | List, add or remove admins. |
+| `ru plugin list`, `ru plugin load\|unload\|reload <name>` | Manage plugins. |
+
+### Modes
+
+| Command | What it does |
+| --- | --- |
+| `ru mode` | Show the current mode. |
+| `ru mode idle`, `ru idle` | Go idle. Same as `.ru idle`. |
+| `ru mode practice`, `ru practice` | Turn practice mode on. |
+| `ru scrim` | Turn scrim warmup back on. |
+
+### Matches
+
+| Command | What it does |
+| --- | --- |
+| `ru match load <url>` | Download a match config and load it. Uses `ru_match_token` as the Bearer token. |
+| `ru start` | Start the loaded match now. |
+| `ru restart` | Restart the match and go back to warmup. |
+| `ru end` | End the match with no winner and reset the server. |
+| `ru side stay\|switch\|ct\|t` | Pick the side after the knife round. |
+| `ru recover [round]` | Ask Auto Tournament to restore the match. |
+
+### Auto Tournament
+
+Auto Tournament sets these for you. Run a command without a value to see the current value. Ready Up saves them in Postgres, if there is one, so they survive a restart.
+
+| Command | What it does |
+| --- | --- |
+| `ru_match_token <token>`, `ru_match_token clear` | The Bearer token for match loading, webhooks and the admin list. |
+| `ru_webhook_url <url>`, `ru_webhook_url clear` | Base URL for match events, for example `https://at.example.com/api/events`. Ready Up adds the match slug or ID. |
+| `ru_heartbeat_url <url>`, `ru_heartbeat_url clear` | Full heartbeat URL, including the server ID. Ready Up posts its status about every 5 seconds. |
+| `ru_admins_url <url>`, `ru_admins_url clear` | URL of the admin list. |
+| `ru_admins_refresh_seconds <seconds>` | How often to fetch the admin list again: `0` (never) or `10` to `3600`. |
+
+<Callout title="Planned" type="info">
+  A full set of `ru_` commands that mirror the `at_` commands of Auto Tournament CS2 is planned. Auto Tournament can then control both plugins the same way. Until then, only the commands on this page exist.
+</Callout>
+
+### Warmup
+
+These change Ready Up's own warmup. They apply the next time warmup rules are set.
+
+| Command | Default | What it does |
+| --- | --- | --- |
+| `ru_warmup_enable 0\|1` | `1` | Keep a loaded match in warmup until everyone is ready, and show the warmup message. With `0` there is no ready-up for matches: the match goes live on the next round start. |
+| `ru_warmup_message_html <html>` | built in | The warmup message. Takes `{ready_count}`, `{connected_count}` and `{total_count}`. `default` restores the built-in message. |
+| `ru_warmup_respawn 0\|1` | `1` | Respawn after death. |
+| `ru_warmup_ignore_win_conditions 0\|1` | `1` | Rounds do not end. |
+| `ru_warmup_roundtime_minutes <1-120>` | `60` | Round time. |
+| `ru_warmup_startmoney <0-60000>` | `16000` | Start money. |
+| `ru_warmup_maxmoney <0-60000>` | `16000` | Maximum money. |
+| `ru_warmup_buy_anywhere 0\|1` | `1` | Buy anywhere. |
+| `ru_warmup_infinite_ammo 0\|1` | `1` | Infinite ammo. `1` sets `sv_infinite_ammo 2`, so players still reload. |
+| `ru_cfg_exec_enable 0\|1` | `0` | Run the `cfg/ReadyUp/*.cfg` file for every mode change. See [Configuration](/cs2/ready-up/configuration#when-the-files-run). |
+
+These values are not saved. They reset when the server restarts.

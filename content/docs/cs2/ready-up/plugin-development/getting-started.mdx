@@ -1,0 +1,178 @@
+---
+title: Getting started
+description: Build the example plugin, load it on a server and hot reload it.
+icon: Rocket
+---
+
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+
+<Callout title="In development" type="warn">
+  The plugin API is at version 1.0 and will grow. The repo is also being reorganized into `core/` and `plugins/`, so some paths on this page will change. Paths that are not settled are marked.
+</Callout>
+
+A Ready Up plugin is a Linux shared library (`.so`) in `game/csgo/readyup/plugins/`. It talks to the server only through a table of C functions that the core hands it. It never touches the engine itself. When CS2 updates, the core gets fixed and your plugin keeps working without a rebuild.
+
+This page walks through `hello`, the example plugin in the repo. It is plain C and about 100 lines.
+
+## Repo layout
+
+This is the target layout from `docs/ARCHITECTURE.md`:
+
+| Path | What it is |
+| --- | --- |
+| `core/` | The core: loader, engine surface, hooks, events, plugin host. |
+| `core/include/readyup/plugin_api.h` | The plugin API. A plugin includes only this file. |
+| `plugins/hello/` | The example plugin. |
+| `plugins/match/` | The match plugin. Planned. |
+| `plugins/skins/` | The skins plugin. Planned. |
+| `libs/` | Shared code that does not touch the engine (Postgres, HTTP, JSON), as static libraries. Planned. |
+| `gamedata/` | `engine-surface.json`. |
+| `tools/` | `readyup_sigcheck`, the plugin host test and generators. |
+
+`plugin_api.h` and `plugins/hello/` are already in their final place. The rest of the core is still in `src/readyup/` and moves to `core/src/` in one commit. Match and skins are still built into the core.
+
+## What you need
+
+- Linux, CMake and GCC or Clang.
+- A CS2 test server with Ready Up installed, where you can use the console.
+- `sv_hibernate_when_empty 0` on that server. Plugins load and reload in server frames, and a hibernating server runs none.
+
+## Build hello
+
+```bash
+git clone https://github.com/Auto-Tournament/ready-up.git
+cd ready-up
+./build.sh
+```
+
+`./build.sh` runs CMake and builds everything into `build/`. You get the core, `build/libserver.so`, and the plugin, `build/plugins/hello.so`.
+
+To build only one plugin:
+
+```bash
+cmake --build build --target readyup_plugin_hello
+```
+
+To build in the same Debian image the dev server uses:
+
+```bash
+BUILD_TARGET=readyup_plugin_hello scripts/docker-build.sh   # -> build-docker/plugins/hello.so
+```
+
+## Load it
+
+<Steps>
+
+<Step>
+
+### Copy the file
+
+Copy `hello.so` to `game/csgo/readyup/plugins/hello.so` on the server. The file name must match the name the plugin reports, here `hello`.
+
+</Step>
+
+<Step>
+
+### Load it
+
+The core loads every `*.so` in that folder on the first server frame, in name order. On a running server, load it by hand:
+
+```text
+ru plugin load hello
+```
+
+</Step>
+
+<Step>
+
+### Check it
+
+```text
+ru plugin list
+```
+
+```text
+plugin: 1 loaded, core api 1.0, dir /home/cs2/game/csgo/readyup/plugins
+plugin:   hello 1.0.0 (api 1.0) cmds=2 ticks=1 subs=1 - example plugin: .hello, hello_status, 10s tick heartbeat, lifecycle event log
+```
+
+Type `.hello` in chat, or `hello_status` in the console. Every 10 seconds the console shows a `tick heartbeat` line from the plugin.
+
+</Step>
+
+</Steps>
+
+## Hot reload
+
+Reload swaps a plugin for the file on disk without a server restart:
+
+```text
+ru plugin reload hello
+```
+
+Admins can also type `.ru plugin reload hello` in chat. The command only queues the reload. It runs at the start of the next server frame, when no plugin code is running. The console then shows `plugin: reloaded hello`, or `plugin: reload hello failed: ...`.
+
+Try it: change `HELLO_VERSION` in `hello.c`, build, copy, reload. `.hello` answers with the new version.
+
+When you copy a new file over a loaded one, do not write into the old file. Copy it next to it and rename it into place (`mv`). The server still has the old file mapped.
+
+A reloaded plugin starts with no state. If the new file fails to load, the plugin stays unloaded. Put the old file back and reload again.
+
+### dev-deploy.sh
+
+`scripts/dev-deploy.sh --plugin <name>` does all of this in one step. It builds only that plugin in Docker, copies it to the server, renames it into place, keeps the old file as `<name>.so.prev`, types `ru plugin reload <name>` into the server's tmux console, and waits up to 15 seconds for the result.
+
+```bash
+scripts/dev-deploy.sh --plugin hello
+```
+
+It is written for the Ready Up test box. Point it at your own server with these options (or the environment variables in brackets):
+
+| Option | Default | What it is |
+| --- | --- | --- |
+| `--target DIR` (`RU_TARGET`) | `/home/cs2servermanager/readyup-test` | Server folder, with `game/` in it. |
+| `--ssh USER@HOST` (`RU_SSH`) | `cs2servermanager@localhost` | The user that owns the server files. |
+| `--session NAME` (`RU_SESSION`) | `ru-test` | The tmux session that runs the server. |
+| `--no-build` | | Deploy the last build. |
+
+The script reads the result from `console.log` in the server folder. Changes to the core still need a full deploy and a restart: `scripts/dev-deploy.sh --restart`.
+
+### Turning plugins off
+
+- `ru plugin unload <name>` unloads a plugin until the next restart.
+- Rename the file, for example to `hello.so.off`, to stop it from loading at start.
+- `READYUP_PLUGINS=0` loads no plugins at all.
+
+## Test without a server
+
+The repo has an offline test that loads `hello.so` into the real plugin host, sends it commands and events, then reloads a second build and checks that the old code is gone:
+
+```bash
+(cd build && ctest --output-on-failure)
+```
+
+## Your own plugin
+
+Inside the repo, add a folder under `plugins/` and register it in CMake:
+
+```cmake title="plugins/myplugin/CMakeLists.txt"
+readyup_add_plugin(myplugin myplugin.c)
+```
+
+Then add `add_subdirectory(plugins/myplugin)` to the top-level `CMakeLists.txt`. `readyup_add_plugin` sets the flags a plugin needs: hidden symbols, `--no-undefined`, and `-fno-gnu-unique` for C++. See [Threading and ABI](/cs2/ready-up/plugin-development/threading-and-abi#build-flags).
+
+A plugin exports three functions:
+
+```c
+#include "readyup/plugin_api.h"
+
+READYUP_PLUGIN_EXPORT const ru_plugin_info* readyup_plugin_info(void);
+READYUP_PLUGIN_EXPORT int readyup_plugin_load(const ru_api* api, uint32_t core_api_version);
+READYUP_PLUGIN_EXPORT void readyup_plugin_unload(void);
+```
+
+Start from `plugins/hello/hello.c`. The [API reference](/cs2/ready-up/plugin-development/api-reference) lists every function.
+
+<Callout title="Planned" type="info">
+  A guide for plugins built outside the repo is planned, once the API has the functions the match and skins plugins need (version 1.1).
+</Callout>
