@@ -58,6 +58,10 @@ While a match is loaded:
 - Only players in `team1.players`, `team2.players` and `spectators.players` can stay on the server. Others are kicked. Admins are never kicked.
 - Roster players can only join their own team. The side comes from `map_sides` for the current map: `team1_ct` or `team2_ct`. Without it, team 1 is CT.
 
+### Team names
+
+With a match loaded, the scoreboard shows the team names from the match config (`mp_teamname_1` and `mp_teamname_2`), and the team flags if the config has them. Name 1 belongs to the team that starts on CT, and follows the teams when they switch sides after the knife round. Scrims keep the default names. The names are reset when the match unloads.
+
 ### Going live
 
 When every roster player is connected and ready, the match goes live. If the map's side is `knife`, the knife round comes first. An admin can start it early with `.ru start`.
@@ -73,7 +77,7 @@ Ready Up reads the same match config Auto Tournament sends to Auto Tournament CS
 | Field | Used for |
 | --- | --- |
 | `matchid`, `slug` | The match ID. Webhooks go to the slug if there is one. |
-| `team1`, `team2` | `name`, `players` (Steam64 IDs), and `captain_steamid64` for `.ff`. |
+| `team1`, `team2` | `name`, `flag`, `players` (Steam64 IDs), and `captain_steamid64` for `.ff`. |
 | `spectators.players` | Spectators allowed on the server. |
 | `maplist`, `num_maps` | The maps. |
 | `map_sides` | `team1_ct`, `team2_ct` or `knife` for each map. |
@@ -83,6 +87,7 @@ Ready Up reads the same match config Auto Tournament sends to Auto Tournament CS
 | `damageTiebreak`, `damageTiebreakSuddenDeath` | What to do when overtime runs out. |
 | `knifeDecisionSeconds` | Time for the side pick. Default 60. |
 | `clinch_series` | End the series as soon as a team has won more than half the maps. Default `true`. |
+| `max_tech_pauses_per_team`, `tech_pause_max_seconds`, `both_teams_unpause_required`, `allow_force_ready`, `min_players_to_ready`, `forfeit_after_seconds` | See [Match rules](#match-rules). |
 
 The response can be the config itself, or a wrapper `{ id, slug, config }`.
 
@@ -98,19 +103,41 @@ The knife round works from the server log alone. It uses engine events when they
 
 ## Pauses
 
-| Who | Pause | Unpause |
-| --- | --- | --- |
-| Player | `.pause`, `.p` or `.tech` | `.unpause` or `.up`. Both teams must type it. |
-| Admin | `.ru pause` | `.ru unpause`. Ends the pause right away. |
+There are three kinds of pause. They only work during a live map of a loaded match.
 
-Pauses only work during a loaded match. Ready Up uses CS2's own `mp_pause_match`, so the pause starts at the next freeze time. `.tech` marks the pause as technical in events, but works the same as `.pause`. There are no pause limits yet. Pause types with limits are coming.
+| Kind | Who | Start | End |
+| --- | --- | --- | --- |
+| Tactical timeout | Roster player | `.tac` | Ends by itself when the timeout is over, at the next freeze time end. |
+| Technical pause | Roster player | `.tech`, `.pause` or `.p` | `.unpause` or `.up`. By default both teams must type it. It also ends by itself after `tech_pause_max_seconds`. |
+| Admin pause | Admin | `.forcepause`, `.fp` or `.ru pause` | Only an admin: `.forceunpause`, `.fup` or `.ru unpause`. |
+
+- **Tactical timeouts** are CS2's own timeouts for the caller's side. Their number and length are `mp_team_timeout_max` and `mp_team_timeout_time`, from `live.cfg` or the match `cvars`.
+- **Technical pauses** use CS2's `mp_pause_match`, so they start at the next freeze time. Each team gets `max_tech_pauses_per_team` per map (3 by default). With `both_teams_unpause_required=0`, the team that paused can end it alone.
+- An admin can call a pause for a team with `.ru tech team1` or `.ru tac team2`. That team's limits apply.
+
+While a map is paused, the panel in the middle of the screen shows the kind of pause, who paused, the countdown to the automatic unpause, and which teams have typed `.unpause`.
 
 In fleet mode, a live match also pauses on its own when the server loses the platform for too long. See [Offline auto-pause](/cs2/ready-up/fleet#offline-auto-pause).
 
+## Force ready
+
+`.forceready` marks the caller's whole team ready in warmup. It only works once enough of the team is connected: `min_players_to_ready` players, or the full roster when that is `0` (the default). The same number is what the match waits for before it goes live. Turn it off with `allow_force_ready=0`. In a scrim, any player on CT or T can use it.
+
 ## Forfeit and give up
 
+- **A team leaves.** If nobody from one team is connected on a live map for `forfeit_after_seconds` (240 by default), that team forfeits the map and the series. Chat and the panel show a countdown. It stops when someone from the team comes back. `0` turns this off.
 - `.ff` or `.forfeit`: the team captain forfeits the match. The captain is `captain_steamid64` in the match config. Without a captain, `.ff` does not work.
 - `.gg`: sends a `player_gg` event to Auto Tournament. It does not end the match on its own.
+
+## Match rules
+
+The pause, force-ready and forfeit rules come from, in this order:
+
+1. the match config: top-level keys `max_tech_pauses_per_team`, `tech_pause_max_seconds`, `both_teams_unpause_required`, `allow_force_ready`, `min_players_to_ready`, `forfeit_after_seconds`. In fleet mode, the platform's `rules` for the match fill these in.
+2. the keys of the same names in `readyup.cfg` or `cfg/ReadyUp/match.cfg`. Scrims only use these. See [Configuration](/cs2/ready-up/configuration#pauses-ready-and-forfeit).
+3. the built-in defaults.
+
+The first one that is set wins. `ru state` prints the rules in use. They are kept across `ru plugin reload match`.
 
 ## End of a map
 
@@ -144,7 +171,7 @@ During scrim and match warmup, each player sees a small panel in the middle of t
 - the countdown, when it runs,
 - the `ru_warmup_message_html` line, if set.
 
-When the knife round starts, the panel shows KNIFE ROUND and stays up for `hud_knife_hold_s` seconds (30 by default), also while the round runs. After the knife round it shows the side pick. It hides when the match goes live.
+When the knife round starts, the panel shows KNIFE ROUND and stays up for `hud_knife_hold_s` seconds (30 by default), also while the round runs. After the knife round it shows the side pick. It hides when the match goes live. On a live map it comes back for pauses and for the forfeit countdown.
 
 While the panel reaches players, it replaces chat for the flow: ready changes, the countdown, the knife start, the knife winner and the side pick are only shown in the panel. Chat still gets the LIVE line, admin actions, and replies that explain why a command was refused. With `ready_hud=0`, or when a panel send fails, the chat messages come back.
 

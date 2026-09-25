@@ -20,9 +20,10 @@ Most commands on this page come from the match plugin. Without `match.so`, only 
 | --- | --- |
 | `.r`, `.ready` | Mark yourself ready. Typing it again does not unready you. |
 | `.ur`, `.unready`, `.nr`, `.notready` | Mark yourself not ready. |
-| `.pause`, `.p` | Pause the match. |
-| `.tech` | Pause the match, marked as a technical pause. |
-| `.unpause`, `.up` | Ask to unpause. Both teams must type it. |
+| `.forceready` | Mark your whole team ready, once enough of it is connected. See [Force ready](/cs2/ready-up/scrims-and-matches#force-ready). |
+| `.tac` | Call a tactical timeout for your side. |
+| `.tech`, `.pause`, `.p` | Call a technical pause. Limited per team per map, and it ends by itself after a while. |
+| `.unpause`, `.up` | Ask to end a technical pause. By default both teams must type it. |
 | `.stay`, `.switch`, `.swap` | After the knife round: keep your side, or switch. Any player on the winning team can pick. |
 | `.ct`, `.t` | After the knife round: pick a side. |
 | `.gg` | Tell Auto Tournament you give up. It sends a `player_gg` event. |
@@ -31,11 +32,11 @@ Most commands on this page come from the match plugin. Without `match.so`, only 
 | `.ru state` | Show the mode, roster, who is ready, and flags. `.ru status` does the same. |
 | `.ru admins` | List the admins. |
 
-With no match loaded, only the ready commands work. The others say they need a live match. You must be on CT or T to ready up.
+With no match loaded, only the ready commands and `.forceready` work. The others say they need a live match. You must be on CT or T to ready up.
 
 With a match loaded, only players on the match roster can use these commands.
 
-There are no pause limits yet. Pause types with limits (`.tac`, `.tech`) are coming.
+See [Pauses](/cs2/ready-up/scrims-and-matches#pauses) for the limits.
 
 ### Practice
 
@@ -57,8 +58,9 @@ Admin commands need admin rights. See [Who is an admin](#who-is-an-admin). Anyon
 | `.ru start` | Start the loaded match now, even if not everyone is ready. |
 | `.ru restart` | Restart the match and go back to warmup. |
 | `.ru end` | End the match. Sends `series_end` with no winner, clears the match and resets the server. |
-| `.ru pause`, `.ru fp`, `.ru forcepause` | Pause as an admin. |
-| `.ru unpause`, `.ru up`, `.ru fup`, `.ru forceunpause` | Unpause right away. The teams do not need to confirm. |
+| `.forcepause`, `.fp`, `.ru pause`, `.ru fp`, `.ru forcepause` | Admin pause. Only an admin can end it. |
+| `.forceunpause`, `.fup`, `.ru unpause`, `.ru up`, `.ru fup`, `.ru forceunpause` | Unpause right away. The teams do not need to confirm. |
+| `.ru tech team1\|team2`, `.ru tac team1\|team2` | Call a technical pause or a tactical timeout for a team. The team's limits apply. |
 | `.ru side stay\|switch\|ct\|t` | Pick the side after the knife round for the winning team. |
 | `.ru recover [round]` | Ask Auto Tournament to restore the match. With a round number, restore to that round. |
 | `.prac`, `.tactics`, `.ru prac` | Turn practice mode on. Type it again to turn it off. Clears any loaded match. |
@@ -158,7 +160,7 @@ These work without any plugin.
 
 ### Auto Tournament
 
-Auto Tournament sets these for you over RCON. Run a command without a value to see the current value. Ready Up saves them in `match/state.json`, so they survive a restart.
+Auto Tournament sets these for you over RCON. Run a command without a value to see the current value. They survive a restart. See [Settings that survive a restart](#settings-that-survive-a-restart).
 
 | Command | What it does |
 | --- | --- |
@@ -172,7 +174,7 @@ In [fleet mode](/cs2/ready-up/fleet), none of these are needed. The platform tal
 
 ### Demos and series end
 
-Ready Up records a GOTV demo when a map goes live. These settings are kept across `ru plugin reload match`, but not across a server restart.
+Ready Up records a GOTV demo when a map goes live.
 
 | Command | Default | What it does |
 | --- | --- | --- |
@@ -207,7 +209,20 @@ These change Ready Up's own warmup. They apply the next time warmup rules are se
 | `ru_cfg_exec_enable 0\|1` | `0` | Run the `cfg/ReadyUp/*.cfg` file for every mode change. See [Configuration](/cs2/ready-up/configuration#when-the-files-run). |
 | `ru_dev_bots_scrim 0\|1\|cfg` | `cfg` | Testing only. Override `dev_bots_scrim`. `cfg` goes back to the value in `readyup.cfg`. |
 
-These values are kept across `ru plugin reload match`, but not across a server restart.
+These values survive a restart, except `ru_dev_bots_scrim`. See below.
+
+### Settings that survive a restart
+
+The match plugin saves these console settings in `game/csgo/readyup/plugins/match/state.json` when you change them in the console, over RCON or from a cfg file. It applies them again when it loads after a server restart. They are also kept across `ru plugin reload match`.
+
+- `ru_match_token`, `ru_webhook_url`, `ru_heartbeat_url`, `ru_admins_url`, `ru_admins_refresh_seconds`. `<setting> clear` forgets them.
+- `ru_cfg_exec_enable` and every `ru_warmup_*` setting.
+- Every `ru_demo_*` setting, including the upload headers.
+- The three `ru_series_end_kick_delay_*` settings.
+
+Only values that differ from the built-in default are saved. `<setting> default` goes back to the default and forgets the saved value. A later command wins over the saved value, so a setting in `server.cfg` still applies on every start.
+
+`ru_dev_bots_scrim` is not saved.
 
 ### Fleet
 

@@ -26,16 +26,15 @@ Ready Up ships as components and two bundles. Every zip has the same layout as `
 | --- | --- |
 | `ready-up-core` | The core: `libserver.so`, `engine-surface.json`, `readyup.cfg.example`, the `gameinfo.gi` patcher and the migration script. On its own it does nothing for matches. |
 | `ready-up-match` | `match.so`: ready-up, scrims, knife round, pauses, practice, match configs, webhooks, demos. Also the mode configs in `readyup/cfg-templates/ReadyUp/`. |
+| `ready-up-fleet` | `fleet.so`, the link to the Auto Tournament platform, and a `cfg/ReadyUp/fleet.cfg` template with every line commented out. It stays idle until you set it up. See [Fleet mode](/cs2/ready-up/fleet). |
 | `ready-up-skins` | `skins.so` and `engine-surface.skins.json`. |
 | `ready-up-hello` | `hello.so`, the example plugin. |
-| `ready-up-essentials` | Bundle: core and match. Use this one. |
-| `ready-up-full` | Bundle: core, match, skins, hello, and the offline gamedata checkers `readyup_sigcheck` and `readyup_hookcheck`. |
+| `ready-up-essentials` | Bundle: core, match and fleet. Use this one. |
+| `ready-up-full` | Bundle: core, match, fleet, skins, hello, and the offline gamedata checkers `readyup_sigcheck` and `readyup_hookcheck`. |
 
 Each release also has a `SHA256SUMS` file.
 
 Skins ship separately on purpose. Valve can ban a server's login token (GSLT) for running a skin changer, so you must choose to install that plugin. The core, match and essentials packages contain no skins code.
-
-The fleet plugin, `fleet.so`, is not in any package yet. See [Fleet mode](/cs2/ready-up/fleet).
 
 ## Install with the installer
 
@@ -50,11 +49,12 @@ In a terminal, it shows the components, what is installed and what the release h
 ```text
 > [x] Core   new 0.2.0     required
   [x] Match  new 0.2.0     ready-up, knife, pauses, webhooks
+  [x] Fleet  new 0.2.0     link to the Auto Tournament platform (idle until configured)
   [ ] Skins  new 0.2.0     may get servers banned
   [ ] Hello  new 0.2.0     example plugin
 ```
 
-Move with the arrow keys (or `j` and `k`), toggle with space, and confirm with enter. `q` quits without changes. Core is always ticked. On a fresh install, core and match are ticked. The installer then asks once more before it changes anything.
+Move with the arrow keys (or `j` and `k`), toggle with space, and confirm with enter. `q` quits without changes. Core is always ticked. On a fresh install, core, match and fleet are ticked. The installer then asks once more before it changes anything.
 
 On a plain terminal (`TERM=dumb`, or with `READYUP_PLAIN=1`), it asks for numbers instead, for example `1,2`.
 
@@ -82,8 +82,8 @@ The installer keeps track of what it installed in `game/csgo/readyup/installed.j
 For scripts, panels and CI, pass a bundle or component name, or `--yes`:
 
 ```bash
-curl -fsSL .../install.sh | bash -s -- essentials      # core + match (the default)
-curl -fsSL .../install.sh | bash -s -- full            # core + match + skins + hello
+curl -fsSL .../install.sh | bash -s -- essentials      # core + match + fleet (the default)
+curl -fsSL .../install.sh | bash -s -- full            # core + match + fleet + skins + hello
 bash install.sh skins                                  # add one component
 bash install.sh --yes                                  # update whatever is installed
 bash install.sh --remove skins                         # remove one component
@@ -94,7 +94,7 @@ bash install.sh --uninstall --purge                    # also delete config and 
 | Option | What it does |
 | --- | --- |
 | `essentials`, `full` | Install a bundle. |
-| `core`, `match`, `skins`, `hello` | Install single components. Core is always included. |
+| `core`, `match`, `fleet`, `skins`, `hello` | Install single components. Core is always included. |
 | `--dir PATH` | The server root, or a `game/csgo` folder. Default: the current folder. |
 | `--version vX.Y.Z` | Install that release instead of the latest. |
 | `--zip FILE` | Install from a local zip. Can be given more than once. A `SHA256SUMS` next to the zip is used to check it. |
@@ -201,7 +201,7 @@ SearchPaths
 
 ### Metamod
 
-Metamod can run next to Ready Up. Keep Metamod's line first and put Ready Up's line directly below it. Both stay above `Game csgo`:
+We recommend running Ready Up on its own. If you need Metamod on the same server, it works. Keep Metamod's line first and put Ready Up's line directly below it. Both stay above `Game csgo`:
 
 ```text
     Game    csgo/addons/metamod
@@ -209,7 +209,19 @@ Metamod can run next to Ready Up. Keep Metamod's line first and put Ready Up's l
     Game    csgo
 ```
 
-Metamod then loads first and loads Ready Up as "the game". The other order, with Ready Up above Metamod, recursed at startup. The installer and the patcher use the right order when they find Metamod.
+Metamod then loads first and loads Ready Up as "the game". The installer and the patcher put the line in this place when they find Metamod, and move it there if it is above Metamod. Older Ready Up builds turned themselves off under Metamod. Use a build that has the fixes from `docs/COMPATIBILITY.md` in the repo.
+
+With the wrong order, Ready Up above Metamod, nothing crashes, but Metamod never loads, and neither does anything it loads, such as CounterStrikeSharp. Ready Up logs a warning at start with the command that fixes it:
+
+```text
+[ReadyUp] load-order: WARNING: Metamod (Game csgo/addons/metamod) is listed BELOW csgo/readyup in gameinfo.gi: ... Fix: python3 <csgo>/readyup/tools/patch_gameinfo.py <csgo>/gameinfo.gi
+```
+
+If two copies of Ready Up end up in one server process, for example from two `readyup` lines, the second copy logs `Ready Up disabled: another copy is already active in this process` and only passes calls through to Valve's library.
+
+With Metamod first, CS2 writes its round backup files into `csgo/addons/metamod/` instead of `csgo/readyup/`. Restoring still works.
+
+What works and what breaks next to Metamod, CounterStrikeSharp and other match plugins is in the [FAQ](/cs2/ready-up/faq#running-other-plugins).
 
 ## After a CS2 update
 

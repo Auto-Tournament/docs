@@ -122,6 +122,21 @@ With `ready_hud=0` the panel is off and the chat reminders come back. Ready-up s
 | `scrim_knife` | `1` | In a scrim, play a knife round after everyone is ready. `0` goes straight to live. |
 | `knife_pick_seconds` | `60` | Seconds the knife winners have to pick a side in a scrim. Matches use `knifeDecisionSeconds` from the match config. |
 
+### Pauses, ready and forfeit
+
+These are the values for scrims, and the fallback for matches whose config leaves a rule out. A match config can set each one with a key of the same name. See [Match rules](/cs2/ready-up/scrims-and-matches#match-rules).
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `max_tech_pauses_per_team` | `3` | Technical pauses per team per map. `0` means no limit. |
+| `tech_pause_max_seconds` | `300` | A technical pause ends by itself after this many seconds. `0` means no limit. |
+| `both_teams_unpause_required` | `1` | `1`: both teams must type `.unpause`. `0`: the team that paused is enough. |
+| `allow_force_ready` | `1` | Allow `.forceready`. |
+| `min_players_to_ready` | `0` | Players of a team that must be connected before `.forceready` works. `0` means the full roster. |
+| `forfeit_after_seconds` | `240` | A team with nobody connected on a live map for this long forfeits. `0` turns it off. |
+
+Tactical timeouts (`.tac`) use CS2's own timeouts. Their number and length are `mp_team_timeout_max` and `mp_team_timeout_time`, set in `live.cfg` or the match `cvars`.
+
 ### Testing only
 
 Never turn these on for a real match. Ready Up logs a warning each time one turns on.
@@ -135,7 +150,7 @@ With either flag on and no human on CT or T, the knife round lasts 30 seconds, b
 
 ## Fleet keys
 
-Read by the fleet plugin (`fleet.so`) from the `[fleet]` section, or from `game/csgo/cfg/ReadyUp/fleet.cfg`. The same names with a `fleet_` prefix (`fleet_url`, `fleet_enroll_code`, ...) also work. See [Fleet mode](/cs2/ready-up/fleet).
+Read by the fleet plugin (`fleet.so`) from the `[fleet]` section, or from `game/csgo/cfg/ReadyUp/fleet.cfg`. The fleet package installs a `fleet.cfg` with every line commented out, so the plugin stays idle until you set `url`. The same names with a `fleet_` prefix (`fleet_url`, `fleet_enroll_code`, ...) also work. See [Fleet mode](/cs2/ready-up/fleet).
 
 | Key | Default | What it does |
 | --- | --- | --- |
@@ -198,7 +213,7 @@ A file that is broken, or from a newer version, is moved to `<name>.corrupt-<tim
 
 | File | What it holds | Written by |
 | --- | --- | --- |
-| `match/state.json` | Saved settings (`ru_webhook_url`, `ru_heartbeat_url`, `ru_match_token`, `ru_admins_url` and others) and the running match, for recovery after a crash. | The match plugin. |
+| `match/state.json` | Saved console settings (`ru_webhook_url`, `ru_match_token`, `ru_warmup_*`, `ru_demo_*` and others, see [Settings that survive a restart](/cs2/ready-up/commands#settings-that-survive-a-restart)) and the running match, for recovery after a crash. | The match plugin. |
 | `match/admins.json` | Admins, when not in fleet mode. See [Who is an admin](/cs2/ready-up/commands#who-is-an-admin). | `ru admins add` and `remove`, or you. |
 | `match/fleet-admins.json` | Fleet mode: a copy of the platform's admin list. | The match plugin. |
 | `skins/loadouts.json` | Skins loadouts, when not in fleet mode. See [Skins](/cs2/ready-up/skins). | You, or a web tool. |

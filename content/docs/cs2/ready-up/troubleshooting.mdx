@@ -116,9 +116,15 @@ There is no Ready Up banner in the console, and `ru` gives `Unknown command`.
 - If you have `gameinfo_branchspecific.gi`, patch it too.
 - With Metamod: Metamod's line must be first and Ready Up's directly below. See [Metamod](/cs2/ready-up/install#metamod).
 
+### Metamod or CounterStrikeSharp does not load
+
+`meta list` gives `Unknown command`, and the console has a `[ReadyUp] load-order: WARNING` line. Ready Up is listed above Metamod in `gameinfo.gi`, so the engine loads Ready Up first and Metamod never starts. Run the command from the warning, or the installer, to move Ready Up's line directly below Metamod's. See [Metamod](/cs2/ready-up/install#metamod).
+
 ### Ready Up turned itself off
 
 The log says Ready Up is disabled, and `ru selftest` has `FAIL readyup enabled`. A function Ready Up cannot run without was not found, usually after a CS2 update. The server runs as plain CS2. Check [GitHub](https://github.com/Auto-Tournament/ready-up/issues) for a `cs2-update` issue and wait for a fixed `engine-surface.json` or a new build.
+
+Under Metamod, older Ready Up builds turned themselves off because they searched the wrong `libserver.so`. Update Ready Up.
 
 ### ru works, but .r and the other commands do nothing
 

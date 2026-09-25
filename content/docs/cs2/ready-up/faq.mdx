@@ -20,7 +20,7 @@ There is no release yet, so for now the installer needs `--zip` with a zip from 
 
 ### Essentials or Full?
 
-Essentials: the core and the match plugin. This is what most servers need.
+Essentials: the core, the match plugin and the fleet plugin. The fleet plugin stays idle until you connect the server to the platform. This is what most servers need.
 
 Full: Essentials plus skins, the example plugin and the offline gamedata checkers. Only take it if you want skins and accept the ban risk (see [Skins](/cs2/ready-up/skins)). You can also add single parts with the installer.
 
@@ -50,19 +50,46 @@ Webhooks, the heartbeat, demo uploads and the fleet link are all outgoing connec
 
 ## Running other plugins
 
-The recommended setup is the Ready Up suite on its own. Never run two match plugins on one server: Ready Up and Auto Tournament CS2, MatchZy or Get5 would both try to run the warmup, the ready-up and the match. If you need a CounterStrikeSharp plugin, [port it to the Ready Up SDK](/cs2/ready-up/sdk/porting).
+The recommended setup is the Ready Up suite on its own. Never run two match plugins on one server. If you need a CounterStrikeSharp plugin, [port it to the Ready Up SDK](/cs2/ready-up/sdk/porting).
+
+These answers come from tests on a real CS2 1.41.8.4 server with Metamod 2.0.0-dev+1469, CounterStrikeSharp v1.0.375 and the Auto Tournament CS2 plugin 2.0.0. The full results, with logs, are in [docs/COMPATIBILITY.md](https://github.com/Auto-Tournament/ready-up/blob/master/docs/COMPATIBILITY.md) in the repo.
 
 ### Can Metamod run next to Ready Up?
 
-Being tested. Answer coming. The installer already puts Ready Up's `gameinfo.gi` line right after Metamod's, which is the order that is expected to work. See [Metamod](/cs2/ready-up/install#metamod).
+Yes. Metamod's `Game csgo/addons/metamod` line goes first in `gameinfo.gi`, and Ready Up's line goes directly below it. The installer does this for you. See [Metamod](/cs2/ready-up/install#metamod).
+
+This needs a current Ready Up build. Older builds turned themselves off under Metamod.
 
 ### Can CounterStrikeSharp plugins run next to Ready Up?
 
-Being tested. Answer coming.
+It works, but we do not recommend it.
 
-### Can Auto Tournament CS2 run next to Ready Up?
+- CounterStrikeSharp's chat hook on `Host_Say` is lost when Ready Up is loaded, without any error. Chat features of CounterStrikeSharp plugins that depend on it, such as chat triggers and silent `/` commands, should be treated as broken. `AddCommandListener("say")` and the `player_chat` event still work.
+- While Ready Up holds round ends back (warmup, practice), a CounterStrikeSharp `TerminateRound()` call does nothing.
+- When a CS2 update breaks CounterStrikeSharp's gamedata, CounterStrikeSharp crashes the whole server while loading. It does that without Ready Up too, and Ready Up cannot prevent it. On its own, Ready Up keeps the server up and only turns off what broke.
 
-Being tested. Answer coming. Even if it loads, do not run both: they are both match plugins.
+Only do it if you need a CounterStrikeSharp plugin that has no Ready Up version yet. Test the chat features it uses. The better fix is to [port it to the Ready Up SDK](/cs2/ready-up/sdk/porting).
+
+### Can MatchZy, Get5 or Auto Tournament CS2 run next to Ready Up?
+
+No. They are match plugins, and so is Ready Up. Tested together, both loaded, but they got in each other's way:
+
+- One `.r` counts as ready in both plugins. The same goes for `.pause`, `.unpause` and the other shared commands.
+- Each plugin keeps overwriting the other's cvars.
+- Every match is reported twice, by two plugins that disagree about its state.
+- Chat messages come twice.
+
+Use Ready Up's match plugin on its own. It uses the same commands and event names.
+
+### What if Ready Up is above Metamod in gameinfo.gi?
+
+Nothing crashes, but Metamod never loads, and neither does anything it loads, such as CounterStrikeSharp. Ready Up logs a `[ReadyUp] load-order: WARNING` line at start with the command that fixes it:
+
+```bash
+python3 game/csgo/readyup/tools/patch_gameinfo.py game/csgo/gameinfo.gi
+```
+
+If two copies of Ready Up end up in one server process, the second copy turns itself off and only passes calls through to Valve's library.
 
 ## Updates and safety
 

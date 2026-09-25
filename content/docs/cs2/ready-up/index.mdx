@@ -19,7 +19,8 @@ Ready Up runs the match flow on a CS2 server. Players ready up, the match goes l
 - Ready-up for scrims and pickups: players type `.r`, a short countdown runs, and the scrim goes live on its own.
 - Matches loaded from Auto Tournament, with a roster whitelist and team locks.
 - A knife round with a side pick (`.stay` / `.switch`).
-- Pauses that both teams must confirm to end, and a captain forfeit.
+- Tactical timeouts (`.tac`) and technical pauses (`.tech`) with limits and an automatic unpause.
+- `.forceready`, team names in game, a captain forfeit, and a forfeit when a whole team leaves.
 - Practice mode with bot helpers.
 - A small panel in the middle of the screen that shows who is ready.
 - GOTV demos for each map, with an optional upload.
@@ -35,7 +36,7 @@ Auto Tournament CS2 needs Metamod:Source and CounterStrikeSharp. Ready Up needs 
 
 CS2 finds its server module, `libserver.so`, through the search paths in `gameinfo.gi`. Ready Up adds one line there, `Game csgo/readyup`, above `Game csgo`. CS2 then loads Ready Up's `libserver.so` first. Ready Up loads Valve's real `libserver.so` and passes everything through to it. This is the same trick Metamod uses.
 
-That means fewer moving parts. There is no .NET runtime, and no need to wait for Metamod and CounterStrikeSharp to catch up after a CS2 update. Metamod can still run next to Ready Up if you need it for other plugins. See [Install](/cs2/ready-up/install#metamod).
+That means fewer moving parts. There is no .NET runtime, and no need to wait for Metamod and CounterStrikeSharp to catch up after a CS2 update. We recommend running Ready Up on its own. Metamod and CounterStrikeSharp can run next to it, with limits. Never run a second match plugin. See [Running other plugins](/cs2/ready-up/faq#running-other-plugins).
 
 ## How it survives CS2 updates
 
@@ -59,7 +60,7 @@ Ready Up is a small core and a set of plugins. The core owns everything that tou
 | Core | `readyup/bin/linuxsteamrt64/libserver.so` | Loading, engine surface, hooks, events, chat and console commands, the plugin host, `ru selftest`, the status endpoint. It runs on its own, but then there is no match flow. |
 | Match | `readyup/plugins/match.so` | Ready-up, scrims, knife round, pauses, practice, match configs, admins, webhooks, demos, stats. |
 | Skins | `readyup/plugins/skins.so` | Weapon paints, knives, gloves and agents. Optional, and not in the default bundle. |
-| Fleet | `readyup/plugins/fleet.so` | The link to the Auto Tournament platform. See [Fleet mode](/cs2/ready-up/fleet). Not in the release packages yet. |
+| Fleet | `readyup/plugins/fleet.so` | The link to the Auto Tournament platform. Idle until you set it up. See [Fleet mode](/cs2/ready-up/fleet). |
 | Hello | `readyup/plugins/hello.so` | A small example plugin for developers. |
 
 Anyone can write a plugin with the [Ready Up SDK](/cs2/ready-up/sdk). The API is at version 1.2.
@@ -68,10 +69,7 @@ Anyone can write a plugin with the [Ready Up SDK](/cs2/ready-up/sdk). The API is
 
 These are being built now and are not on this site yet:
 
-- Pause types with limits (`.tac`, `.tech`), and `.forcepause` for admins.
-- Team names in game.
-- `.forceready` for admins.
-- A forfeit when a whole team leaves.
+- Esports mode: an opt-in match setting that applies Valve's published tournament rules (`ruleset: "valve"`).
 - Workshop maps.
 - Resuming a match on another server after a failure ([failover](/cs2/ready-up/fleet#failover)).
 

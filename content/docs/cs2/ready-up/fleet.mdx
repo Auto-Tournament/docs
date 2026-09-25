@@ -7,7 +7,7 @@ icon: Network
 import { Step, Steps } from 'fumadocs-ui/components/steps';
 
 <Callout title="Not ready for use" type="warn">
-  The Ready Up side of fleet mode is built and tested against a mock platform. The Auto Tournament side (enrollment, the WebSocket gateway, match assignment) is still being built and is not released. The fleet plugin, `fleet.so`, is also not in the release packages yet. Build it from source to try it. Everything on this page can still change.
+  The Ready Up side of fleet mode is built and tested against a mock platform. The Auto Tournament side (enrollment, the WebSocket gateway, match assignment) is still being built and is not released. Everything on this page can still change.
 </Callout>
 
 A Ready Up server runs in one of two modes:
@@ -15,7 +15,7 @@ A Ready Up server runs in one of two modes:
 - **Standalone.** Auto Tournament drives the server over RCON and webhooks: `ru match load`, `ru_webhook_url`, `ru_heartbeat_url`. Admins and skins come from local JSON files. This is how the rest of these pages describe it.
 - **Fleet mode.** The server keeps one outbound WebSocket to the platform. The platform sends matches, commands, the admin list and skins loadouts over it. The server streams match state, events and round backups back. No RCON, no webhooks, and no settings to set by hand on each server after it is enrolled.
 
-Fleet mode is the fleet plugin, `readyup/plugins/fleet.so`. Without it, or without a platform URL, the server is standalone.
+Fleet mode is the fleet plugin, `readyup/plugins/fleet.so`. It is in the Essentials and Full bundles, and stays idle until you give it a platform URL. Without it, or without a platform URL, the server is standalone.
 
 ## Enroll a server
 
@@ -40,7 +40,7 @@ Create it on the platform. The code is shown once.
 
 ### Give it to the server
 
-Either put it in the `[fleet]` section of `readyup.cfg` and restart (or run `ru plugin reload fleet`):
+Either put it in `game/csgo/cfg/ReadyUp/fleet.cfg` (the fleet package installs this file with every line commented out) or in the `[fleet]` section of `readyup.cfg`, then restart or run `ru plugin reload fleet`:
 
 ```text title="readyup.cfg"
 [fleet]
@@ -105,7 +105,7 @@ All `[fleet]` keys are listed in [Configuration](/cs2/ready-up/configuration#fle
 
 ### Matches
 
-The platform assigns a match to a server. The assignment carries the teams and rosters, the maps and sides, the rules (round limit, overtime, knife side pick time, tiebreak), match admins, engine cvars, and a password for this match.
+The platform assigns a match to a server. The assignment carries the teams and rosters, the maps and sides, the rules (round limit, overtime, knife side pick time, tiebreak, technical pauses, force ready, forfeit when a team leaves), match admins, engine cvars, and a password for this match.
 
 When a match is assigned, the server:
 
