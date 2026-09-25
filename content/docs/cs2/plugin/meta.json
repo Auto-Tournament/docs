@@ -1,6 +1,6 @@
 {
   "title": "Auto Tournament CS2",
-  "description": "The CS2 server plugin (formerly MatchZy Enhanced)",
+  "description": "The CS2 server plugin",
   "icon": "Plug",
   "root": true,
   "pages": [

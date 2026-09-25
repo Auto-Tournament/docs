@@ -11,21 +11,21 @@ Auto Tournament builds the match config for you. Read this page if you want to k
 The plugin downloads a match config from a URL:
 
 ```text
-matchzy_loadmatch_url "https://tournament.example.com/api/matches/r1m1.json"
+at_loadmatch_url "https://tournament.example.com/api/matches/r1m1.json"
 ```
 
 If the URL needs a header, add the header name and value:
 
 ```text
-matchzy_loadmatch_url "https://tournament.example.com/api/matches/r1m1.json" "X-MatchZy-Token" "<SERVER_TOKEN>"
+at_loadmatch_url "https://tournament.example.com/api/matches/r1m1.json" "X-Auto-Tournament-Token" "<SERVER_TOKEN>"
 ```
 
-Auto Tournament's match config URL needs this header. The config holds the team rosters with Steam IDs, so Auto Tournament answers `401` without it. Auto Tournament adds the header itself when it loads a match. If you run the command by hand, add `"X-MatchZy-Token" "<SERVER_TOKEN>"` as above. Signed-in admins can open the URL in a browser.
+Auto Tournament's match config URL needs this header. The config holds the team rosters with Steam IDs, so Auto Tournament answers `401` without it. Auto Tournament adds the header itself when it loads a match. If you run the command by hand, add `"X-Auto-Tournament-Token" "<SERVER_TOKEN>"` as above. Signed-in admins can open the URL in a browser.
 
 To load a file from the server instead, use a path relative to `csgo/`:
 
 ```text
-matchzy_loadmatch MatchZy/my-match.json
+at_loadmatch AutoTournamentCS2/my-match.json
 ```
 
 ## Required fields

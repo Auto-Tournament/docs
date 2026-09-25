@@ -7,16 +7,10 @@ icon: Settings
 You configure Auto Tournament with environment variables in the `.env` file next to `docker-compose.yml`. After a change, recreate the app container:
 
 ```bash
-docker compose up -d --force-recreate matchzy-tournament
+docker compose up -d --force-recreate auto-tournament
 ```
 
 Most other settings, such as match rules, the webhook URL and the hostname format, are in the app under **Settings**.
-
-<Callout>
-  The variable names still use `MATCHZY_` in some places. They keep these names until 3.0.
-</Callout>
-
-{/* TODO 3.0: Before 3.0 ships, say whether the MATCHZY_ variables are renamed in 3.0, and list old and new names if they are. */}
 
 ## Required
 
@@ -34,7 +28,7 @@ Most other settings, such as match rules, the webhook URL and the hostname forma
 | `HOST_PORT` | `3069` | The port on your machine. Only used by `docker-compose.yml`. |
 | `DB_USER` | `postgres` | Database user. |
 | `DB_PASSWORD` | `postgres` | Database password. |
-| `DB_NAME` | `matchzy_tournament` | Database name. |
+| `DB_NAME` | `auto_tournament` | Database name. |
 | `DATABASE_URL` | Built from `DB_*` | Full PostgreSQL address. `docker-compose.yml` sets it for you. |
 | `DB_HOST`, `DB_PORT` | `postgres` in Docker, port `5432` | Only used when `DATABASE_URL` is not set. |
 | `PORT` | `3000` | Internal API port. `docker-compose.yml` sets it. Do not change it. |
@@ -83,7 +77,7 @@ See [API](/reference/api) for the format.
 | --- | --- | --- |
 | `API_BASE_URL` | `FRONTEND_BASE_URL` | Starting value for the webhook URL, if the game servers must use another address than the browser. After the first start, change it in **Settings** instead. Also used as the server address in `/api-docs`. |
 | `ALLOW_UNAUTHENTICATED_EVENTS` | `false` | Accept game events without a token. Only for servers set up by hand or by a very old version. While it is on, anyone who can reach the API can send fake results. Turn it off again after you click **Retry** on your servers. |
-| `MATCHZY_ENABLE_SIMULATION_IN_PROD` | `false` | Allow [simulation mode](/guides/simulation-mode). Only for test installs. |
+| `AT_ENABLE_SIMULATION_IN_PROD` | `false` | Allow [simulation mode](/guides/simulation-mode). Only for test installs. |
 | `GITHUB_TOKEN` | empty | GitHub token for **Sync CS2 Maps**. Only needed if you hit the GitHub rate limit. |
 
 ## Logging

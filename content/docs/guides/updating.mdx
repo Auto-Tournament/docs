@@ -52,7 +52,7 @@ docker compose up -d
 ### Watch the log
 
 ```bash
-docker compose logs -f matchzy-tournament
+docker compose logs -f auto-tournament
 ```
 
 Wait until the log shows that the server started, then press `Ctrl+C`.
@@ -79,8 +79,8 @@ If the app does not start, the log usually shows the reason. The most common cau
 
 ```yaml title="docker-compose.yml"
 services:
-  matchzy-tournament:
-    image: sivertio/matchzy-auto-tournament:2.4.15
+  auto-tournament:
+    image: sivertio/auto-tournament:2.4.15
 ```
 
 Versions are listed on the [releases page](https://github.com/Auto-Tournament/auto-tournament/releases). The image tag has no `v` in front.
@@ -93,7 +93,7 @@ Versions are listed on the [releases page](https://github.com/Auto-Tournament/au
 
 ### Set the older version
 
-Set the older version in `image:` in `docker-compose.yml`, for example `sivertio/matchzy-auto-tournament:2.4.13`.
+Set the older version in `image:` in `docker-compose.yml`, for example `sivertio/auto-tournament:2.4.13`.
 
 </Step>
 
@@ -115,7 +115,7 @@ A newer version can change the database. If the older version does not start aft
 ## After you update
 
 - If you lost admin access, set `ADMIN_STEAM_IDS`. See [First login](/getting-started/first-login#if-you-are-not-admin).
-- Update Auto Tournament CS2 (formerly MatchZy Enhanced) on your servers too, so all servers run the same version. See [Update the CS2 plugin](/cs2/plugin/install#update), or run `sudo csm update-plugins` with CS2 Server Manager.
+- Update Auto Tournament CS2 on your servers too, so all servers run the same version. See [Update the CS2 plugin](/cs2/plugin/install#update), or run `sudo csm update-plugins` with CS2 Server Manager.
 - To free disk space from old images:
 
 ```bash

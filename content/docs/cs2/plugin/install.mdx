@@ -38,20 +38,20 @@ Install both on the server and check that CounterStrikeSharp loads. Follow the C
 
 ### Download and copy the plugin
 
-The release zip has one top folder, `MatchZy-<version>/`. Copy what is **inside** that folder into the server's `game/csgo/` folder. Change `VERSION` to the [latest release](https://github.com/Auto-Tournament/cs2-plugin/releases/latest) and `CS2_DIR` to your server path:
+The release zip has one top folder, `AutoTournamentCS2-<version>/`. Copy what is **inside** that folder into the server's `game/csgo/` folder. Change `VERSION` to the [latest release](https://github.com/Auto-Tournament/cs2-plugin/releases/latest) and `CS2_DIR` to your server path:
 
 ```bash
-VERSION=1.4.33
+VERSION=2.0.0
 CS2_DIR=/home/steam/cs2
-curl -L -o /tmp/MatchZy.zip "https://github.com/Auto-Tournament/cs2-plugin/releases/download/v${VERSION}/MatchZy-${VERSION}.zip"
-unzip -q -o /tmp/MatchZy.zip -d /tmp
-cp -r "/tmp/MatchZy-${VERSION}/." "${CS2_DIR}/game/csgo/"
+curl -L -o /tmp/AutoTournamentCS2.zip "https://github.com/Auto-Tournament/cs2-plugin/releases/download/v${VERSION}/AutoTournamentCS2-${VERSION}.zip"
+unzip -q -o /tmp/AutoTournamentCS2.zip -d /tmp
+cp -r "/tmp/AutoTournamentCS2-${VERSION}/." "${CS2_DIR}/game/csgo/"
 ```
 
 You now have:
 
-- `game/csgo/addons/counterstrikesharp/plugins/MatchZy/MatchZy.dll`
-- `game/csgo/cfg/MatchZy/`
+- `game/csgo/addons/counterstrikesharp/plugins/AutoTournamentCS2/AutoTournamentCS2.dll`
+- `game/csgo/cfg/AutoTournamentCS2/`
 
 </Step>
 
@@ -77,7 +77,7 @@ Restart the server. In the server console, run:
 css_plugins list
 ```
 
-MatchZy must be in the list. The plugin still uses that name. If it is missing, check that CounterStrikeSharp loads first.
+Auto Tournament CS2 must be in the list. If it is missing, check that CounterStrikeSharp loads first.
 
 </Step>
 
@@ -111,14 +111,14 @@ Use version **1.4.28 or newer** on every server. Older versions stored the setti
 
 ### Point the plugin at MySQL
 
-Set the database in `game/csgo/cfg/MatchZy/database.json` on each server:
+Set the database in `game/csgo/cfg/AutoTournamentCS2/database.json` on each server:
 
-```json title="game/csgo/cfg/MatchZy/database.json"
+```json title="game/csgo/cfg/AutoTournamentCS2/database.json"
 {
   "DatabaseType": "MySQL",
   "MySqlHost": "192.168.1.20",
-  "MySqlDatabase": "matchzy",
-  "MySqlUsername": "matchzy",
+  "MySqlDatabase": "auto_tournament_cs2",
+  "MySqlUsername": "auto_tournament_cs2",
   "MySqlPassword": "change-me",
   "MySqlPort": 3306
 }
@@ -133,7 +133,7 @@ Set the database in `game/csgo/cfg/MatchZy/database.json` on each server:
 Add a scope name to the start arguments of each server. Use a different name on each server:
 
 ```text
-+matchzy_config_scope cs2-server-1
++at_config_scope cs2-server-1
 ```
 
 The start argument is better than setting it in `config.cfg`, because it is read before any config runs. CS2 Server Manager 1.7.8 and newer adds this argument for you.
@@ -158,7 +158,7 @@ Restart the servers. The plugin logs the scope at startup, for example `[ConfigS
 
 ### Save your config files
 
-Save your own `cfg/MatchZy/database.json` and `cfg/MatchZy/config.cfg` if you changed them. The zip contains default copies that overwrite them.
+Save your own `cfg/AutoTournamentCS2/database.json` and `cfg/AutoTournamentCS2/config.cfg` if you changed them. The zip contains default copies that overwrite them.
 
 </Step>
 
@@ -174,7 +174,7 @@ Download the new release and copy it the same way as in [Download and copy the p
 
 ### Put your files back
 
-Copy your saved `database.json` and `config.cfg` back into `cfg/MatchZy/`.
+Copy your saved `database.json` and `config.cfg` back into `cfg/AutoTournamentCS2/`.
 
 </Step>
 

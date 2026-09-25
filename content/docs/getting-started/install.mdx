@@ -8,12 +8,6 @@ import { Step, Steps } from 'fumadocs-ui/components/steps';
 
 Auto Tournament runs as two containers: the app and a PostgreSQL database. You need a Linux, macOS or Windows machine with [Docker](https://docs.docker.com/engine/install/) and Docker Compose.
 
-<Callout title="Old names">
-  The Docker image is still `sivertio/matchzy-auto-tournament` and the container is still called `matchzy-tournament-api`. They keep these names until 3.0. The commands on this page use the current names.
-</Callout>
-
-{/* TODO 3.0: Before 3.0 ships, switch this page to the sivertio/auto-tournament image and remove the Old names callout, or keep it if the old image is still the default. See /guides/upgrading-to-3. */}
-
 <Steps>
 
 <Step>
@@ -36,12 +30,12 @@ Save this file as `docker-compose.yml` in the folder:
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: matchzy-postgres
+    container_name: auto-tournament-postgres
     restart: unless-stopped
     environment:
       - POSTGRES_USER=${DB_USER:-postgres}
       - POSTGRES_PASSWORD=${DB_PASSWORD:-postgres}
-      - POSTGRES_DB=${DB_NAME:-matchzy_tournament}
+      - POSTGRES_DB=${DB_NAME:-auto_tournament}
     volumes:
       - postgres-data:/var/lib/postgresql/data
     healthcheck:
@@ -50,11 +44,11 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - matchzy-network
+      - auto-tournament-network
 
-  matchzy-tournament:
-    image: sivertio/matchzy-auto-tournament:latest
-    container_name: matchzy-tournament-api
+  auto-tournament:
+    image: sivertio/auto-tournament:latest
+    container_name: auto-tournament
     restart: unless-stopped
     depends_on:
       postgres:
@@ -67,7 +61,7 @@ services:
       - NODE_ENV=production
       - PORT=3000
       - DB_HOST=postgres
-      - DATABASE_URL=postgresql://${DB_USER:-postgres}:${DB_PASSWORD:-postgres}@postgres:5432/${DB_NAME:-matchzy_tournament}
+      - DATABASE_URL=postgresql://${DB_USER:-postgres}:${DB_PASSWORD:-postgres}@postgres:5432/${DB_NAME:-auto_tournament}
       - SESSION_SECRET=${SESSION_SECRET:-}
     volumes:
       - ./data:/app/data
@@ -78,10 +72,10 @@ services:
       retries: 3
       start_period: 10s
     networks:
-      - matchzy-network
+      - auto-tournament-network
 
 networks:
-  matchzy-network:
+  auto-tournament-network:
     driver: bridge
 
 volumes:
