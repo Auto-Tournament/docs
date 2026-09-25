@@ -1,0 +1,133 @@
+---
+title: FAQ
+description: Short answers to common questions about Ready Up.
+icon: CircleQuestionMark
+---
+
+## Setup
+
+### How do I install or update Ready Up?
+
+Run the installer from the server root, the folder that contains `game/`:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Auto-Tournament/ready-up/master/install.sh | bash
+```
+
+Run the same command again to update, or to add or remove parts. After a CS2 update, run it again too: CS2 rewrites `gameinfo.gi`, and the installer puts Ready Up's line back. See [Install](/cs2/ready-up/install).
+
+There is no release yet, so for now the installer needs `--zip` with a zip from CI.
+
+### Essentials or Full?
+
+Essentials: the core and the match, essentials, practice and fleet plugins. The fleet plugin stays idle until you connect the server to the platform. This is what most servers need.
+
+Full: Essentials plus skins, whitelist, Midas, the example plugin and the offline gamedata checkers. Only take skins if you accept the ban risk (see [Skins](/cs2/ready-up/skins)). You can also add single plugins with the installer. See [Plugins](/cs2/ready-up/plugins).
+
+### Does it need Metamod or CounterStrikeSharp?
+
+No. Ready Up loads into CS2 on its own.
+
+### Do I need the Auto Tournament platform?
+
+No. A standalone server runs scrims and pickups with no setup, and matches loaded with `ru match load`. [Fleet mode](/cs2/ready-up/fleet) connects a server to the platform, and it is optional.
+
+### Does it need a database?
+
+No. Admins, settings and skins loadouts are small JSON files in `game/csgo/readyup/plugins/`.
+
+### Which ports does it use?
+
+- The game port, as set by CS2 (`-port`, `27015` by default).
+- The GOTV port, if GOTV is on. That is CS2's own port, not Ready Up's.
+- The status endpoint: game port + 7 (`27022` for `27015`), on `127.0.0.1` only by default. Change it with `status_http_port` and `status_http_bind`.
+
+Webhooks, the heartbeat, demo uploads and the fleet link are all outgoing connections. Ready Up opens no other ports.
+
+## Running other plugins
+
+The recommended setup is the Ready Up suite on its own. Never run two match plugins on one server. If you need a CounterStrikeSharp plugin, [port it to the Ready Up SDK](/cs2/ready-up/sdk/porting).
+
+These answers come from tests on a real CS2 1.41.8.4 server with Metamod 2.0.0-dev+1469, CounterStrikeSharp v1.0.375 and the Auto Tournament CS2 plugin 2.0.0. The full results, with logs, are in [docs/COMPATIBILITY.md](https://github.com/Auto-Tournament/ready-up/blob/master/docs/COMPATIBILITY.md) in the repo.
+
+### Can Metamod run next to Ready Up?
+
+Yes. Metamod's `Game csgo/addons/metamod` line goes first in `gameinfo.gi`, and Ready Up's line goes directly below it. The installer does this for you. See [Metamod](/cs2/ready-up/install#metamod).
+
+This needs a current Ready Up build. Older builds turned themselves off under Metamod.
+
+### Can CounterStrikeSharp plugins run next to Ready Up?
+
+It works, but we do not recommend it.
+
+- CounterStrikeSharp's chat hook on `Host_Say` is lost when Ready Up is loaded, without any error. Chat features of CounterStrikeSharp plugins that depend on it, such as chat triggers and silent `/` commands, should be treated as broken. `AddCommandListener("say")` and the `player_chat` event still work.
+- While Ready Up holds round ends back (warmup, practice), a CounterStrikeSharp `TerminateRound()` call does nothing.
+- When a CS2 update breaks CounterStrikeSharp's gamedata, CounterStrikeSharp crashes the whole server while loading. It does that without Ready Up too, and Ready Up cannot prevent it. On its own, Ready Up keeps the server up and only turns off what broke.
+
+Only do it if you need a CounterStrikeSharp plugin that has no Ready Up version yet. Test the chat features it uses. The better fix is to [port it to the Ready Up SDK](/cs2/ready-up/sdk/porting).
+
+### Can MatchZy, Get5 or Auto Tournament CS2 run next to Ready Up?
+
+No. They are match plugins, and so is Ready Up. Tested together, both loaded, but they got in each other's way:
+
+- One `.r` counts as ready in both plugins. The same goes for `.pause`, `.unpause` and the other shared commands.
+- Each plugin keeps overwriting the other's cvars.
+- Every match is reported twice, by two plugins that disagree about its state.
+- Chat messages come twice.
+
+Use Ready Up's match plugin on its own. It uses the same commands and event names.
+
+### What if Ready Up is above Metamod in gameinfo.gi?
+
+Nothing crashes, but Metamod never loads, and neither does anything it loads, such as CounterStrikeSharp. Ready Up logs a `[ReadyUp] load-order: WARNING` line at start with the command that fixes it:
+
+```bash
+python3 game/csgo/readyup/tools/patch_gameinfo.py game/csgo/gameinfo.gi
+```
+
+If two copies of Ready Up end up in one server process, the second copy turns itself off and only passes calls through to Valve's library.
+
+## Updates and safety
+
+### Is it safe after a CS2 update?
+
+Every engine function Ready Up uses is listed in `engine-surface.json`, with a signature and identity checks. A function only counts as found when both match. If one is not found, only the features that need it turn off, and the rest of the server keeps running.
+
+CI checks the file against every new public CS2 build, usually before servers update. On your server, `ru selftest` shows every check and ends with `PASS` or `FAIL`. A fixed `engine-surface.json` can be dropped in without a new build.
+
+After a CS2 update, run the installer again (for the `gameinfo.gi` line) and `ru selftest`.
+
+### Do plugins break when CS2 updates?
+
+Plugins do not touch the engine. Only the core does, so a CS2 update only ever needs a core fix. See [Ready Up SDK](/cs2/ready-up/sdk).
+
+## Day to day
+
+### How do I see what it is doing?
+
+- `ru selftest` in the console: every engine check and feature, ending with `PASS` or `FAIL`.
+- `ru match state`: the mode, roster and who is ready.
+- `ru plugin list`: which plugins are loaded.
+- `ru perf`: how much time each plugin takes per server frame.
+- `curl -s http://127.0.0.1:27022/status` on the server: a JSON summary for tools. See [Status endpoint](/cs2/ready-up/fleet#status-endpoint).
+- The console log: Ready Up's lines start with `[ReadyUp]`. Set `debug=1` in `readyup.cfg` for more.
+
+### How do I add an admin?
+
+In the server console: `ru admins add <steamid64>`. After that, that admin can add others in chat with `.ru admins add`. In fleet mode, the platform's admins count too. See [Who is an admin](/cs2/ready-up/commands#who-is-an-admin).
+
+### Can I change the plugin without restarting the server?
+
+Yes. `ru plugin reload match` loads a new `match.so` and keeps a running match. Only a new core needs a restart.
+
+### Can I write my own plugin?
+
+Yes, with the [Ready Up SDK](/cs2/ready-up/sdk). Start with [Build your first plugin](/cs2/ready-up/sdk/getting-started).
+
+## License
+
+### What is the license?
+
+PolyForm Noncommercial 1.0.0. You can use, change and share Ready Up for anything noncommercial. Anyone who earns money from it (a business, a profit-making event, a paid server operator, or selling it or a service built on it) needs a commercial license first. See [Licensing](/reference/licensing).
+
+The installer asks which one applies to you, once, and saves the answer. Unattended installs pass `--accept-license=noncommercial` or `--accept-license=commercial`.

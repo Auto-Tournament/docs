@@ -1,0 +1,190 @@
+---
+title: Skins
+description: Weapon paints, knives, gloves and agents, the loadouts.json format, and loadouts from the platform.
+icon: Palette
+---
+
+<Callout title="Ban risk" type="warn">
+  Valve can ban servers that run a skin changer. Only use skins on servers where you accept that risk. This is why skins are a separate plugin that you must choose to install.
+</Callout>
+
+Skins give players the weapon paints, knife, gloves and agent they pick. The skins plugin, `skins.so`, reads each player's choices from one of two places:
+
+- **Standalone:** `loadouts.json` in the plugin's data folder. Ready Up does not come with a picker. Whatever manages skins (a web tool, a script) writes this file. Ready Up only reads it.
+- **Fleet mode:** the platform sends each player's loadout over the fleet link. The local file is not read then. See [Loadouts from the platform](#loadouts-from-the-platform).
+
+## Install
+
+Skins are the `ready-up-skins` component, and are in the `ready-up-full` bundle. The Essentials bundle contains no skins code.
+
+```bash
+bash install.sh skins
+```
+
+The package has two files:
+
+- `readyup/plugins/skins.so`, the plugin,
+- `readyup/bin/linuxsteamrt64/engine-surface.skins.json`, the engine signatures only skins needs. The core adds them to its own list at start. Without this file, the core does not look for them.
+
+To stop skins on a server, remove the component (`bash install.sh --remove skins`), run `ru plugin disable skins` (it stays off after a restart), or start the server with `READYUP_DISABLE_SKINS=1`. That last one keeps the plugin loaded, but idle.
+
+Under [Valve's rules](/cs2/ready-up/esports-mode) (`ruleset=valve`, or `cosmetics: "inventory"`), the plugin is inert: it applies nothing, and players keep their own Steam inventory. `skins_status` then says `skins inert (valve ruleset)`.
+
+## What works
+
+| Item | How it is applied |
+| --- | --- |
+| Weapon paints | Paint, wear, seed, name tag and StatTrak on each weapon a player gets. |
+| Knives | The knife model, and its paint. |
+| Gloves | The glove model. Gloves need a paint row too, or they are skipped. |
+| Agents | The player model for CT and T. |
+
+Ready Up applies skins in the same server frame a weapon is created, before any client sees it. Picked-up weapons keep the skin of the player who first owned them.
+
+Many older paints (for example Redline, AWP Asiimov, Howl) were made for the CS:GO weapon models. Ready Up switches those weapons to their legacy model, so the paint looks right. Fade, Printstream and other CS2 paints do not need this.
+
+A player with no knife row gets the stock knife. There is no default knife for admins or anyone else.
+
+## When a change takes effect
+
+- Ready Up keeps each player's loadout for 45 seconds. It fetches it again in the background when the player connects, about once a second while they play, and on game events. It reads `loadouts.json` again only when the file changed. The game never waits for it.
+- A player can type `.skins reload` to load their own skins again, for example after changing them in a web tool. It works in idle, practice and warmup, not during a knife round, a live map or postgame, and once every 10 seconds per player. Gloves and agent change at once, and the weapons in hand are repainted.
+- `skins_refresh [steamid64]` in the server console refreshes now.
+- In fleet mode, a loadout from the platform applies at once.
+- A change applies to the next weapon the player gets: a buy, the round start, or picking up their own drop. Weapons already in hand keep their look.
+- Gloves and agent change on the next spawn.
+
+## loadouts.json
+
+`game/csgo/readyup/plugins/skins/loadouts.json`
+
+```json
+{
+  "version": 1,
+  "players": {
+    "76561198000000000": {
+      "weapon_skins": [
+        {"weapon_team": 2, "weapon_defindex": 7, "paint_id": 282, "wear": 0.15, "seed": 661},
+        {"weapon_team": 0, "weapon_defindex": 9, "paint_id": 279, "wear": 0.12, "seed": 0,
+         "stattrak_enabled": true, "stattrak_count": 1337},
+        {"weapon_team": 3, "weapon_defindex": 16, "paint_id": 309, "wear": 0.03, "seed": 0,
+         "nametag": "Ready Up test"},
+        {"weapon_team": 0, "weapon_defindex": 507, "paint_id": 38, "wear": 0.01, "seed": 412},
+        {"weapon_team": 0, "weapon_defindex": 5030, "paint_id": 10037, "wear": 0.2, "seed": 0}
+      ],
+      "weapon_knives": [{"weapon_team": 0, "knife_classname": "weapon_knife_karambit"}],
+      "weapon_gloves": [{"weapon_team": 0, "glove_defindex": 5030}],
+      "weapon_agents": {"agent_ct": "agents/models/ctm_fbi/ctm_fbi_variantb.vmdl",
+                        "agent_t": "agents/models/tm_leet/tm_leet_variantf.vmdl"}
+    }
+  }
+}
+```
+
+Rules:
+
+- `version` is required. Ready Up understands `1`. A newer version, broken JSON or a missing `version` makes Ready Up move the file to `loadouts.json.corrupt-<time>`, log it, and run with no loadouts. Fix the file and put it back.
+- Keys under `players` are Steam64 IDs, as strings.
+- Every list is optional. Unknown keys are ignored.
+- Write the file in one step: write a temp file in the same folder, then rename it over `loadouts.json`.
+
+### weapon_team
+
+Every row has `weapon_team`: `2` = T, `3` = CT, `0` = both. For each item, a row for one team wins over the `0` row.
+
+Keep one row per `weapon_team` and `weapon_defindex` in `weapon_skins`, and one row per `weapon_team` in `weapon_knives` and `weapon_gloves`. With duplicates, the last row wins.
+
+### weapon_skins
+
+Paints for weapons, knives and gloves.
+
+| Key | Type | Default | Notes |
+| --- | --- | --- | --- |
+| `weapon_defindex` | int | required | Item index from `items_game.txt`. For example AK-47 `7`, AWP `9`, M4A4 `16`, M4A1-S `60`, USP-S `61`, Glock-18 `4`, Desert Eagle `1`. A knife uses the knife's index (Karambit `507`), gloves use the glove index (Sport Gloves `5030`). |
+| `paint_id` | int | `0` | Paint kit ID, for example Redline `282`, AWP Asiimov `279`, Howl `309`, Fade `38`, Pandora's Box `10037`. `0` or less means no paint. |
+| `wear` | number | `0.000001` | 0 to 1. Factory New is below 0.07. |
+| `seed` | int | `0` | Pattern seed, 0 to 1000. |
+| `nametag` | string | none | Optional. Up to 160 bytes. |
+| `stattrak_enabled` | bool | `false` | Show a StatTrak counter. |
+| `stattrak_count` | int | `0` | Starting count. Kills are counted in `stattrak.json`. |
+
+### weapon_knives
+
+| Key | Notes |
+| --- | --- |
+| `knife_classname` | One of the class names below. |
+
+`weapon_bayonet` (500), `weapon_knife_css` (503), `weapon_knife_flip` (505), `weapon_knife_gut` (506), `weapon_knife_karambit` (507), `weapon_knife_m9_bayonet` (508), `weapon_knife_tactical` (509), `weapon_knife_falchion` (512), `weapon_knife_survival_bowie` (514), `weapon_knife_butterfly` (515), `weapon_knife_push` (516), `weapon_knife_cord` (517), `weapon_knife_canis` (518), `weapon_knife_ursus` (519), `weapon_knife_gypsy_jackknife` (520), `weapon_knife_outdoor` (521), `weapon_knife_stiletto` (522), `weapon_knife_widowmaker` (523), `weapon_knife_skeleton` (525), `weapon_knife_kukri` (526).
+
+An unknown value is ignored, and the player keeps the stock knife. The knife's paint is a `weapon_skins` row with the number in brackets as `weapon_defindex`.
+
+### weapon_gloves
+
+| Key | Notes |
+| --- | --- |
+| `glove_defindex` | Broken Fang `4725`, Bloodhound `5027`, Sport `5030`, Driver `5031`, Hand Wraps `5032`, Moto `5033`, Specialist `5034`, Hydra `5035`. |
+
+Gloves need a paint row in `weapon_skins` with `weapon_defindex` equal to `glove_defindex`. Without one, Ready Up skips the gloves, because unpainted gloves look wrong.
+
+### weapon_agents
+
+One object, not a list: `{"agent_ct": ..., "agent_t": ...}`. A value is either the full model path, such as `agents/models/ctm_fbi/ctm_fbi_variantb.vmdl`, or the short form `ctm_fbi/ctm_fbi_variantb`. Ready Up turns the short form into `agents/models/<value>.vmdl`.
+
+Empty or `null` means the default model. Do not use the old `characters/models/...` paths. They are empty stubs in CS2.
+
+### stattrak.json
+
+Ready Up never writes `loadouts.json`. It counts kills in `stattrak.json` next to it:
+
+```json
+{"version": 1, "counters": {"76561198000000000/0/9": 1338}}
+```
+
+The key is `<steamid64>/<weapon_team>/<weapon_defindex>` of the row that matched. Once a counter exists, it replaces `stattrak_count` from `loadouts.json`. Delete the key to go back to the file's value.
+
+### Migrating from Postgres
+
+Older builds kept loadouts in four Postgres tables. The file uses the same column names, grouped by player. `migrate-postgres-to-json.py` copies them over. See [Upgrading from Postgres](/cs2/ready-up/install#upgrading-from-postgres).
+
+## Loadouts from the platform
+
+In [fleet mode](/cs2/ready-up/fleet), the platform sends a `skins.loadout` message for each player, for example when they connect. It holds the player's whole loadout and replaces the one before. The data is the same as a player's entry in `loadouts.json`, in a slightly different shape:
+
+```json
+{
+  "steamid64": "76561198000000000",
+  "rev": 12,
+  "items": {
+    "paints": [{"team": 0, "defindex": 7, "paint": 282, "wear": 0.15, "seed": 661, "stattrak": 40}],
+    "knife": [{"team": 0, "defindex": 507}],
+    "gloves": [{"team": 0, "defindex": 5030}],
+    "agents": [{"team": 3, "model": "agents/models/ctm_fbi/ctm_fbi_variantb.vmdl"}]
+  }
+}
+```
+
+- The knife is an item index, not a class name.
+- `stattrak` present means StatTrak is on, with that count.
+- A loadout with a lower `rev` than the one the server has is ignored.
+- `skins.invalidate` drops a player's loadout.
+
+StatTrak counters live on the platform in fleet mode. Ready Up sends the new kills every 10 seconds (`skins.stattrak`) and shows the platform's count plus local kills.
+
+The platform only sends loadouts to servers that have the skins plugin loaded, and only when skins are turned on for the deployment.
+
+<Callout title="Platform side not released" type="info">
+  The skin picker and loadout storage on the Auto Tournament platform are not released yet. Until then, use `loadouts.json`.
+</Callout>
+
+## Test data
+
+`scripts/seed-dev-skins.py --steamid <steamid64> [--file <path to loadouts.json>]` in the repo adds a full test loadout for one player and keeps everyone else in the file.
+
+## Where the item IDs come from
+
+Build a picker's list from the game files, not from a hard-coded list:
+
+- `scripts/items/items_game.txt` has the items, `paint_kits`, and which paint fits which weapon.
+- `resource/csgo_english.txt` has the display names.
+
+Both are inside `game/csgo/pak01_dir.vpk`.

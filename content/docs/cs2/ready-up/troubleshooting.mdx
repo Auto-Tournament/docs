@@ -1,0 +1,246 @@
+---
+title: Troubleshooting
+description: Read the selftest, measure plugin time with ru perf, find the logs, and fix common problems.
+icon: LifeBuoy
+---
+
+When you ask for help or open an [issue](https://github.com/Auto-Tournament/ready-up/issues), include:
+
+- the CS2 version (`version` in the server console),
+- the Ready Up build (`ru` in the server console),
+- the output of `ru selftest`,
+- the output of `ru plugin list`,
+- the relevant part of the server console log.
+
+Ready Up does not write tokens or passwords to the log.
+
+## ru selftest
+
+Run `ru selftest` in the server console. Admins can type `.ru selftest` in chat: the result goes to chat, the full report to the console. The last report is also at `/selftest` on the [status endpoint](/cs2/ready-up/fleet#status-endpoint).
+
+The first line names the Ready Up build, the CS2 version and build ID, and the CS2 version the engine surface was made for:
+
+```text
+selftest: Ready Up 0.1.0 (abc1234) on CS2 1.41.8.4 (build 25515854); engine-surface for 1.41.8.4
+```
+
+Then come these sections:
+
+| Section | What it checks |
+| --- | --- |
+| `[engine-surface functions]` | Each engine function: its address, and whether its anchors passed. |
+| `[rtti]` | The engine classes Ready Up finds by their type name. |
+| `[vtable slots]` | The virtual functions Ready Up patches or calls. |
+| `[struct layouts]` | Struct offsets, such as the command argument layout. |
+| `[schema]` | Every game field Ready Up reads, with its offset. |
+| `[runtime]` | The live hooks (GameFrame, ClientCommand, command buffer, log listener), engine events, the entity system and chat output. |
+| `[funchook detour sites (hookcheck)]` | Whether each detour is installed, or could still be installed. |
+| `[plugins]` | The plugin API version, the plugins folder, loaded and disabled plugins, load errors, and the plugins' own checks (for example the ready panel header, the ruleset, the fleet link, skins, the warmup weapon cleanup). |
+| `[features]` | Each feature: `on`, `OFF` or `pending`, what it needs, and what is missing. |
+
+Each check line starts with a status:
+
+| Status | Meaning |
+| --- | --- |
+| `OK` | Works. |
+| `FAIL` | Broken. Counts against the result. |
+| `PEND` | Not known yet. For example the entity system before the first map. Run the selftest again after a map has loaded. |
+| `WARN`, `INFO`, `SKIP` | Information only. |
+
+The last line is the result:
+
+```text
+selftest: PASS 58/58
+selftest: FAIL 55/58 (LegacyGameEventListener; ...) [2 pending]
+```
+
+A `FAIL` does not mean the server is broken. It means some features are off. The `[features]` section shows which ones, for example:
+
+```text
+  OFF     ready_hud                needs: hook:GameFrame, fn:LegacyGameEventListener, eventmgr  -- missing: fn:LegacyGameEventListener
+```
+
+When a feature turns off at runtime, the log has one line for it:
+
+```text
+feature ready_hud DISABLED: needs fn:LegacyGameEventListener. Everything else keeps working.
+```
+
+### Features
+
+| Feature | What it covers |
+| --- | --- |
+| `chat_commands` | `.r`, `.ru` and the other chat commands, and the replies. |
+| `match_flow` | Warmup, scrims, matches, going live. |
+| `pauses` | `.pause` and `.unpause`. |
+| `knife` | The knife round and side pick. Without it, knife maps go live with default sides. |
+| `events` | Engine game events: round lifecycle and stats. Without them, Ready Up reads the server log instead. |
+| `ready_hud`, `welcome_html`, `hud_brand` | The ready panel, the welcome card and their header. |
+| `round_term_suppression` | Keeps rounds from ending during warmup and practice. |
+| `client_command_hook` | Team joins, hidden chat commands, the admin and captain chat prefix. |
+| `player_chat_print` | Chat to a single player. |
+| `plugins` | The plugin host. |
+
+### Selftest in CI
+
+To run the selftest without a person, start the server with `READYUP_SELFTEST_AND_QUIT=1` (or the start argument `-readyup_selftest_and_quit`). After the first map has run for a few seconds, Ready Up writes the report and quits. The exit code is `0` for `PASS` and `1` for `FAIL`.
+
+| Variable | Default | What it does |
+| --- | --- | --- |
+| `READYUP_SELFTEST_DELAY` | `5` | Seconds the first map runs before the test. |
+| `READYUP_SELFTEST_FILE` | `readyup_selftest.txt` next to the core | Where the report goes. It ends with `exit_code: 0` or `1`. |
+| `READYUP_SELFTEST_TIMEOUT` | `300` | If no map runs within this many seconds, Ready Up writes a `FAIL` report and quits. |
+
+## ru perf
+
+`ru perf` in the server console (or `.ru plugin perf` in chat) shows where the server frame goes: how long each plugin callback takes, since the start or the last `ru perf reset`.
+
+```text
+perf: 600 s, 38400 frames; plugins' worst frame 3.10 ms, 0 over the warn level; longest gap between frames 180 ms (0 over)
+perf:   match tick                        38400 calls  avg    21.4 us  max     0.90 ms  0.021 ms/frame
+```
+
+- The first line: how long it measured, the worst frame in plugin time, and the longest gap between two frames.
+- Then one line per plugin callback, the costliest first: calls, average, maximum, and time per frame.
+
+A CS2 server at 64 tick has about 15.6 ms per frame. Plugins normally use a small part of a millisecond.
+
+Ready Up also logs slow frames on its own, at most once every 10 seconds:
+
+```text
+perf: slow frame: 12.40 ms in plugins, 16 ms since the last frame; top: practice tick 11.90 ms
+perf: late frame: 0.20 ms in plugins, 900 ms since the last frame (Ready Up was not the cause: the engine itself, a map load or hibernation)
+```
+
+A **slow** frame is one where plugins took longer than `perf_warn_ms` (8 by default). The line names the slowest callbacks. A **late** frame came more than `perf_gap_warn_ms` (250 by default) after the one before. If plugins were fast in that frame, the line says Ready Up was not the cause. Both keys are in `readyup.cfg`. See [Configuration](/cs2/ready-up/configuration#core-keys).
+
+If one plugin shows up in slow frames, turn it off with `ru plugin disable <name>` and check again, then report it with the `ru perf` output.
+
+## Logs
+
+- Ready Up writes to the server console. Its lines start with `[ReadyUp]`, and plugin lines carry the plugin's name, for example `practice: ...` or `vote: ...`.
+- Set `debug=1` in `readyup.cfg` (or `READYUP_DEBUG=1`) for more detail, then `ru reload`.
+- `ru match state` prints the mode, the roster and the rules. The console logs a `state:` line on every change.
+- A plugin that fails to load logs a line that starts with `plugin:`. `ru selftest` lists the error under `[plugins]`.
+
+## Crash log
+
+If the server crashes, Ready Up writes a backtrace to the console (stderr) and appends it to `readyup_crash.log` next to the core:
+
+```text
+game/csgo/readyup/bin/linuxsteamrt64/readyup_crash.log
+```
+
+It starts with `=== crash handler (Ready Up <build>) ===` and the signal. If the crash happened inside a plugin, the next line says `crashed inside plugin "<name>"`.
+
+The handler then lets the process die as normal, so your supervisor can restart it. To turn it off, set `READYUP_CRASH_HANDLER=0`.
+
+Include the crash log when you report a crash.
+
+## Common problems
+
+### Ready Up does not load
+
+There is no Ready Up banner in the console, and `ru` gives `Unknown command`.
+
+- Check `gameinfo.gi`. `Game csgo/readyup` must be above `Game csgo`. A CS2 update rewrites the file, so run the installer or the patcher again. See [After a CS2 update](/cs2/ready-up/install#after-a-cs2-update).
+- Check that `game/csgo/readyup/bin/linuxsteamrt64/libserver.so` exists, not one folder deeper.
+- If you have `gameinfo_branchspecific.gi`, patch it too.
+- With Metamod: Metamod's line must be first and Ready Up's directly below. See [Metamod](/cs2/ready-up/install#metamod).
+
+### Metamod or CounterStrikeSharp does not load
+
+`meta list` gives `Unknown command`, and the console has a `[ReadyUp] load-order: WARNING` line. Ready Up is listed above Metamod in `gameinfo.gi`, so the engine loads Ready Up first and Metamod never starts. Run the command from the warning, or the installer, to move Ready Up's line directly below Metamod's. See [Metamod](/cs2/ready-up/install#metamod).
+
+### Ready Up turned itself off
+
+The log says Ready Up is disabled, and `ru selftest` has `FAIL readyup enabled`. A function Ready Up cannot run without was not found, usually after a CS2 update. The server runs as plain CS2. Check [GitHub](https://github.com/Auto-Tournament/ready-up/issues) for a `cs2-update` issue and wait for a fixed `engine-surface.json` or a new build.
+
+Under Metamod, older Ready Up builds turned themselves off because they searched the wrong `libserver.so`. Update Ready Up.
+
+### ru works, but .r and the other commands do nothing
+
+The match flow is a plugin. Run `ru plugin list`. If `match` is missing:
+
+- check that it was not turned off: `ru plugin enable match` loads it and keeps it on,
+- check that `game/csgo/readyup/plugins/match.so` exists, or install the `match` component,
+- check the console for lines that start with `plugin:`, and `ru selftest` under `[plugins]` for load errors,
+- check that `READYUP_PLUGINS=0` is not set.
+
+The same goes for other plugins: `.prac` needs `practice`, `.ru map` and `.ru admins` need `essentials`, `.ru whitelist` needs `whitelist`.
+
+### Chat commands do nothing
+
+- Run `ru selftest` and look at `chat_commands` under `[features]`.
+- With a match loaded, only roster players can use the player commands.
+- Admin commands need admin rights. See [Who is an admin](/cs2/ready-up/commands#who-is-an-admin).
+- `unknown command, type .ru help`: the command is spelled wrong, or its plugin is not loaded. Old flat names such as `.ru start` are gone. See [Commands](/cs2/ready-up/commands).
+- Replies go only to the player who typed the command. Other players see nothing.
+
+### Nobody is admin
+
+Add the first admin from the server console: `ru admins add <steamid64>`. This needs the essentials plugin: check `ru plugin list`. In fleet mode, the local `admins.json` counts too, so this also works when the platform has not sent a list yet.
+
+### admins.json or loadouts.json was ignored
+
+Look for a `<name>.corrupt-<time>` file next to it, and a line in the console. Ready Up moves a file aside when it is not valid JSON, has no `"version"`, or has a newer version than it knows. Fix the file and put it back under its normal name.
+
+### A map command is refused
+
+`.ru map change`, `reload` and `restart` are refused during a knife round or a live map: `a match is live ...: add force to ... anyway`. Add `force` if you mean it.
+
+A Workshop map needs the server to download it first. Everyone sees a progress bar in the middle of the screen, and the console logs progress every 5 seconds. If the bar never moves, check that the server can reach Steam, and that the ID is a map.
+
+### The match does not go live under Valve's rules
+
+Under `ruleset=valve`, the match waits for GOTV. Chat and the console say so. Turn on GOTV (`tv_enable 1`) and reload the map, or have an admin run `.ru match start force`. See [GOTV must be on](/cs2/ready-up/esports-mode#gotv-must-be-on).
+
+A match config with a `knife` map side does not load at all under Valve's rules. The console gives the reason.
+
+### The ready panel does not show
+
+- `ready_hud=1` in `readyup.cfg`.
+- `ready_hud` is `on` in `ru selftest`. If it is `OFF`, a CS2 update broke a function it needs. Chat reminders are used instead.
+- `ru_warmup_enable` is `1`. With `0`, loaded matches have no ready-up at all.
+- Do not add `mp_warmup_start` to your configs. CS2's WARMUP text covers the panel.
+- Another panel may be up. The map change card, the Workshop download bar and the welcome card win over the ready panel. It comes back when they are gone.
+
+### The panel blinks
+
+Set `hud_tick_ms=0`, `hud_resend_ms=0` and `hud_duration_s=1`. Do not put an image in a panel that is resent every frame.
+
+### The server feels slow
+
+Run `ru perf` and look at the `perf:` lines in the console. See [ru perf](#ru-perf). A `late frame` line that says Ready Up was not the cause points at the engine, a map load or the machine.
+
+After a day or more on one map, player animations in CS2 run in slow motion. A map load fixes it: `.ru map reload`. Ready Up does this on its own for an empty server (`idle_map_refresh_hours`).
+
+### Commands queued for later never run
+
+Ready Up does its work in server frames. An empty server that hibernates runs no frames. Keep `sv_hibernate_when_empty 0`, as in `cfg/ReadyUp/warmup.cfg`.
+
+### No events arrive in Auto Tournament
+
+1. On the CS2 machine, check that it can reach Auto Tournament:
+
+   ```bash
+   curl -sS https://at.example.com/api/events/test
+   ```
+
+2. Run `ru_webhook_url` and `ru_match_token` without a value in the console. Both must be set.
+3. Events are only sent while a match is loaded. Scrims are not sent.
+
+### The fleet link does not connect
+
+- `ru fleet status` shows the state and the last error.
+- `standalone`: there is no `url` in `[fleet]` and no `credentials.json`. See [Enroll a server](/cs2/ready-up/fleet#enroll-a-server).
+- `rejected`: the platform refused the code, key or token. A code works once and runs out after 15 minutes. Get a new one and run `ru fleet enroll`.
+- `offline`: the platform cannot be reached. Check the URL, DNS and the certificate. Ready Up only uses `https://` and `wss://` unless `insecure_dev=1`.
+- Check that `game/csgo/readyup/plugins/fleet.so` exists and `ru plugin list` shows `fleet`.
+
+### The status endpoint does not answer
+
+- `ru status_http` shows the address and port.
+- The default port is the game port + 7. Another server on the same machine may already use it. Set `status_http_port`.
+- With a non-loopback `status_http_bind`, a token of 16 characters or more is required, or the endpoint does not start.
+- From another machine, send the token from `status.json`.

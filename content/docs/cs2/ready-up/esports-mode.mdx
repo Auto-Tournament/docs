@@ -1,0 +1,112 @@
+---
+title: Esports mode
+description: Run matches under Valve's CS2 tournament rules with ruleset valve, and change single rules with overrides.
+icon: Trophy
+---
+
+<Callout title="In development" type="warn">
+  Ready Up is not released yet. Rule names and values can still change.
+</Callout>
+
+Esports mode runs a match under Valve's published CS2 tournament rules, from the [Major supplemental rulebook](https://github.com/ValveSoftware/counter-strike_rules_and_regs). It is opt-in. Without it, matches use Ready Up's default rules, which follow MatchZy.
+
+Valve's rule is short: load Premier's own configs, then apply a list of exceptions. Esports mode does exactly that, so when Valve changes Premier, esports mode follows without a Ready Up update.
+
+## Turn it on
+
+For every match on a server, in `readyup.cfg`, above the first `[section]`:
+
+```text title="readyup.cfg"
+ruleset=valve
+```
+
+For one match, in the match config:
+
+```json
+{
+  "matchid": 123,
+  "ruleset": "valve",
+  "map_sides": ["team1_ct", "team2_ct", "team1_ct"]
+}
+```
+
+The match config wins over `readyup.cfg`. In fleet mode, the platform sends the ruleset with the match. Scrims follow `readyup.cfg`, but keep their knife round.
+
+## What changes
+
+| | Default | Valve |
+| --- | --- | --- |
+| Go-live config | `cfg/ReadyUp/live.cfg` | `cfg/ReadyUp/esports_live.cfg`: Valve's `gamemode_competitive` and `gamemode_competitive_tmm`, then Valve's exceptions. It runs even with `ru_cfg_exec_enable 0`. |
+| Your own changes | `live_override.cfg` | `esports_override.cfg` |
+| Knife round | Allowed (`map_sides: "knife"`) | Refused. A match config with a `knife` side does not load. Sides come from the veto. |
+| Overtime | `maxOvertimes` and the damage tiebreak apply | Unlimited overtime. `maxOvertimes` and `damageTiebreak` are ignored, with a note at load. |
+| Technical pauses | 3 per team, 300 seconds | 1 per team, 120 seconds |
+| Halftime | No pause | A pause at halftime. Both teams type `.unpause`, or an admin ends it. It does not count against either team. |
+| A team short of players | Play on | CS2 pauses at the next round start when a side has fewer than 5 players (`sv_matchpause_auto_5v5`). Ready Up shows it as a pause of the short team. Both teams type `.unpause`, or an admin ends it. It is never counted. |
+| GOTV | Demo recorded if GOTV is up | Required. The match does not go live while no GOTV client is on the map. See [GOTV must be on](#gotv-must-be-on). |
+| Coaches | Admitted as spectators | Only admitted at a LAN (`lan`) or with `coaches_online`. |
+| Skins and Midas | Active if installed | Inert. Players keep their own Steam inventory. |
+| Practice tools, `.gg` vote, `.stop` vote, damage report | Available | Off. `.gg` only sends `player_gg`. |
+
+Your warmup stays Ready Up's warmup. Valve's warmup values are set for the live state only.
+
+## GOTV must be on
+
+Valve's rules require a demo of every map. Under `ruleset=valve`, Ready Up refuses to go live while no GOTV client is on the map: straight to live, after the knife round, `ru match start`, and a start from the platform.
+
+When it refuses, the console and chat (at most every 30 seconds) say why, and Ready Up sends `tv_enable 1`, so GOTV comes up with the next map load. Start GOTV with the server (`tv_enable 1` in `server.cfg` or on the command line), or reload the map with `.ru map reload`.
+
+To go live anyway, an admin runs `.ru match start force`. Chat then says that the map is not recorded.
+
+## Overrides
+
+A match can change single rules on top of the ruleset with `overrides`. Later wins: the ruleset's preset, then the match's pause keys, then match `cvars` that set a rule's cvar, then `overrides`.
+
+```json
+{
+  "ruleset": "valve",
+  "overrides": { "tv_delay": 90, "lan": true }
+}
+```
+
+| Key | Type | Default | Valve | Sets |
+| --- | --- | --- | --- | --- |
+| `freezetime` | 0 to 120 | 18 | 20 | `mp_freezetime` |
+| `tac_timeouts` | 0 to 10 | 3 | 3 | `mp_team_timeout_max` (`.tac`) |
+| `tac_timeout_seconds` | 1 to 300 | 30 | 31 | `mp_team_timeout_time` |
+| `tech_pauses_per_team` | 0 to 20, 0 = no limit | `readyup.cfg`, else 3 | 1 | Technical pauses (`.tech`) |
+| `tech_pause_seconds` | 0 to 3600, 0 = never | `readyup.cfg`, else 300 | 120 | Automatic unpause |
+| `allow_knife` | bool | true | false | Allow `map_sides: "knife"` |
+| `overtime.enabled` | bool | true | true | `mp_overtime_enable` |
+| `overtime.maxrounds` | 2 to 30 | 6 | 6 | `mp_overtime_maxrounds` |
+| `overtime.startmoney` | 0 to 65535 | 10000 | 10000 | `mp_overtime_startmoney` |
+| `overtime.limit` | 0 to 100 | server | 0 | `mp_overtime_limit` |
+| `zeus` | -1 to 10 | 1 | 5 | `mp_weapons_allow_zeus` |
+| `spectators_max` | 0 to 64 | 20 | 10 | `mp_spectators_max` |
+| `halftime_pausematch` | bool | false | true | Halftime pause |
+| `tv_delay` | 0 to 960 | server | 105 | `tv_delay` |
+| `tv_broadcast_url` | URL or `""` | `""` | `""` | CSTV broadcast (`tv_broadcast 1` when set) |
+| `camera_man_steamid` | Steam64 ID or `""` | `""` | `""` | `tv_allow_camera_man_steamid` |
+| `lan` | bool | false | false | Coaches admitted at a LAN |
+| `coaches_online` | bool | true | false | Coaches admitted online |
+| `default_models` | bool | false | false | Reset every player to a default agent on spawn |
+| `cosmetics` | `inventory` or `plugin` | `plugin` | `inventory` | `inventory` makes the skins plugin inert |
+
+An unknown key, a wrong type or a value out of range refuses the whole match, with the reason in the console, for example `unknown override "freeztime"`.
+
+`default_models` uses the models in `readyup.cfg` `default_model_ct` and `default_model_t`. It only changes the player model. It gives no items and writes no inventory data.
+
+## Check what is in use
+
+- `ru match rules`: every rule, with `*` on the ones that differ from the ruleset, and where each change came from.
+- `ru match state`: the same lines, with the mode and roster.
+- At match load, the console logs `esports: ruleset=valve ...` and the rules that differ.
+- `ru selftest` has an `INFO ruleset:` line, and `skins: inert (valve ruleset)` when skins are installed.
+- `/status` and the fleet state carry the ruleset and the effective rules.
+
+## What esports mode does not do
+
+- It does not make Ready Up allowed at a Major. Valve's rulebook only allows server mods with Valve's written approval. That is up to the organizer.
+- Some rules are not server settings: client settings, PC lockdown, map pool, rosters and coach communication. Those stay with the organizer and the platform.
+- Seven cvars in Valve's list do not exist on current CS2 builds (for example `sv_occlude_players`). `esports_live.cfg` keeps them, and the server answers `Unknown command`. That is expected.
+- `tv_broadcast` stays `0` unless the match sets `tv_broadcast_url`.

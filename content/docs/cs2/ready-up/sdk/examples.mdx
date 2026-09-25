@@ -1,0 +1,70 @@
+---
+title: Examples
+description: The four plugins in the Ready Up repo, and which parts of the SDK each one shows.
+icon: Library
+---
+
+Every plugin in the [ready-up repo](https://github.com/Auto-Tournament/ready-up) uses the same SDK you do. None of them has special access to the core. Read them as real-world references.
+
+## hello
+
+`plugins/hello/hello.c`. Plain C, about 200 lines. Start here.
+
+- Chat and console commands, an `ru hello` subcommand, a hidden chat command, and a console command it only watches.
+- A tick heartbeat, and a frame counter that also runs when the server does not simulate.
+- Lifecycle events, `player_death` as a raw engine event, and a count of log lines.
+- A `greeting` setting read with `config_get`.
+- A load counter kept across `ru plugin reload hello` with the stash.
+- Publishes its own interface, `readyup.hello.v1`.
+- Asks for API 1.0 and checks every newer function with `RU_API_HAS`, so it loads on older cores too.
+
+See [Build your first plugin](/cs2/ready-up/sdk/getting-started).
+
+## skins
+
+`plugins/skins/`. C++. Applies weapon paints, knives, gloves and agents.
+
+- Entities and schema: walks player controllers to pawns to weapons with `entity_by_index`, `entity_from_handle` and `schema_offset`. Keeps entity handles across frames, never pointers.
+- Item attributes, knife subclass, models and bodygroups, then `entity_mark_changed` so clients get the change.
+- A gamedata fragment, `engine-surface.skins.json`. The signatures only skins needs ship with skins, not with the core.
+- A worker thread for file reads, started in load and joined in unload. The game thread only reads an in-memory cache.
+- Raw engine events to prefetch loadouts on spawn and pickup, and to count StatTrak kills.
+- Fleet handlers (`skins.loadout`) and a capability (`skins.v1`), looked up through `readyup.fleet.v1` on every tick.
+
+## match
+
+`plugins/match/`. C++, the largest plugin. The whole match flow.
+
+- Many chat commands, some hidden with `RU_CMD_HIDE`, and every `ru <x>` subcommand the match flow has.
+- Lifecycle events and server log lines. The knife round works from log lines alone.
+- Per-player center HTML for the ready panel and the welcome card.
+- `set_round_termination_suppressed` for warmup and practice, `set_chat_name_prefix` for admins and captains.
+- An admin provider (`set_admin_provider`) that answers for the whole server.
+- Its own settings from `readyup.cfg`, `[match]` and `cfg/ReadyUp/match.cfg`, and JSON data files in its data folder.
+- Publishes `readyup.match.v1` for the core's `/status`, and its own `ru selftest` lines.
+- Keeps a running match across `ru plugin reload match` with the stash. See [What survives a reload](/cs2/ready-up/sdk/threading-and-abi#what-survives-a-reload).
+- Uses `readyup.fleet.v1` to take match assignments and stream state to the platform.
+- `match_host_test` loads the real `match.so` into the plugin host without a server.
+
+## fleet
+
+`plugins/fleet/`. C++. The link to the Auto Tournament platform.
+
+- A network thread (libcurl WebSockets) that never blocks the game thread. Messages reach other plugins through `post_to_game_thread`.
+- Publishes `readyup.fleet.v1` with thread-safe members, for the core and other plugins.
+- Handles its own reload: every other plugin compares `instance_id()` and registers its handlers again.
+- Keeps a value in the stash across reloads.
+- Its own `ru selftest` lines.
+- Unit tests, and an integration test against a mock platform.
+
+## Where to look for what
+
+| You want to | Look at |
+| --- | --- |
+| Add a chat or console command | `hello.c` |
+| Show something in the middle of the screen | `plugins/match/readyup/ready_hud.cpp` |
+| Change something on a player or weapon | `plugins/skins/apply.cpp`, `cosmetics.cpp` |
+| Run work off the game thread | `plugins/skins/loadout.cpp`, `plugins/fleet/fleet_client.cpp` |
+| Keep state across a reload | `hello.c` (small), `plugins/match/readyup/reload_state.cpp` (large) |
+| Publish an interface | `hello.c`, `plugins/match/readyup/match_plugin.cpp` (with `match_status.cpp`) |
+| Add `ru selftest` lines | `plugins/fleet/fleet_plugin.cpp` |

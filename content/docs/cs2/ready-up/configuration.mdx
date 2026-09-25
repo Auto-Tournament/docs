@@ -1,0 +1,284 @@
+---
+title: Configuration
+description: readyup.cfg, plugin settings, the mode configs, data files and environment variables.
+icon: Settings
+---
+
+<Callout title="In development" type="warn">
+  Ready Up is not released yet. Keys can still change.
+</Callout>
+
+Ready Up reads these files:
+
+| File | Where | Used for |
+| --- | --- | --- |
+| `readyup.cfg` | `game/csgo/readyup/bin/linuxsteamrt64/` | Core settings, match settings, and one `[section]` per plugin. |
+| `cfg/ReadyUp/<plugin>.cfg` | `game/csgo/cfg/ReadyUp/` | Optional. Settings for one plugin, for example `match.cfg`, `practice.cfg`, `midas.cfg` or `fleet.cfg`. |
+| `cfg/ReadyUp/*.cfg` (mode configs) | `game/csgo/cfg/ReadyUp/` | Server settings for each mode (warmup, knife, live, practice). |
+
+Settings for Auto Tournament (token, webhook URL, heartbeat URL) are console commands, not keys in a file. See [Commands](/cs2/ready-up/commands#auto-tournament). Ready Up saves them for you.
+
+## readyup.cfg
+
+The file sits next to the core, `libserver.so`. The installer creates it from `readyup.cfg.example` only if it is missing, so your changes survive updates.
+
+The format is one `key=value` per line. Lines that start with `#` or `//` are comments. Quote a value that has spaces. Booleans take `0`/`1` (also `n`/`y`, `f`/`t`). Unknown keys are ignored.
+
+```text title="game/csgo/readyup/bin/linuxsteamrt64/readyup.cfg"
+debug=0
+banner=1
+chat_prefix=<DarkRed>[Ready Up]<Default>
+
+welcome=1
+ready_hud=1
+hud_brand="Auto Tournament"
+
+[fleet]
+url=https://tournament.example.com
+enroll_key=rfk_...
+```
+
+### Where each key is read
+
+- **Core keys** must be above the first `[section]` line. The core stops reading at the first section.
+- **Match keys** can be at the top of the file (where they have always been), in a `[match]` section, or in `game/csgo/cfg/ReadyUp/match.cfg`. When a key is set in more than one place, the later one in that list wins.
+- **Other plugins** read their `[<plugin>]` section, for example `[fleet]`, `[practice]` or `[midas]`. The file `game/csgo/cfg/ReadyUp/<plugin>.cfg` wins over the section. In that file, keys can be at the top or in the `[<plugin>]` section.
+
+### Reloading
+
+- `ru reload` in the console, or `.ru reload` in chat as an admin, reloads the core keys. Plugins read their own settings again too.
+- The match plugin checks its files once a second and reloads by itself when one changes. The Midas plugin reads its settings every 5 seconds.
+- The fleet plugin reads its settings when it loads. Use `ru plugin reload fleet` after a change.
+- The `status_http_*` keys are read once at start. Restart the server to change them.
+
+## Core keys
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `debug` | `0` | Verbose logging in the server console. |
+| `chat_debug` | `0` | Also send debug lines to chat. Only works with `debug=1`. |
+| `banner` | `1` | Print the Ready Up banner to the console at start. |
+| `chat_prefix` | `<DarkRed>[Ready Up]<Default>` | Prefix of Ready Up's chat messages. Ready Up adds one space after it. |
+| `consume_ru_chat` | `0` | Hide `.ru ...` messages from chat after Ready Up handles them. To keep admin commands out of chat, admins can also type `ru ...` in their own game console. |
+| `ruleset` | `default` | `valve` runs loaded matches under Valve's tournament rules. A match config's `ruleset` wins. See [Esports mode](/cs2/ready-up/esports-mode). |
+| `perf_warn_ms` | `8` | Log a server frame in which plugins took longer than this, with the slowest plugin calls. At most one line every 10 seconds. See [ru perf](/cs2/ready-up/troubleshooting#ru-perf). |
+| `perf_gap_warn_ms` | `250` | Log a frame that came this long after the previous one. `0` turns these lines off. |
+
+### Status endpoint
+
+The core serves a small read-only HTTP endpoint for monitoring tools. See [Status endpoint](/cs2/ready-up/fleet#status-endpoint).
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `status_http_enabled` | `1` | Turn the endpoint on or off. |
+| `status_http_bind` | `127.0.0.1` | Address to listen on. |
+| `status_http_port` | `0` | Port. `0` means the game port + 7, for example `27022` for `27015`. |
+| `status_http_token` | empty | Token for requests that do not come from the same machine. Empty means Ready Up generates one on first start and keeps it in `status.json`. |
+| `status_http_metrics` | `0` | Turn on `/metrics` (Prometheus text). |
+
+If you bind to anything other than a loopback address, a token of at least 16 characters is required. Without one, the endpoint does not start.
+
+### Chat colors
+
+`chat_prefix`, `admin_prefix` and the captain prefixes take color tokens: `<Default>`, `<White>`, `<DarkRed>`, `<Green>`, `<LightYellow>`, `<LightBlue>`, `<Olive>`, `<Lime>`, `<Red>`, `<LightPurple>`, `<Purple>`, `<Grey>`, `<Yellow>`, `<Gold>`, `<Silver>`, `<Blue>`, `<DarkBlue>`, `<BlueGrey>`, `<Magenta>`, `<LightRed>`, `<Orange>`.
+
+```text
+chat_prefix="<Green>[PUG #1]<Default>"
+```
+
+## Match keys
+
+Read by the match plugin (`match.so`). See [Where each key is read](#where-each-key-is-read).
+
+### Chat
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `admin_prefix` | `<DarkRed>[Admin]<Default>` | Prefix shown in front of an admin's name in chat. |
+| `captain_prefix_team1` | `<LightBlue>[CAP]<Default>` | Prefix for the team 1 captain from the match config. |
+| `captain_prefix_team2` | `<Orange>[CAP]<Default>` | Prefix for the team 2 captain. |
+| `consume_ready_chat` | `0` | Hide `.r`, `.ur` and the other ready messages from chat. |
+
+### Welcome screen and HUD
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `welcome` | `1` | Show a welcome card to a player the first time they join CT or T on a map, once they have spawned. Only that player sees it, for about 5 seconds. It shows the header, the build, the player's name and team, and the mode. |
+| `ready_hud` | `1` | Show each player the ready panel during warmup, the knife round and the side pick. See [The ready HUD](/cs2/ready-up/scrims-and-matches#the-ready-hud). |
+| `hud_brand` | `Auto Tournament` | Text in the header of the welcome card and the ready panel. |
+| `hud_logo_url` | empty | URL of a PNG shown in front of `hud_brand`. Empty means no image. |
+| `hud_knife_hold_s` | `30` | Seconds the KNIFE ROUND panel stays up after the knife round starts. 0 to 300. |
+| `hud_tick_ms` | `0` | How often the ready panel is rebuilt, in milliseconds. `0` means every frame. |
+| `hud_resend_ms` | `0` | Minimum time between two sends of the same panel to a player, in milliseconds. `0` means every frame. |
+| `hud_duration_s` | `1` | How long each send stays up, in seconds. 1 to 10. |
+
+Keep the three timing keys (`hud_tick_ms`, `hud_resend_ms`, `hud_duration_s`) at their defaults. CS2 replays the panel's open animation on every send, and only a resend every frame gives a steady panel. Slower values make it blink.
+
+The logo must be a public PNG, already scaled to the size you want. SVG does not work, and the client ignores `width` and `height`. An image in a panel that is resent every frame flashes. The CS2 client only renders a small part of HTML. Admins can test what works in game with `.ru hud test 1` to `.ru hud test 7`. `8` to `11` measure the panel: rows, width and image sizes. `.ru hud anim` measures how fast the client redraws it.
+
+Each player has one panel in the middle of the screen. When two things want it at once, the more urgent one wins: the map change card and the Workshop download bar, then the welcome card and test panels, then the ready panel.
+
+With `ready_hud=0` the panel is off and the chat reminders come back. Ready-up still works.
+
+### Warmup and scrims
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `scrim_knife` | `1` | In a scrim, play a knife round after everyone is ready. `0` goes straight to live. |
+| `knife_pick_seconds` | `60` | Seconds the knife winners have to pick a side in a scrim. Matches use `knifeDecisionSeconds` from the match config. |
+| `warmup_money` | `1` | In scrim and match warmup, top every player's money back up to $16000 after each purchase, like CS2's own warmup. |
+| `warmup_weapon_cleanup` | `1` | In idle, scrim and match warmup, remove a weapon that has lain on the ground for 2 seconds, including a dropped bomb. |
+| `damage_report` | `1` | After each round of a live map, send each player their damage to and from each opponent, only to them. Never under `ruleset=valve`. |
+| `idle_map_refresh_hours` | `12` | Load the same map again after this many hours with no match loaded and nobody connected. `0` turns it off. |
+
+In warmup, nothing drops when a player dies, and there is no bomb. Ready Up sets this itself, also when `ru_cfg_exec_enable` is `0`. Going live puts CS2's defaults back.
+
+After a day or more on one map, player animations in CS2 run in slow motion while the tick rate stays fine. A map load fixes it. That is why `idle_map_refresh_hours` exists, and why loading a match always changes map, even onto the map the server is already on.
+
+### Pauses, ready and forfeit
+
+These are the values for scrims, and the fallback for matches whose config leaves a rule out. A match config can set each one with a key of the same name. See [Match rules](/cs2/ready-up/scrims-and-matches#match-rules).
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `max_tech_pauses_per_team` | `3` | Technical pauses per team per map. `0` means no limit. |
+| `tech_pause_max_seconds` | `300` | A technical pause ends by itself after this many seconds. `0` means no limit. |
+| `both_teams_unpause_required` | `1` | `1`: both teams must type `.unpause`. `0`: the team that paused is enough. |
+| `allow_force_ready` | `1` | Allow `.forceready`. |
+| `min_players_to_ready` | `0` | Players of a team that must be connected before `.forceready` works. `0` means the full roster. |
+| `forfeit_after_seconds` | `240` | A team with nobody connected on a live map for this long forfeits. `0` turns it off. |
+| `gg_enabled` | `0` | Make `.gg` a surrender vote. See [Give up](/cs2/ready-up/scrims-and-matches#forfeit-and-give-up). |
+| `gg_threshold` | `0.8` | Share of the team's connected players that must type `.gg` within 60 seconds. `0.8` and `80` both work. |
+| `gg_min_score_diff` | `8` | The team must trail by at least this many rounds to surrender. |
+| `stop_command_available` | `0` | Allow `.stop`: go back to the start of the current round when both teams agree. |
+| `stop_command_no_damage` | `0` | Only allow `.stop` while no player has damaged an opponent this round. |
+| `stop_vote_seconds` | `30` | Time the other team has to agree to a `.stop`. |
+
+Tactical timeouts (`.tac`) use CS2's own timeouts. Their number and length are `mp_team_timeout_max` and `mp_team_timeout_time`, set in `live.cfg` or the match `cvars`.
+
+### Esports mode
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `default_model_ct` | `agents/models/ctm_sas/ctm_sas.vmdl` | The CT model for the `default_models` override. |
+| `default_model_t` | `agents/models/tm_phoenix/tm_phoenix.vmdl` | The T model for the `default_models` override. |
+
+The `ruleset` key itself is a core key. See [Esports mode](/cs2/ready-up/esports-mode).
+
+### Testing only
+
+Never turn these on for a real match. Ready Up logs a warning each time one turns on.
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `dev_bots_ready` | `0` | Bots on CT and T count as players and are always ready. One person can test ready-up and pauses with bots. |
+| `dev_bots_scrim` | `0` | A scrim starts and runs with only bots on CT and T: warmup, countdown, knife round, live. Also `ru_dev_bots_scrim 0\|1\|cfg` in the console. |
+
+With either flag on and no human on CT or T, the knife round lasts 30 seconds, because bots do not knife each other.
+
+## Plugin settings
+
+The practice and Midas settings are on [Plugins](/cs2/ready-up/plugins#practice). The whitelist has no settings file. Use `ru whitelist` in the console.
+
+## Fleet keys
+
+Read by the fleet plugin (`fleet.so`) from the `[fleet]` section, or from `game/csgo/cfg/ReadyUp/fleet.cfg`. The fleet package installs a `fleet.cfg` with every line commented out, so the plugin stays idle until you set `url`. The same names with a `fleet_` prefix (`fleet_url`, `fleet_enroll_code`, ...) also work. See [Fleet mode](/cs2/ready-up/fleet).
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `url` | empty | Base URL of the Auto Tournament platform. Empty, and no saved credentials, means standalone: the plugin loads and stays idle. |
+| `enroll_code` | empty | One-time enrollment code from the platform. |
+| `enroll_key` | empty | Reusable fleet enrollment key (`rfk_...`), for scripted installs. |
+| `enabled` | `1` | `0` turns the plugin off without removing it. |
+| `offline_pause_minutes` | `3` | Pause a live match after this many minutes without the platform. `0` turns it off. |
+| `ca_file` | empty | CA bundle for a platform with a private certificate authority. |
+| `pin_sha256` | empty | Optional pin of the platform's public key. |
+| `insecure_dev` | `0` | Allow `ws://` and `http://`, only to a loopback or private (RFC 1918) address. For development. |
+| `spool_max_msgs` | `50000` | Most messages kept on disk while offline. |
+| `spool_max_mb` | `64` | Most megabytes kept on disk while offline. |
+
+## Mode configs
+
+`cfg/ReadyUp/*.cfg` are normal CS2 config files with server settings for each mode. The packages have them in `readyup/cfg-templates/ReadyUp/`. The installer copies missing ones to `game/csgo/cfg/ReadyUp/`. Edit the copies there.
+
+| File | Runs when |
+| --- | --- |
+| `warmup.cfg` | Warmup rules apply (scrim or match warmup). |
+| `idle.cfg` | The server goes idle, or practice ends. It runs `warmup.cfg`. |
+| `knife.cfg` | The knife round starts. |
+| `live.cfg` | The match goes live. |
+| `live_override.cfg` | At the end of `live.cfg`. Put your own changes here. |
+| `esports_live.cfg` | The match goes live under `ruleset=valve`, instead of `live.cfg`. See [Esports mode](/cs2/ready-up/esports-mode). |
+| `esports_override.cfg` | At the end of `esports_live.cfg`. Put your own changes here. |
+| `prac.cfg` | Practice mode starts. It keeps the bomb, for plant practice. |
+
+The same folder holds the plugin settings files `practice.cfg`, `midas.cfg` and `fleet.cfg`. Those are Ready Up settings, not CS2 configs.
+
+`live.cfg`, `knife.cfg` and `prac.cfg` start from the MatchZy defaults.
+
+Two rules for `warmup.cfg`:
+
+- Do not add `mp_warmup_start`. Ready Up does not use CS2's own warmup, because its WARMUP text covers the ready panel. Ready Up makes its own warmup instead: players respawn, rounds do not end, you can buy anywhere, nothing drops on death, and there is no bomb.
+- It sets `sv_hibernate_when_empty 0`. Keep that. A hibernating server runs no frames, and Ready Up does its work in frames.
+
+### When the files run
+
+By default Ready Up runs:
+
+- `knife.cfg` for the knife round,
+- `live.cfg` when a scrim goes live, and after the knife side pick,
+- `prac.cfg` when practice turns on, and `idle.cfg` when it turns off,
+- `esports_live.cfg` instead of `live.cfg` under `ruleset=valve`, always.
+
+For warmup, it sets the warmup settings itself. A match without a knife round goes live with its own settings, without `live.cfg`.
+
+The `cvars` of a loaded match are applied after `live.cfg`, so they always win over it.
+
+To run the mode files on every mode change, as MatchZy does, turn on cfg exec in the console:
+
+```text
+ru_cfg_exec_enable 1
+```
+
+The built-in warmup settings can be changed with the `ru_warmup_*` console commands. See [Commands](/cs2/ready-up/commands#warmup).
+
+## Data files
+
+Ready Up has no database. Each plugin keeps its state in small JSON files in its data folder, `game/csgo/readyup/plugins/<plugin>/`. Every file has a `"version"`, is replaced in one step (a temp file, then a rename), and is never in a release zip, so updates keep it.
+
+A file that is broken, or from a newer version, is moved to `<name>.corrupt-<time>`. Ready Up logs it and starts that part fresh.
+
+| File | What it holds | Written by |
+| --- | --- | --- |
+| `match/state.json` | Saved console settings (`ru_webhook_url`, `ru_match_token`, `ru_warmup_*`, `ru_demo_*` and others, see [Settings that survive a restart](/cs2/ready-up/commands#settings-that-survive-a-restart)) and the running match, for recovery after a crash. | The match plugin. |
+| `essentials/admins.json` | Admins. See [Who is an admin](/cs2/ready-up/commands#who-is-an-admin). | `ru admins add` and `remove`, or you. |
+| `match/fleet-admins.json` | Fleet mode: a copy of the platform's admin list. | The match plugin. |
+| `whitelist/whitelist.json` | The whitelist and whether it is on. | `ru whitelist`. |
+| `skins/loadouts.json` | Skins loadouts, when not in fleet mode. See [Skins](/cs2/ready-up/skins). | You, or a web tool. |
+| `skins/stattrak.json` | StatTrak counters, when not in fleet mode. | The skins plugin. |
+| `fleet/install_id`, `fleet/credentials.json` | The server's identity and platform token. `credentials.json` is only readable by its owner. | The fleet plugin. |
+| `fleet/spool/` | Messages waiting to be sent to the platform. | The fleet plugin. |
+| `plugins.json` | The plugins turned off with `ru plugin disable`. Directly in `plugins/`, not in a plugin's folder. | The core. |
+
+Delete `match/state.json` to forget saved settings and a half-finished match.
+
+## Environment variables
+
+Set these before the server starts.
+
+| Variable | What it does |
+| --- | --- |
+| `READYUP_DEBUG` | Overrides `debug`. |
+| `READYUP_BANNER` | Overrides `banner`. |
+| `READYUP_CHAT_DEBUG` | Overrides `chat_debug`. |
+| `READYUP_DEV_BOTS_READY` | Overrides `dev_bots_ready`. |
+| `READYUP_DEV_BOTS_SCRIM` | Overrides `dev_bots_scrim`. |
+| `READYUP_WELCOME=0` | Turns the welcome card off. |
+| `READYUP_DISABLE_SKINS=1` | Keeps the skins plugin loaded, but idle. |
+| `READYUP_STATUS_HTTP=0` | Turns the status endpoint off. |
+| `READYUP_STATUS_HTTP_PORT` | Port of the status endpoint. |
+| `READYUP_CRASH_HANDLER=0` | Turns the crash handler off. |
+| `READYUP_REAL_SERVER_PATH` | Path to Valve's `libserver.so`, if it is not in the usual place. |
+| `READYUP_PLUGINS=0` | Loads no plugins. |
+| `READYUP_PLUGINS_DIR` | Loads plugins from another folder. Used by tests. |
+| `READYUP_SELFTEST_AND_QUIT=1` | Runs the selftest after the first map and quits. For CI. See [Troubleshooting](/cs2/ready-up/troubleshooting#selftest-in-ci). |

@@ -1,0 +1,282 @@
+---
+title: Install
+description: Install, update and remove Ready Up on a CS2 server, and keep it working after CS2 updates.
+icon: Download
+---
+
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+
+<Callout title="Not released yet" type="warn">
+  There is no Ready Up release on GitHub yet. Until there is one, the installer cannot download anything on its own. Use the zips that CI builds for every commit, with `--zip`. See [Install from a zip file](#install-from-a-zip-file).
+</Callout>
+
+## What you need
+
+- A CS2 dedicated server on Linux (`linuxsteamrt64`). Windows servers are not supported.
+- glibc 2.31 or newer. OpenSSL and libcurl are built into Ready Up.
+- For the installer: bash 4 or newer, Python 3, curl or wget, and unzip. Without unzip, the installer uses Python to extract.
+
+You do not need Metamod:Source, CounterStrikeSharp or a database.
+
+## Packages
+
+Ready Up ships as single components and two bundles. Every zip has the same layout as `game/csgo`.
+
+| Package | Contains |
+| --- | --- |
+| `ready-up-essentials` | Bundle: core, essentials, match, fleet and practice. Use this one. |
+| `ready-up-full` | Bundle: everything in Essentials, plus skins, whitelist, midas, hello, and the offline gamedata checkers `readyup_sigcheck` and `readyup_hookcheck`. |
+| `ready-up-core` | The core: `libserver.so`, `engine-surface.json`, `readyup.cfg.example`, the `gameinfo.gi` patcher and the tools. Always installed. |
+| `ready-up-match` | The match flow, and the mode configs in `readyup/cfg-templates/ReadyUp/`. |
+| `ready-up-essentials-plugin` | The essentials plugin alone: admins and map commands. Not the same as the `ready-up-essentials` bundle. |
+| `ready-up-practice` | Practice mode and its tools. |
+| `ready-up-fleet` | The link to the Auto Tournament platform, and a `fleet.cfg` with every line commented out. See [Fleet mode](/cs2/ready-up/fleet). |
+| `ready-up-skins` | Skins, and `engine-surface.skins.json`. |
+| `ready-up-whitelist` | The whitelist plugin. |
+| `ready-up-midas` | The Midas plugin. |
+| `ready-up-hello` | The example plugin. |
+
+Each release also has a `SHA256SUMS` file. Which plugins to pick is on [Plugins](/cs2/ready-up/plugins).
+
+Skins ship separately on purpose. Valve can ban servers that run a skin changer, so you must choose to install that plugin. The Essentials bundle contains no skins code.
+
+## Install with the installer
+
+Run this from the server root, the folder that contains `game/`, as the user that owns the server files:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Auto-Tournament/ready-up/master/install.sh | bash
+```
+
+### License choice
+
+The first time, the installer asks how you use Ready Up:
+
+- **Noncommercial** (personal use, free events): type `yes` to accept the PolyForm Noncommercial license.
+- **Commercial** (you or your organization earn money from it): you need a paid license first. See [Licensing](/reference/licensing).
+
+The answer is saved in `game/csgo/readyup/license-acceptance.json`, so updates do not ask again. The server prints a one-line license notice at every start.
+
+### Pick the components
+
+In a terminal, the installer then shows the components, what is installed and what the release has:
+
+```text
+> [x] Core       new 0.2.0   required
+  [x] Match      new 0.2.0   ready-up, knife, pauses, webhooks
+  [x] Fleet      new 0.2.0   link to the Auto Tournament platform (idle until configured)
+  [ ] Skins      new 0.2.0   may get servers banned
+  [ ] Hello      new 0.2.0   example plugin
+  [ ] Midas      new 0.2.0   fun: gold weapons (off until enabled)
+  [ ] Whitelist  new 0.2.0   only listed players may join (off until turned on)
+  [x] Practice   new 0.2.0   practice mode + tools (.prac, .savepos, .rethrow, .bot)
+  [x] Essentials new 0.2.0   admins + map commands (needed for admins without a match config)
+```
+
+Move with the arrow keys (or `j` and `k`), toggle with space, and confirm with enter. `q` quits without changes. Core is always ticked. On a fresh install, the Essentials bundle is ticked. The installer then asks once more before it changes anything.
+
+On a plain terminal (`TERM=dumb`, or with `READYUP_PLAIN=1`), it asks for numbers instead, for example `1,2`.
+
+The installer then:
+
+- downloads the ticked components from the latest release and checks them against `SHA256SUMS`,
+- puts them in `game/csgo/readyup/`,
+- copies the mode configs to `game/csgo/cfg/ReadyUp/`, but only files that are missing,
+- adds `Game csgo/readyup` to `gameinfo.gi` and `gameinfo_branchspecific.gi`. With Metamod, the line goes right after Metamod's line. A backup is saved as `gameinfo.gi.readyup-backup-<time>`.
+
+It never overwrites `readyup.cfg`, your `cfg/ReadyUp/*.cfg` files or the plugins' JSON data. If a shipped default changed, the new one is written next to yours as `<name>.default`, so you can compare.
+
+It never uses sudo, never stops or starts the server, and never touches a database.
+
+Then restart the server and run `ru selftest` in its console. The last line must be `selftest: PASS n/n`.
+
+### Update or change components
+
+Run the same command again. It shows the installed version next to the latest one. Untick an installed component to remove it.
+
+The installer keeps track of what it installed in `game/csgo/readyup/installed.json`, and of each component's files in `game/csgo/readyup/manifests/<component>.json`. That is how an update removes files a newer version no longer ships.
+
+### Without questions
+
+For scripts, panels and CI, pass a bundle or component name, or `--yes`. The first unattended run must also state the license choice with `--accept-license`, or it stops before it changes anything:
+
+```bash
+curl -fsSL .../install.sh | bash -s -- essentials --accept-license=noncommercial
+curl -fsSL .../install.sh | bash -s -- full --accept-license=noncommercial
+bash install.sh whitelist                              # add one component
+bash install.sh --yes                                  # update whatever is installed
+bash install.sh --remove skins                         # remove one component
+bash install.sh --uninstall                            # remove Ready Up, keep your config
+bash install.sh --uninstall --purge                    # also delete config and plugin data
+```
+
+| Option | What it does |
+| --- | --- |
+| `essentials`, `full` | Install a bundle. |
+| `core`, `match`, `fleet`, `practice`, `skins`, `whitelist`, `midas`, `hello` | Install single components. Core is always included. The essentials plugin comes with the bundles. |
+| `--accept-license=noncommercial\|commercial` | Your license choice. Needed once for unattended installs, until a choice is saved. Removing components and uninstalling never ask. |
+| `--dir PATH` | The server root, or a `game/csgo` folder. Default: the current folder. |
+| `--version vX.Y.Z` | Install that release instead of the latest. |
+| `--zip FILE` | Install from a local zip. Can be given more than once. A `SHA256SUMS` next to the zip is used to check it. |
+| `--remove NAME` | Remove an installed component, for example `--remove essentials`. Not `core`. |
+| `-y`, `--yes` | No questions. Update what is installed, or install Essentials. |
+| `--uninstall` | Remove the `gameinfo.gi` line and Ready Up's files. Config and data stay. |
+| `--purge` | With `--uninstall`: also delete `readyup.cfg`, the plugins' JSON data (admins, match state, skins loadouts) and `cfg/ReadyUp/`. |
+
+To turn a plugin off without removing its files, use `ru plugin disable <name>`. See [Turn a plugin on or off](/cs2/ready-up/plugins#turn-a-plugin-on-or-off).
+
+The release zips also carry a copy of the installer, `game/csgo/readyup/tools/install.sh`. It is the same script. Use `--dir` to point it at the server root.
+
+### Install from a zip file
+
+Until the first release, download the zips from a CI run of the [ready-up repo](https://github.com/Auto-Tournament/ready-up/actions), then:
+
+```bash
+bash install.sh --zip ready-up-essentials-<version>-linuxsteamrt64.zip essentials --accept-license=noncommercial
+```
+
+This also works offline.
+
+## Install by hand
+
+<Steps>
+
+<Step>
+
+### Extract
+
+Download a zip, for example `ready-up-essentials-<version>-linuxsteamrt64.zip`. Extract it into `game/csgo`. You should end up with `game/csgo/readyup/bin/linuxsteamrt64/libserver.so`.
+
+</Step>
+
+<Step>
+
+### Add Ready Up to gameinfo.gi
+
+```bash
+cd game/csgo
+python3 readyup/tools/patch_gameinfo.py gameinfo.gi --game csgo/readyup
+```
+
+If the folder has a `gameinfo_branchspecific.gi`, run the patcher on that file too.
+
+The patcher is safe to run more than once. It fixes a misplaced or duplicated line, and writes a backup (`gameinfo.gi.readyup-backup-<timestamp>`) whenever it changes the file. `--check` only reports, and exits with code `3` when the file needs a change. `--remove` takes the line out again.
+
+</Step>
+
+<Step>
+
+### Copy the config files
+
+If you do not have them yet:
+
+- copy `readyup/bin/linuxsteamrt64/readyup.cfg.example` to `readyup.cfg` in the same folder,
+- copy `readyup/cfg-templates/ReadyUp/*.cfg` to `game/csgo/cfg/ReadyUp/`.
+
+</Step>
+
+<Step>
+
+### Restart and check
+
+Restart the server. In the server console, run:
+
+```text
+ru selftest
+```
+
+The last line must be `selftest: PASS n/n`. See [Troubleshooting](/cs2/ready-up/troubleshooting) if it says `FAIL`.
+
+</Step>
+
+</Steps>
+
+## What goes where
+
+| Path under `game/csgo/` | What it is |
+| --- | --- |
+| `readyup/bin/linuxsteamrt64/libserver.so` | The core. |
+| `readyup/bin/linuxsteamrt64/engine-surface.json` | Signatures and anchors. Also built into the core. |
+| `readyup/bin/linuxsteamrt64/readyup.cfg` | Your config. See [Configuration](/cs2/ready-up/configuration). |
+| `readyup/plugins/<name>.so` | Plugins. Every `*.so` here loads on the first server frame, in name order, unless it is disabled. |
+| `readyup/plugins/plugins.json` | The plugins you turned off with `ru plugin disable`. |
+| `readyup/plugins/<name>/` | Each plugin's data: admins, match state, whitelist, skins loadouts, fleet credentials. |
+| `readyup/license-acceptance.json` | Your license choice from the installer. |
+| `readyup/status.json` | Port and token of the [status endpoint](/cs2/ready-up/fleet#status-endpoint). Written by the core. |
+| `readyup/tools/` | `patch_gameinfo.py`, `install.sh`, `migrate-postgres-to-json.py`. |
+| `readyup/installed.json`, `readyup/manifests/` | What the installer installed. |
+| `readyup/VERSION`, `readyup/BUILD_INFO` | The version, the commit and the CS2 build it was checked against. |
+| `cfg/ReadyUp/*.cfg` | The mode configs and plugin settings. See [Configuration](/cs2/ready-up/configuration#mode-configs). |
+
+Back up `readyup/plugins/` to keep admins, the whitelist, loadouts and fleet credentials.
+
+## What gameinfo.gi must look like
+
+The order in `SearchPaths` matters. Ready Up must be above `Game csgo`, or CS2 loads its own `libserver.so` and Ready Up never runs.
+
+```text title="game/csgo/gameinfo.gi (part)"
+SearchPaths
+{
+    Game_LowViolence    csgo_lv
+    Game    csgo/readyup
+    Game    csgo
+    ...
+}
+```
+
+### Metamod
+
+We recommend running Ready Up on its own. If you need Metamod on the same server, it works. Keep Metamod's line first and put Ready Up's line directly below it. Both stay above `Game csgo`:
+
+```text
+    Game    csgo/addons/metamod
+    Game    csgo/readyup
+    Game    csgo
+```
+
+Metamod then loads first and loads Ready Up as "the game". The installer and the patcher put the line in this place when they find Metamod, and move it there if it is above Metamod. Older Ready Up builds turned themselves off under Metamod. Use a build that has the fixes from `docs/COMPATIBILITY.md` in the repo.
+
+With the wrong order, Ready Up above Metamod, nothing crashes, but Metamod never loads, and neither does anything it loads, such as CounterStrikeSharp. Ready Up logs a warning at start with the command that fixes it:
+
+```text
+[ReadyUp] load-order: WARNING: Metamod (Game csgo/addons/metamod) is listed BELOW csgo/readyup in gameinfo.gi: ... Fix: python3 <csgo>/readyup/tools/patch_gameinfo.py <csgo>/gameinfo.gi
+```
+
+If two copies of Ready Up end up in one server process, for example from two `readyup` lines, the second copy logs `Ready Up disabled: another copy is already active in this process` and only passes calls through to Valve's library.
+
+With Metamod first, CS2 writes its round backup files into `csgo/addons/metamod/` instead of `csgo/readyup/`. Restoring still works.
+
+What works and what breaks next to Metamod, CounterStrikeSharp and other match plugins is in the [FAQ](/cs2/ready-up/faq#running-other-plugins).
+
+## After a CS2 update
+
+CS2 updates rewrite `gameinfo.gi` and remove Ready Up's line. The server then starts without Ready Up. After each CS2 update:
+
+1. Run the installer again (it only adds the line back), or run the patcher on `gameinfo.gi` and `gameinfo_branchspecific.gi`.
+2. Restart the server.
+3. Run `ru selftest`.
+
+If a CS2 update breaks part of the engine surface, only the affected features turn off. `ru selftest` lists them. A fixed `engine-surface.json` can be dropped next to `libserver.so` without a new build, because the file on disk wins over the copy built into the core.
+
+## Upgrading from Postgres
+
+Older builds kept admins, settings and skins in Postgres (`readyup_db.json`). Ready Up no longer reads either. Copy the data into the JSON files once, before or right after you update:
+
+```bash
+# reads readyup_db.json next to the core
+python3 game/csgo/readyup/tools/migrate-postgres-to-json.py --csgo game/csgo
+# Postgres in a Docker container (psql runs inside it)
+python3 game/csgo/readyup/tools/migrate-postgres-to-json.py --csgo game/csgo --docker readyup-postgres
+# only show what it would do
+python3 game/csgo/readyup/tools/migrate-postgres-to-json.py --csgo game/csgo --dry-run
+```
+
+The script only reads the database. It merges into existing JSON files, and existing entries win. `--prefer-db` flips that. Afterwards, restart the server. The script writes admins to the old place, `plugins/match/admins.json`. The essentials plugin copies that file to `plugins/essentials/admins.json` when it loads and finds no admins file of its own. If it already has one, add the admins again with `ru admins add`. Then you can delete `readyup_db.json` and the database.
+
+## Use a different Valve libserver.so
+
+Ready Up loads Valve's module from `game/csgo/bin/linuxsteamrt64/libserver.so`. To load another file, set this environment variable before the server starts:
+
+```bash
+READYUP_REAL_SERVER_PATH=/full/path/to/libserver.so
+```
