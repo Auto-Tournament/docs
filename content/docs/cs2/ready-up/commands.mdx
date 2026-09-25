@@ -1,6 +1,6 @@
 ---
 title: Commands
-description: Chat commands for players and admins, and console and RCON commands.
+description: Chat commands for players and admins, the .ru admin commands, and console and RCON commands.
 icon: SquareTerminal
 ---
 
@@ -8,13 +8,26 @@ icon: SquareTerminal
   Ready Up is not released yet. Commands can still change.
 </Callout>
 
-Chat commands start with a dot, for example `.r`. Admin commands in chat start with `.ru`. In the server console and over RCON, the same commands start with `ru` and no dot, for example `ru start`.
+## How commands work
 
-Type `ru` or `ru help` in the server console for the full list. It shows the core's commands, then every command the loaded plugins add. In chat, `.ru help` shows a short list.
+- **Player commands** start with a dot in chat, for example `.r`.
+- **Ready Up commands** are `.ru <command> <subcommand>`, for example `.ru match start` or `.ru map change de_mirage`. Most of them are for admins.
+- In the **server console** and over **RCON**, the same commands start with `ru` and no dot: `ru match start`. The console is always allowed.
+- A player can also type `ru ...` in their **own game console**, like Metamod's `meta` or CounterStrikeSharp's `css_` commands. The same admin checks apply, and nothing shows in chat.
 
-Most commands on this page come from the match plugin. Without `match.so`, only the core commands work.
+`.ru help` lists the commands, one line each. `.ru help <command>`, or just `.ru <command>`, lists its subcommands. An unknown command answers `unknown command, type .ru help`.
+
+Help, state and error replies go only to the player who asked. Actions that concern everyone, such as a pause or a map change, are announced to all.
+
+Which commands exist depends on the [plugins](/cs2/ready-up/plugins) you run. `ru help` in the server console lists all of them.
+
+<Callout title="Changed" type="info">
+  Earlier builds had flat commands such as `ru start`, `ru end`, `ru idle`, `ru state`, `ru side` and `.ru hudtest`. They are gone. Use `ru match start`, `ru match end`, `ru mode idle`, `ru match state`, `ru match side` and `.ru hud test`.
+</Callout>
 
 ## Player commands
+
+These come from the match plugin.
 
 | Command | What it does |
 | --- | --- |
@@ -23,14 +36,19 @@ Most commands on this page come from the match plugin. Without `match.so`, only 
 | `.forceready` | Mark your whole team ready, once enough of it is connected. See [Force ready](/cs2/ready-up/scrims-and-matches#force-ready). |
 | `.tac` | Call a tactical timeout for your side. |
 | `.tech`, `.pause`, `.p` | Call a technical pause. Limited per team per map, and it ends by itself after a while. |
-| `.unpause`, `.up` | Ask to end a technical pause. By default both teams must type it. |
+| `.unpause`, `.up` | Ask to end a pause. By default both teams must type it. |
 | `.stay`, `.switch`, `.swap` | After the knife round: keep your side, or switch. Any player on the winning team can pick. |
 | `.ct`, `.t` | After the knife round: pick a side. |
-| `.gg` | Tell Auto Tournament you give up. It sends a `player_gg` event. |
+| `.gg` | Give up. Sends `player_gg` to Auto Tournament, or starts a surrender vote when the match allows it. See [Forfeit and give up](/cs2/ready-up/scrims-and-matches#forfeit-and-give-up). |
+| `.stop` | Ask to go back to the start of the current round. Only when the match allows it, and the other team must agree. |
 | `.ff`, `.forfeit` | Forfeit the match. Only the team captain from the match config can do this. |
-| `.help` | Show the player commands. |
-| `.ru state` | Show the mode, roster, who is ready, and flags. `.ru status` does the same. |
+| `.help` | Show the player commands. In practice mode, it shows the practice tools. |
+| `.ru match state` | Show the mode, roster, who is ready, and the rules. |
+| `.ru match rules` | Show the rules in use. See [Esports mode](/cs2/ready-up/esports-mode#check-what-is-in-use). |
+| `.ru mode show` | Show the current mode. |
 | `.ru admins` | List the admins. |
+| `.ru version` | Show the Ready Up build. |
+| `.skins reload` | Load your skins again. Only with the skins plugin, and not while a match is live. |
 
 With no match loaded, only the ready commands and `.forceready` work. The others say they need a live match. You must be on CT or T to ready up.
 
@@ -40,60 +58,118 @@ See [Pauses](/cs2/ready-up/scrims-and-matches#pauses) for the limits.
 
 ### Practice
 
-These only work in practice mode.
+These come from the practice plugin and only work in practice mode. Anyone on the server can use them.
 
 | Command | What it does |
 | --- | --- |
-| `.bot` | Add a frozen bot on the other team. |
+| `.savepos [name]`, `.loadpos [name]` | Save your position on this map, and go back to it. |
+| `.back` | Go back to where you threw your last grenade, or to where you were before your last `.loadpos` or `.spawn`. |
+| `.spawn N`, `.ctspawn N`, `.tspawn N` | Go to spawn point N of your team, CT or T. |
+| `.rethrow`, `.rt` | Throw the last grenade again. CS2 only remembers the last grenade on the server, so with several players it rethrows whoever threw last. |
+| `.clear` | Remove smokes, molotov fires and decoys. |
+| `.noflash` | Toggle: flashbangs do not blind you. |
+| `.god` | Toggle: you take no damage. |
+| `.bot` | Add a bot on the other team where you stand. |
 | `.cbot`, `.crouchbot` | Add a crouching bot. |
-| `.boost`, `.crouchboost` | The same as `.bot` and `.cbot` for now. |
+| `.boost`, `.crouchboost` | The same as `.bot` and `.cbot`. |
 | `.nobots` | Kick all bots. |
 
 ## Admin commands
 
-Admin commands need admin rights. See [Who is an admin](#who-is-an-admin). Anyone else who types one gets `not authorized`.
+Admin commands need admin rights. See [Who is an admin](#who-is-an-admin). Anyone else gets `not authorized`, and nothing happens.
+
+### Match
+
+From the match plugin.
 
 | Command | What it does |
 | --- | --- |
-| `.ru start` | Start the loaded match now, even if not everyone is ready. |
-| `.ru restart` | Restart the match and go back to warmup. |
-| `.ru end` | End the match. Sends `series_end` with no winner, clears the match and resets the server. |
-| `.forcepause`, `.fp`, `.ru pause`, `.ru fp`, `.ru forcepause` | Admin pause. Only an admin can end it. |
-| `.forceunpause`, `.fup`, `.ru unpause`, `.ru up`, `.ru fup`, `.ru forceunpause` | Unpause right away. The teams do not need to confirm. |
-| `.ru tech team1\|team2`, `.ru tac team1\|team2` | Call a technical pause or a tactical timeout for a team. The team's limits apply. |
-| `.ru side stay\|switch\|ct\|t` | Pick the side after the knife round for the winning team. |
-| `.ru recover [round]` | Ask Auto Tournament to restore the match. With a round number, restore to that round. |
-| `.prac`, `.tactics`, `.ru prac` | Turn practice mode on. Type it again to turn it off. Clears any loaded match. |
-| `.ru idle` | Go idle. Clears any loaded match. Scrim warmup stays off until `.ru scrim` or the next map. |
-| `.ru scrim` | Turn scrim warmup back on after `.ru idle`. |
-| `.ru reload` | Load `readyup.cfg` again. |
-| `.ru admins add <steamid64\|name>` | Add an admin. A name is a part of the name of a connected player. Not in fleet mode. |
-| `.ru admins remove <steamid64\|name>` | Remove an admin. Not in fleet mode. |
-| `.ru selftest` | Run the selftest. The full report goes to the server console, the result and the first failures go to chat. |
-| `.ru hudtest <1-7>` | Show a test panel to yourself for 10 seconds. `1` fonts, `2` images, `3` unicode, `4` SVG, `5` PNG, `6` another PNG, `7` your `hud_brand` header. |
-| `.ru plugin list` | List loaded plugins. |
-| `.ru plugin load\|unload\|reload <name>` | Load, unload or reload a plugin. See [Build your first plugin](/cs2/ready-up/sdk/getting-started#hot-reload). |
-| `.ru version` | Show the version. |
-| `.fleet status`, `.fleet reconnect` | Fleet link status, or reconnect now. `.ru fleet ...` does the same. See [Fleet mode](/cs2/ready-up/fleet). |
+| `.ru match load <url>` | Download a match config and load it. The URL shows in chat, so load from the console if it has a secret in it. |
+| `.ru match start [force]` | Start the loaded match now, even if not everyone is ready. Under `ruleset=valve`, `force` also starts it without GOTV. |
+| `.ru match restart` | Back to the match warmup. Everyone readies again. |
+| `.ru match end` | End the match with no winner (`series_end`), clear it and reset the server. |
+| `.ru match recover [round]` | Ask Auto Tournament to restore the match. With a round number, restore to that round. |
+| `.ru match pause`, `.fp`, `.forcepause` | Admin pause. Only an admin can end it. |
+| `.ru match unpause`, `.fup`, `.forceunpause` | Unpause right away. The teams do not need to confirm. This also ends a pause CS2 started on its own. |
+| `.ru match tech team1\|team2`, `.ru match tac team1\|team2` | Call a technical pause or a tactical timeout for a team. The team's limits apply. |
+| `.ru match side stay\|switch\|ct\|t` | Pick the side after the knife round for the winning team. |
 
-`ru match load` only works from the console or RCON, not from chat.
+### Modes
 
-`.ru <name>` also reaches a plugin's chat command `.<name>`, so `.ru fleet status` runs `.fleet status`.
+| Command | What it does |
+| --- | --- |
+| `.ru mode idle` | Plain CS2. Clears any loaded match. No scrim warmup until `.ru mode scrim` or the next map. |
+| `.ru mode scrim` | Turn scrim warmup back on. |
+| `.ru mode practice`, `.prac`, `.tactics` | Turn practice mode on, or off again. Needs the practice plugin. Refused while a match is loaded. |
+| `.ru practice on\|off\|status` | The same, from the practice plugin. `status` is open to everyone. |
+
+### Maps
+
+From the essentials plugin.
+
+| Command | What it does |
+| --- | --- |
+| `.ru map change <name\|workshop id\|link> [force]` | Change map. Takes a map name (`de_mirage`), a Workshop ID (`3084291314`), `ws:<id>`, `workshop/<id>`, or a pasted Workshop link. |
+| `.ru map reload [force]` | Load the current map again. A Workshop map reloads by its ID. |
+| `.ru map restart [force]` | Restart the game (`mp_restartgame 1`). A loaded match stays loaded. |
+
+During a knife round or a live map, these are refused unless you add `force`.
+
+While the server downloads a Workshop map, every player sees a progress bar in the middle of the screen until the map starts. The console gets a progress line every 5 seconds.
+
+### Admins
+
+From the essentials plugin.
+
+| Command | What it does |
+| --- | --- |
+| `.ru admins [list]` | List the admins in `admins.json`. Open to everyone. |
+| `.ru admins add <steamid64\|name>` | Add an admin. A name is part of the name of a connected player. |
+| `.ru admins remove <steamid64\|name>` | Remove an admin. |
+
+### Whitelist
+
+From the whitelist plugin.
+
+| Command | What it does |
+| --- | --- |
+| `.ru whitelist on\|off` | Turn the whitelist on or off. |
+| `.ru whitelist add\|remove <steamid64>` | Add or remove a player. |
+| `.ru whitelist list` | Show the list. |
+| `.ru whitelist clear` | Empty the list. |
+
+### Plugins and server
+
+From the core.
+
+| Command | What it does |
+| --- | --- |
+| `.ru plugin list` | List the loaded plugins. |
+| `.ru plugin enable\|disable <name>` | Load or unload a plugin, and keep it that way after a restart. See [Turn a plugin on or off](/cs2/ready-up/plugins#turn-a-plugin-on-or-off). |
+| `.ru plugin load\|unload\|reload <name>` | Load, unload or reload a plugin until the next restart. |
+| `.ru plugin perf [reset]` | Time each plugin takes per server frame. See [ru perf](/cs2/ready-up/troubleshooting#ru-perf). |
+| `.ru reload` | Load `readyup.cfg` again. Plugins read their settings again too. |
+| `.ru selftest` | Run the selftest. The result and the first failures go to you, the full report to the server console. |
+| `.ru hud test <1-11>` | Show a test panel to yourself for 10 seconds. `1` to `7` test fonts, images and symbols; `7` is your `hud_brand` header. `8` to `11` measure the panel. |
+| `.ru hud anim [hz] [seconds]` | Show an animated bar with a frame counter to yourself, to measure how fast the client redraws the panel. |
+| `.fleet status`, `.fleet reconnect` | Fleet link status, or reconnect now. See [Fleet mode](/cs2/ready-up/fleet). |
 
 ## Who is an admin
 
 A player is an admin if one of these is true:
 
+- The Steam64 ID is in `admins.json` of the essentials plugin. This counts in every mode, also in fleet mode.
 - The Steam64 ID is in the `admins` list of the loaded match config.
 - The Steam64 ID is in the admin list that Auto Tournament serves at `ru_admins_url`.
-- Standalone: the Steam64 ID is in `admins.json` (`.ru admins add`).
-- Fleet mode: the Steam64 ID is in the platform's admin list. `admins.json` is not used.
+- Fleet mode: the Steam64 ID is in the platform's admin list.
 
 The server console and RCON are always allowed.
 
+Without the essentials plugin, `admins.json` is not read, and only the other sources count.
+
 ### admins.json
 
-`game/csgo/readyup/plugins/match/admins.json`:
+`game/csgo/readyup/plugins/essentials/admins.json`:
 
 ```json
 {
@@ -112,13 +188,13 @@ The first admin must be added from the server console (or in the file), because 
 ru admins add 76561198000000000
 ```
 
-Each server has its own file. To share admins between servers, copy the file, point them at the same `ru_admins_url`, or use [fleet mode](/cs2/ready-up/fleet).
+Older builds kept the file in `plugins/match/admins.json`. The essentials plugin copies it over the first time it loads.
 
-In fleet mode, `ru admins` shows the platform's list, and `add` and `remove` answer `Admins are managed on the platform`.
+Each server has its own file. To share admins between servers, copy the file, point them at the same `ru_admins_url`, or use [fleet mode](/cs2/ready-up/fleet). In fleet mode, the local file is a safety net: the server owner stays an admin even when the platform sends no list.
 
 ## Console and RCON commands
 
-Run these in the server console or over RCON.
+Run these in the server console or over RCON. Every `.ru ...` command above also works here as `ru ...`.
 
 ### Core
 
@@ -127,36 +203,23 @@ These work without any plugin.
 | Command | What it does |
 | --- | --- |
 | `ru`, `ru help` | Show the build and all commands. |
+| `ru help <command>` | Show the subcommands of a command, for example `ru help match`. |
 | `ru version` | Show the version. |
 | `ru reload` | Load `readyup.cfg` again. |
 | `ru selftest` | Check the engine surface, hooks, schema, events, plugins and features. Ends with `PASS` or `FAIL`. See [Troubleshooting](/cs2/ready-up/troubleshooting#ru-selftest). |
 | `ru sigtest` | Check only the engine functions. Prints `OK`, `WARN` or `FAIL` for each. |
+| `ru perf [reset]` | Time each plugin takes per server frame. The same as `ru plugin perf`. |
 | `ru status_http` | The address of the status endpoint, a token hint and counters. |
-| `ru plugin list` | List loaded plugins and the API version. |
-| `ru plugin load\|unload\|reload <name>` | Load, unload or reload `readyup/plugins/<name>.so`. |
+| `ru plugin ...` | As in chat: `list`, `enable`, `disable`, `load`, `unload`, `reload`, `perf`. |
 
-### Modes
+`ru <name> ...` also reaches a console command of a plugin, so `ru fleet status` runs `fleet status`.
 
-| Command | What it does |
-| --- | --- |
-| `ru state`, `ru status` | Show the mode, roster, ready players and flags. |
-| `ru mode` | Show the current mode. |
-| `ru mode idle`, `ru idle` | Go idle. Same as `.ru idle`. |
-| `ru mode practice`, `ru practice` | Turn practice mode on. |
-| `ru scrim` | Turn scrim warmup back on. |
-| `ru admins`, `ru admins add\|remove <steamid64\|name>` | List, add or remove admins. |
-
-### Matches
+### Console only
 
 | Command | What it does |
 | --- | --- |
-| `ru match load <url>` | Download a match config and load it. Uses `ru_match_token` as the Bearer token. |
-| `ru start` | Start the loaded match now. |
-| `ru restart` | Restart the match and go back to warmup. |
-| `ru end` | End the match with no winner and reset the server. |
-| `ru side stay\|switch\|ct\|t` | Pick the side after the knife round. |
-| `ru recover [round]` | Ask Auto Tournament to restore the match. |
 | `ru_match_stats` | Print the current map's stats as one JSON line. |
+| `ru practice as <slot> <.command> [args]` | Run a practice tool as that player. For tests with bots. |
 
 ### Auto Tournament
 
@@ -209,6 +272,8 @@ These change Ready Up's own warmup. They apply the next time warmup rules are se
 | `ru_cfg_exec_enable 0\|1` | `0` | Run the `cfg/ReadyUp/*.cfg` file for every mode change. See [Configuration](/cs2/ready-up/configuration#when-the-files-run). |
 | `ru_dev_bots_scrim 0\|1\|cfg` | `cfg` | Testing only. Override `dev_bots_scrim`. `cfg` goes back to the value in `readyup.cfg`. |
 
+Money in warmup is topped up after each purchase. That is `warmup_money` in `readyup.cfg`, not a console setting. See [Configuration](/cs2/ready-up/configuration#warmup-and-scrims).
+
 These values survive a restart, except `ru_dev_bots_scrim`. See below.
 
 ### Settings that survive a restart
@@ -222,7 +287,7 @@ The match plugin saves these console settings in `game/csgo/readyup/plugins/matc
 
 Only values that differ from the built-in default are saved. `<setting> default` goes back to the default and forgets the saved value. A later command wins over the saved value, so a setting in `server.cfg` still applies on every start.
 
-`ru_dev_bots_scrim` is not saved.
+Saved values are plain text, like the match token and upload header values. Keep `state.json` private.
 
 ### Fleet
 

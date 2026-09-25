@@ -5,7 +5,7 @@ icon: Palette
 ---
 
 <Callout title="Ban risk" type="warn">
-  Valve can ban a server's game server login token (GSLT) for running a skin changer. Only use skins on servers where you accept that risk. This is why skins are a separate plugin that you must choose to install.
+  Valve can ban servers that run a skin changer. Only use skins on servers where you accept that risk. This is why skins are a separate plugin that you must choose to install.
 </Callout>
 
 Skins give players the weapon paints, knife, gloves and agent they pick. The skins plugin, `skins.so`, reads each player's choices from one of two places:
@@ -15,7 +15,7 @@ Skins give players the weapon paints, knife, gloves and agent they pick. The ski
 
 ## Install
 
-Skins are the `ready-up-skins` component, and are in the `ready-up-full` bundle. The core, match and essentials packages contain no skins code.
+Skins are the `ready-up-skins` component, and are in the `ready-up-full` bundle. The Essentials bundle contains no skins code.
 
 ```bash
 bash install.sh skins
@@ -26,7 +26,9 @@ The package has two files:
 - `readyup/plugins/skins.so`, the plugin,
 - `readyup/bin/linuxsteamrt64/engine-surface.skins.json`, the engine signatures only skins needs. The core adds them to its own list at start. Without this file, the core does not look for them.
 
-To stop skins on a server, remove the component (`bash install.sh --remove skins`), run `ru plugin unload skins`, or start the server with `READYUP_DISABLE_SKINS=1`. That last one keeps the plugin loaded, but idle.
+To stop skins on a server, remove the component (`bash install.sh --remove skins`), run `ru plugin disable skins` (it stays off after a restart), or start the server with `READYUP_DISABLE_SKINS=1`. That last one keeps the plugin loaded, but idle.
+
+Under [Valve's rules](/cs2/ready-up/esports-mode) (`ruleset=valve`, or `cosmetics: "inventory"`), the plugin is inert: it applies nothing, and players keep their own Steam inventory. `skins_status` then says `skins inert (valve ruleset)`.
 
 ## What works
 
@@ -46,6 +48,7 @@ A player with no knife row gets the stock knife. There is no default knife for a
 ## When a change takes effect
 
 - Ready Up keeps each player's loadout for 45 seconds. It fetches it again in the background when the player connects, about once a second while they play, and on game events. It reads `loadouts.json` again only when the file changed. The game never waits for it.
+- A player can type `.skins reload` to load their own skins again, for example after changing them in a web tool. It works in idle, practice and warmup, not during a knife round, a live map or postgame, and once every 10 seconds per player. Gloves and agent change at once, and the weapons in hand are repainted.
 - `skins_refresh [steamid64]` in the server console refreshes now.
 - In fleet mode, a loadout from the platform applies at once.
 - A change applies to the next weapon the player gets: a buy, the round start, or picking up their own drop. Weapons already in hand keep their look.

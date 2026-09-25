@@ -1,7 +1,7 @@
 ---
 title: FAQ
 description: Short answers to common questions about Ready Up.
-icon: CircleHelp
+icon: CircleQuestionMark
 ---
 
 ## Setup
@@ -20,9 +20,9 @@ There is no release yet, so for now the installer needs `--zip` with a zip from 
 
 ### Essentials or Full?
 
-Essentials: the core, the match plugin and the fleet plugin. The fleet plugin stays idle until you connect the server to the platform. This is what most servers need.
+Essentials: the core and the match, essentials, practice and fleet plugins. The fleet plugin stays idle until you connect the server to the platform. This is what most servers need.
 
-Full: Essentials plus skins, the example plugin and the offline gamedata checkers. Only take it if you want skins and accept the ban risk (see [Skins](/cs2/ready-up/skins)). You can also add single parts with the installer.
+Full: Essentials plus skins, whitelist, Midas, the example plugin and the offline gamedata checkers. Only take skins if you accept the ban risk (see [Skins](/cs2/ready-up/skins)). You can also add single plugins with the installer. See [Plugins](/cs2/ready-up/plugins).
 
 ### Does it need Metamod or CounterStrikeSharp?
 
@@ -35,10 +35,6 @@ No. A standalone server runs scrims and pickups with no setup, and matches loade
 ### Does it need a database?
 
 No. Admins, settings and skins loadouts are small JSON files in `game/csgo/readyup/plugins/`.
-
-### Does it need a GSLT?
-
-Ready Up itself does not. A server that runs the skins plugin must not use a GSLT: Valve bans the login token of servers that run skin changers.
 
 ### Which ports does it use?
 
@@ -110,14 +106,15 @@ Plugins do not touch the engine. Only the core does, so a CS2 update only ever n
 ### How do I see what it is doing?
 
 - `ru selftest` in the console: every engine check and feature, ending with `PASS` or `FAIL`.
-- `ru state`: the mode, roster and who is ready.
+- `ru match state`: the mode, roster and who is ready.
 - `ru plugin list`: which plugins are loaded.
+- `ru perf`: how much time each plugin takes per server frame.
 - `curl -s http://127.0.0.1:27022/status` on the server: a JSON summary for tools. See [Status endpoint](/cs2/ready-up/fleet#status-endpoint).
 - The console log: Ready Up's lines start with `[ReadyUp]`. Set `debug=1` in `readyup.cfg` for more.
 
 ### How do I add an admin?
 
-In the server console: `ru admins add <steamid64>`. In fleet mode, add admins on the platform. See [Who is an admin](/cs2/ready-up/commands#who-is-an-admin).
+In the server console: `ru admins add <steamid64>`. After that, that admin can add others in chat with `.ru admins add`. In fleet mode, the platform's admins count too. See [Who is an admin](/cs2/ready-up/commands#who-is-an-admin).
 
 ### Can I change the plugin without restarting the server?
 
@@ -131,4 +128,6 @@ Yes, with the [Ready Up SDK](/cs2/ready-up/sdk). Start with [Build your first pl
 
 ### What is the license?
 
-PolyForm Noncommercial 1.0.0. You can use, change and share Ready Up for anything noncommercial. Commercial use, such as paid events or selling a service built on it, needs a separate license. Ask on [Discord](https://discord.gg/n7gHYau7aW).
+PolyForm Noncommercial 1.0.0. You can use, change and share Ready Up for anything noncommercial. Anyone who earns money from it (a business, a profit-making event, a paid server operator, or selling it or a service built on it) needs a commercial license first. See [Licensing](/reference/licensing).
+
+The installer asks which one applies to you, once, and saves the answer. Unattended installs pass `--accept-license=noncommercial` or `--accept-license=commercial`.

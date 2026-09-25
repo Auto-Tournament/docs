@@ -1,10 +1,10 @@
 ---
 title: API reference
-description: The types and functions in plugin_api.h (API version 1.2), and the interfaces plugins share.
+description: The types and functions in plugin_api.h (API version 1.6), and the interfaces plugins share.
 icon: BookOpen
 ---
 
-The API is one C header, `core/include/readyup/plugin_api.h`. This page describes version 1.2. The header has the exact signatures and a comment on every member. When this page and the header differ, the header is right.
+The API is one C header, `core/include/readyup/plugin_api.h`. This page describes version 1.6. The header has the exact signatures and a comment on every member. When this page and the header differ, the header is right.
 
 ## Versions
 
@@ -23,8 +23,12 @@ The API is one C header, `core/include/readyup/plugin_api.h`. This page describe
 | 1.0 | Logging, server commands, chat, chat and console commands, ticks, lifecycle events, posted tasks, the data folder. |
 | 1.1 | Center HTML, players, raw engine events, log lines, schema and entities, round control, admins, config, plugin-to-plugin interfaces, state across reloads. |
 | 1.2 | Untagged log lines, command flags, `ru` subcommands, `on_frame`, feature state, the current map. |
+| 1.3 | `entity_set_abs_origin`: move an entity. |
+| 1.4 | `workshop_download_progress`: Steam Workshop download progress. |
+| 1.5 | `entity_remove`: remove an entity. |
+| 1.6 | Center panel priorities: `center_html_to_slot_prio`, `center_html_all_prio`, `center_html_release`. |
 
-A plugin that requires 1.2 in `ru_plugin_info.api_version` can call everything. A plugin that requires an older minor must check `RU_API_HAS(api, member)` before it calls a newer member. The rules are on [Threading and ABI](/cs2/ready-up/sdk/threading-and-abi#versions).
+A plugin that requires 1.6 in `ru_plugin_info.api_version` can call everything. A plugin that requires an older minor must check `RU_API_HAS(api, member)` before it calls a newer member. The rules are on [Threading and ABI](/cs2/ready-up/sdk/threading-and-abi#versions).
 
 ## Exports
 
@@ -155,7 +159,7 @@ You own the `ru_player` struct. Set `struct_size` before you pass it in. It has 
 | `set_round_termination_suppressed(self, on)` | Keep rounds from ending, for warmup and practice. There is no function to force a round end. |
 | `set_chat_name_prefix(self, steamid64, prefix)` | A chat prefix for one player, such as `[CAP]`. NULL or `""` clears it. Removed on unload. |
 | `is_admin(self, steamid64)` | Any thread, may block. Asks the admin provider first, then the core. |
-| `set_admin_provider(self, fn, user)` | Decide who is an admin. One provider at a time. `fn` returns `1`, `0`, or `-1` for "no opinion". It can run on any thread. The match plugin registers one. |
+| `set_admin_provider(self, fn, user)` | Help decide who is an admin. One provider per plugin, and several plugins can have one: a player is an admin when any provider says so. `fn` returns `1`, `0`, or `-1` for "no opinion". It can run on any thread. The match and essentials plugins register one. |
 | `config_get(self, key, buf, len)` | A setting from `cfg/ReadyUp/<plugin>.cfg`, then from the `[<plugin>]` section of `readyup.cfg`. Returns the length, or `-1` if the key is not set. |
 | `debug_enabled(self)` | Any thread. `debug=1`. |
 | `config_dir(self)` | Any thread. The folder that holds `readyup.cfg`. |
@@ -180,6 +184,19 @@ You own the `ru_player` struct. Set `struct_size` before you pass it in. It has 
 | `on_frame(self, fn, user)` | Every server frame, simulating or not. For timers that must run during a map change or on an empty server. |
 | `feature_state(self, name)` | `1` on, `0` pending, `-1` off, for a core feature (`knife`, `ready_hud`, ...), an engine dependency (`fn:<name>`, `cmdbuf`, `eventmgr`, ...), or `events_live`. The same names `ru selftest` shows. |
 | `current_map(self)` | The current map, or `""` before the first map. |
+
+### 1.3 to 1.6
+
+| Function | Since | What it does |
+| --- | --- | --- |
+| `entity_set_abs_origin(self, entity, origin)` | 1.3 | Move an entity to `origin[0..2]`. On a player pawn this is a teleport. `0` if unavailable or the origin is off the map. Game thread. |
+| `workshop_download_progress(self, id, downloaded, total)` | 1.4 | Bytes downloaded of a Workshop item. `0` when nothing is downloading. Any thread. |
+| `entity_remove(self, entity)` | 1.5 | Remove an entity at the end of the frame. Refuses the world and player controllers. Game thread. |
+| `center_html_to_slot_prio(self, slot, html, seconds, priority)` | 1.6 | Send center HTML at a priority. `1` sent, `-1` refused because a higher panel of another plugin is up (try again later), `0` failed. |
+| `center_html_all_prio(self, html, seconds, priority)` | 1.6 | The same to every player. Returns how many got it. |
+| `center_html_release(self, slot)` | 1.6 | Give up your panel on a slot (`-1`: all), so lower panels can draw at once. |
+
+Each player has one center panel. The core keeps who owns it until that panel's `seconds` run out. The priorities are `RU_HTML_PRIO_INFO` (10), `RU_HTML_PRIO_HUD` (50, what `center_html_to_slot` and `center_html_all` use), `RU_HTML_PRIO_NOTICE` (70, one-off cards) and `RU_HTML_PRIO_ALERT` (90, must be seen now).
 
 ## Handles
 

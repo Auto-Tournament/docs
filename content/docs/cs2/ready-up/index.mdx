@@ -12,7 +12,7 @@ Ready Up runs the match flow on a CS2 server. Players ready up, the match goes l
 
 - Source: [github.com/Auto-Tournament/ready-up](https://github.com/Auto-Tournament/ready-up)
 - Bugs and questions: [GitHub issues](https://github.com/Auto-Tournament/ready-up/issues) or [Discord](https://discord.gg/n7gHYau7aW)
-- License: PolyForm Noncommercial 1.0.0, free for non-commercial use
+- License: PolyForm Noncommercial 1.0.0, free for non-commercial use. Commercial use needs a paid license. See [Licensing](/reference/licensing).
 
 ## What it does
 
@@ -21,8 +21,11 @@ Ready Up runs the match flow on a CS2 server. Players ready up, the match goes l
 - A knife round with a side pick (`.stay` / `.switch`).
 - Tactical timeouts (`.tac`) and technical pauses (`.tech`) with limits and an automatic unpause.
 - `.forceready`, team names in game, a captain forfeit, and a forfeit when a whole team leaves.
-- Practice mode with bot helpers.
-- A small panel in the middle of the screen that shows who is ready.
+- An opt-in [esports mode](/cs2/ready-up/esports-mode) that applies Valve's tournament rules.
+- A warmup that feels like CS2's own: infinite money, no weapon drops, no bomb.
+- A panel in the middle of the screen that shows who is ready, and a welcome card when you join.
+- Admin commands for maps, including Workshop maps with a download progress bar.
+- A practice mode with tools: saved positions, rethrow, spawns, bots, and flash and damage feedback in chat.
 - GOTV demos for each map, with an optional upload.
 - Admins, settings and crash recovery in small JSON files. There is no database.
 - A local status endpoint (`/health`, `/status`) for monitoring tools.
@@ -53,28 +56,31 @@ The details are in [Engine surface](/cs2/ready-up/sdk/engine-surface).
 
 ## Core and plugins
 
-Ready Up is a small core and a set of plugins. The core owns everything that touches the engine. Plugins only call a versioned C API, so a CS2 update needs a core fix only. Plugins can be reloaded without a server restart.
+Ready Up is a small core and a set of plugins, like Metamod and its plugins in one package. The core owns everything that touches the engine. Plugins only call a versioned C API, so a CS2 update needs a core fix only. Each plugin can be installed, reloaded or turned off on its own, without a server restart.
 
-| Part | File | What it does |
-| --- | --- | --- |
-| Core | `readyup/bin/linuxsteamrt64/libserver.so` | Loading, engine surface, hooks, events, chat and console commands, the plugin host, `ru selftest`, the status endpoint. It runs on its own, but then there is no match flow. |
-| Match | `readyup/plugins/match.so` | Ready-up, scrims, knife round, pauses, practice, match configs, admins, webhooks, demos, stats. |
-| Skins | `readyup/plugins/skins.so` | Weapon paints, knives, gloves and agents. Optional, and not in the default bundle. |
-| Fleet | `readyup/plugins/fleet.so` | The link to the Auto Tournament platform. Idle until you set it up. See [Fleet mode](/cs2/ready-up/fleet). |
-| Hello | `readyup/plugins/hello.so` | A small example plugin for developers. |
+| Part | What it does | In Essentials | In Full |
+| --- | --- | --- | --- |
+| Core | Loading, engine surface, hooks, chat and console commands, the plugin host, `ru selftest`, the status endpoint. | Yes | Yes |
+| Match | Ready-up, scrims, knife round, pauses, match configs, webhooks, demos, stats, the ready panel. | Yes | Yes |
+| Essentials | Admins (`admins.json`) and the map commands. | Yes | Yes |
+| Practice | Practice mode and its tools. | Yes | Yes |
+| Fleet | The link to the Auto Tournament platform. Idle until you set it up. | Yes | Yes |
+| Skins | Weapon paints, knives, gloves and agents. | No | Yes |
+| Whitelist | Only listed players may join. Off until you turn it on. | No | Yes |
+| Midas | For fun: gold weapons for chosen players. Off until you turn it on. | No | Yes |
+| Hello | A small example plugin for developers. | No | Yes |
 
-Anyone can write a plugin with the [Ready Up SDK](/cs2/ready-up/sdk). The API is at version 1.2.
+What each plugin does, and which ones to pick, is in [Plugins](/cs2/ready-up/plugins). Anyone can write a plugin with the [Ready Up SDK](/cs2/ready-up/sdk).
 
 ## Coming soon
 
-These are being built now and are not on this site yet:
+These are being built now:
 
-- Esports mode: an opt-in match setting that applies Valve's published tournament rules (`ruleset: "valve"`).
-- Workshop maps.
-- Resuming a match on another server after a failure ([failover](/cs2/ready-up/fleet#failover)).
+- The platform side of [fleet mode](/cs2/ready-up/fleet), including [failover](/cs2/ready-up/fleet#failover) to another server.
 
 ## Next
 
 - [Install](/cs2/ready-up/install)
+- [Plugins](/cs2/ready-up/plugins)
 - [Commands](/cs2/ready-up/commands)
 - [Scrims and matches](/cs2/ready-up/scrims-and-matches)

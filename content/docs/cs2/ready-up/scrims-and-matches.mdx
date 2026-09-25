@@ -10,14 +10,14 @@ icon: Swords
 
 The match flow is the match plugin, `match.so`. Without it, the server runs as plain CS2 with the core only.
 
-Ready Up has four modes. `ru state` shows the current one.
+Ready Up has four modes. `ru mode show` shows the current one, and `ru match state` shows the details.
 
 | Mode | When |
 | --- | --- |
 | Idle | No match is loaded and no one is on CT or T. Plain CS2. |
 | Scrim | No match is loaded and a player joins CT or T. Players ready up, then the scrim goes live. |
 | Match | A match was loaded from Auto Tournament. Only roster players can join. |
-| Practice | An admin typed `.prac`. Cheats and practice settings are on. |
+| Practice | An admin typed `.prac`, or the server is a dedicated practice server. Cheats and practice tools are on. Needs the practice plugin. |
 
 A scrim or match moves through phases: warmup, knife round (if any), live, and postgame at the end of each map.
 
@@ -33,13 +33,13 @@ A scrim needs no match config. Anyone on the server can play.
 
 In a scrim, CT is team 1 and T is team 2. There is no whitelist and no team lock. Scrims are not reported to Auto Tournament.
 
-`.ru idle` stops scrim warmup until `.ru scrim` or the next map. Use it if you want a plain CS2 server for a while.
+`.ru mode idle` stops scrim warmup until `.ru mode scrim` or the next map. Use it if you want a plain CS2 server for a while.
 
 ## Matches
 
 A match comes from Auto Tournament in one of two ways:
 
-- **Standalone:** Auto Tournament runs `ru match load <url>` over RCON. Ready Up downloads the config with `ru_match_token` as the Bearer token.
+- **Standalone:** Auto Tournament runs `ru match load <url>` over RCON. Ready Up downloads the config with `ru_match_token` as the Bearer token. An admin can also type `.ru match load <url>` in chat.
 - **Fleet mode:** the platform assigns the match over the fleet link. See [Fleet mode](/cs2/ready-up/fleet#what-the-platform-controls).
 
 When a match loads, Ready Up:
@@ -48,7 +48,7 @@ When a match loads, Ready Up:
 - saves the match in `match/state.json`, so a restarted server can pick it up again,
 - kicks bots and sets `bot_quota 0`,
 - turns on CS2's round backups (`mp_backup_round_auto 1`),
-- changes to the first map in `maplist`, if the server is on another map,
+- changes to the first map in `maplist`, even if the server is already on it, so every match starts on a fresh map,
 - starts the match warmup.
 
 ### Whitelist and team lock
@@ -64,7 +64,7 @@ With a match loaded, the scoreboard shows the team names from the match config (
 
 ### Going live
 
-When every roster player is connected and ready, the match goes live. If the map's side is `knife`, the knife round comes first. An admin can start it early with `.ru start`.
+When every roster player is connected and ready, the match goes live. If the map's side is `knife`, the knife round comes first. An admin can start it early with `.ru match start`.
 
 With `ru_warmup_enable 0` there is no ready-up for matches at all: no warmup rules, no panel and no knife round. The match goes live on the next round start. Use that only when something else starts the match.
 
@@ -79,7 +79,7 @@ Ready Up reads the same match config Auto Tournament sends to Auto Tournament CS
 | `matchid`, `slug` | The match ID. Webhooks go to the slug if there is one. |
 | `team1`, `team2` | `name`, `flag`, `players` (Steam64 IDs), and `captain_steamid64` for `.ff`. |
 | `spectators.players` | Spectators allowed on the server. |
-| `maplist`, `num_maps` | The maps. |
+| `maplist`, `num_maps` | The maps. An entry is a map name (`de_mirage`) or a Workshop map: `3084291314`, `ws:3084291314`, `workshop/3084291314` or `workshop/3084291314/aim_map`. |
 | `map_sides` | `team1_ct`, `team2_ct` or `knife` for each map. |
 | `admins` | Steam64 IDs with admin rights for this match. |
 | `cvars` | Server settings for this match. |
@@ -88,6 +88,9 @@ Ready Up reads the same match config Auto Tournament sends to Auto Tournament CS
 | `knifeDecisionSeconds` | Time for the side pick. Default 60. |
 | `clinch_series` | End the series as soon as a team has won more than half the maps. Default `true`. |
 | `max_tech_pauses_per_team`, `tech_pause_max_seconds`, `both_teams_unpause_required`, `allow_force_ready`, `min_players_to_ready`, `forfeit_after_seconds` | See [Match rules](#match-rules). |
+| `gg_enabled`, `gg_threshold`, `gg_min_score_diff`, `stop_command_available`, `stop_command_no_damage`, `stop_vote_seconds` | The `.gg` and `.stop` votes. See [Forfeit and give up](#forfeit-and-give-up). |
+| `ruleset`, `overrides` | Valve's tournament rules, and single rule changes. See [Esports mode](/cs2/ready-up/esports-mode). |
+| `coaches` | Steam64 IDs of coaches. They join as spectators. Under Valve's rules, only at a LAN. |
 
 The response can be the config itself, or a wrapper `{ id, slug, config }`.
 
@@ -95,7 +98,7 @@ The response can be the config itself, or a wrapper `{ id, slug, config }`.
 
 1. Ready Up runs `ReadyUp/knife.cfg` and restarts the game. Players have knives only.
 2. The team that kills the other team wins. If the round ends another way, for example on time, the winner is the team with more players alive, then the team with more health left, then a coin flip.
-3. Any player on the winning team types `.stay` or `.switch` (or `.ct` / `.t`). An admin can pick for them with `.ru side`.
+3. Any player on the winning team types `.stay` or `.switch` (or `.ct` / `.t`). An admin can pick for them with `.ru match side`.
 4. The winners have `knifeDecisionSeconds` in a match, or `knife_pick_seconds` in a scrim, both 60 by default. If no one picks, the team stays. If the winning team has only bots, it stays after 3 seconds.
 5. Ready Up swaps teams if needed, runs `ReadyUp/live.cfg` and restarts. The match is live on the next round start.
 
@@ -109,11 +112,13 @@ There are three kinds of pause. They only work during a live map of a loaded mat
 | --- | --- | --- | --- |
 | Tactical timeout | Roster player | `.tac` | Ends by itself when the timeout is over, at the next freeze time end. |
 | Technical pause | Roster player | `.tech`, `.pause` or `.p` | `.unpause` or `.up`. By default both teams must type it. It also ends by itself after `tech_pause_max_seconds`. |
-| Admin pause | Admin | `.forcepause`, `.fp` or `.ru pause` | Only an admin: `.forceunpause`, `.fup` or `.ru unpause`. |
+| Admin pause | Admin | `.forcepause`, `.fp` or `.ru match pause` | Only an admin: `.forceunpause`, `.fup` or `.ru match unpause`. |
+| Halftime pause | CS2, under [Valve's rules](/cs2/ready-up/esports-mode) | At halftime | Both teams `.unpause`, or an admin. Not counted. |
+| Short-handed pause | CS2, when `sv_matchpause_auto_5v5` is on | A round start with fewer than 5 players on a side | Both teams `.unpause`, or an admin. Not counted. |
 
 - **Tactical timeouts** are CS2's own timeouts for the caller's side. Their number and length are `mp_team_timeout_max` and `mp_team_timeout_time`, from `live.cfg` or the match `cvars`.
 - **Technical pauses** use CS2's `mp_pause_match`, so they start at the next freeze time. Each team gets `max_tech_pauses_per_team` per map (3 by default). With `both_teams_unpause_required=0`, the team that paused can end it alone.
-- An admin can call a pause for a team with `.ru tech team1` or `.ru tac team2`. That team's limits apply.
+- An admin can call a pause for a team with `.ru match tech team1` or `.ru match tac team2`. That team's limits apply.
 
 While a map is paused, the panel in the middle of the screen shows the kind of pause, who paused, the countdown to the automatic unpause, and which teams have typed `.unpause`.
 
@@ -127,7 +132,20 @@ In fleet mode, a live match also pauses on its own when the server loses the pla
 
 - **A team leaves.** If nobody from one team is connected on a live map for `forfeit_after_seconds` (240 by default), that team forfeits the map and the series. Chat and the panel show a countdown. It stops when someone from the team comes back. `0` turns this off.
 - `.ff` or `.forfeit`: the team captain forfeits the match. The captain is `captain_steamid64` in the match config. Without a captain, `.ff` does not work.
-- `.gg`: sends a `player_gg` event to Auto Tournament. It does not end the match on its own.
+- `.gg`: by default, it only sends a `player_gg` event to Auto Tournament. With `gg_enabled`, it is a surrender vote: when `gg_threshold` of the team's connected players (80% by default) type `.gg` within 60 seconds, and the team trails by at least `gg_min_score_diff` rounds (8 by default), the team forfeits the map and the series.
+- `.stop`: with `stop_command_available`, one player of each team types `.stop` within `stop_vote_seconds` (30 by default), and the round goes back to its start from CS2's round backup, paused. With `stop_command_no_damage`, `.stop` only works while no player has damaged an opponent that round.
+
+Under [Valve's rules](/cs2/ready-up/esports-mode), the `.gg` and `.stop` votes are off.
+
+## Damage report
+
+After each round of a live map, each player gets their damage to and from each opponent in chat, only to them:
+
+```text
+To: 54 in 2 | From: 27 in 1 — Name (46 hp)
+```
+
+Knife rounds and warmup are not reported. `damage_report=0` in `readyup.cfg` turns it off. It is off under Valve's rules.
 
 ## Match rules
 
@@ -137,11 +155,11 @@ The pause, force-ready and forfeit rules come from, in this order:
 2. the keys of the same names in `readyup.cfg` or `cfg/ReadyUp/match.cfg`. Scrims only use these. See [Configuration](/cs2/ready-up/configuration#pauses-ready-and-forfeit).
 3. the built-in defaults.
 
-The first one that is set wins. `ru state` prints the rules in use. They are kept across `ru plugin reload match`.
+The first one that is set wins. `ru match rules` prints the rules in use. They are kept across `ru plugin reload match`.
 
 ## End of a map
 
-When a map is decided, Ready Up switches to the postgame phase. `ru state` and the heartbeat show `postgame`.
+When a map is decided, Ready Up switches to the postgame phase. `ru match state` and the heartbeat show `postgame`.
 
 1. Ready Up sends `map_result` with the map score, the series score and the player stats.
 2. It waits before the next step. Without a demo, 10 seconds. With a demo, `tv_delay` + 15 seconds, plus 10 more when `tv_delay` is above 0. The demo stops when GOTV has sent everything, then uploads if `ru_demo_upload_url` is set.
@@ -156,9 +174,18 @@ Ready Up records a GOTV demo when a map goes live, to `game/csgo/ReadyUp/` by de
 
 ## Practice
 
-An admin types `.prac` to turn practice on and again to turn it off. Practice clears any loaded match and runs `ReadyUp/prac.cfg`: cheats, infinite ammo, grenade trajectories, buy anywhere, respawn. Turning it off runs `ReadyUp/idle.cfg`.
+Practice is its own plugin. An admin types `.prac` to turn it on, and again to turn it off. It cannot start while a match is loaded. See [Plugins](/cs2/ready-up/plugins#practice) for the settings, including a dedicated practice server, and [Commands](/cs2/ready-up/commands#practice) for the tools.
 
-In practice, `.bot`, `.cbot`, `.boost`, `.crouchboost` and `.nobots` add and remove bots. See [Commands](/cs2/ready-up/commands#practice).
+## Warmup
+
+Ready Up does not use CS2's own warmup, because its WARMUP text covers the ready panel. It makes its own warmup instead:
+
+- players respawn, and rounds do not end,
+- you can buy anywhere, and money is topped up to $16000 after each purchase (`warmup_money`),
+- nothing drops when a player dies, and there is no bomb,
+- a weapon dropped on the ground is removed after 2 seconds (`warmup_weapon_cleanup`).
+
+Going live puts CS2's normal rules back.
 
 ## The ready HUD
 
@@ -171,11 +198,13 @@ During scrim and match warmup, each player sees a small panel in the middle of t
 - the countdown, when it runs,
 - the `ru_warmup_message_html` line, if set.
 
-When the knife round starts, the panel shows KNIFE ROUND and stays up for `hud_knife_hold_s` seconds (30 by default), also while the round runs. After the knife round it shows the side pick. It hides when the match goes live. On a live map it comes back for pauses and for the forfeit countdown.
+When the knife round starts, the panel shows KNIFE ROUND and stays up for `hud_knife_hold_s` seconds (30 by default), also while the round runs. After the knife round it shows the side pick. It hides when the match goes live. On a live map it comes back for pauses (tactical, technical, admin, halftime and short-handed) and for the forfeit countdown.
 
 While the panel reaches players, it replaces chat for the flow: ready changes, the countdown, the knife start, the knife winner and the side pick are only shown in the panel. Chat still gets the LIVE line, admin actions, and replies that explain why a command was refused. With `ready_hud=0`, or when a panel send fails, the chat messages come back.
 
-The first time a player joins CT or T on a map, a welcome card shows for about 5 seconds before the panel.
+The first time a player joins CT or T on a map, a welcome card shows once they have spawned, for about 5 seconds, before the panel. It shows the `hud_brand` header, the Ready Up build, the player's name and team, and the mode.
+
+Each player has one panel in the middle of the screen. When two things want it at once, the more urgent one wins: the Workshop download bar, then the welcome card and admin test panels, then the ready panel. The ready panel comes back by itself when the other one is gone.
 
 The panel needs two engine functions (`LegacyGameEventListener` and the game event manager). If a CS2 update breaks them, the panel and the welcome card turn off and chat takes over. `ru selftest` shows this under `[features]`.
 
@@ -183,9 +212,13 @@ Settings are in [Configuration](/cs2/ready-up/configuration#welcome-screen-and-h
 
 ## Recovery after a restart
 
-Ready Up saves the loaded match and the name of the round backup file in `game/csgo/readyup/plugins/match/state.json`. When the server restarts, it loads the match again. `.ru recover [round]` asks Auto Tournament to restore the match, optionally to a given round.
+Ready Up saves the loaded match and the name of the round backup file in `game/csgo/readyup/plugins/match/state.json`. When the server restarts, it loads the match again. `.ru match recover [round]` asks Auto Tournament to restore the match, optionally to a given round.
 
 `ru plugin reload match` does not stop a match. Ready states, scores, the knife round, pauses and the stats carry over. See [What survives a reload](/cs2/ready-up/sdk/threading-and-abi#what-survives-a-reload).
+
+## Idle map refresh
+
+After a day or more on one map, player animations in CS2 run in slow motion, while the tick rate stays fine. A map load fixes it. So when no match is loaded, nobody is connected, and the server has been on the same map for `idle_map_refresh_hours` (12 by default), Ready Up loads the same map again. The console logs `idle-refresh: ...`. `0` turns it off.
 
 ## Events sent to Auto Tournament
 

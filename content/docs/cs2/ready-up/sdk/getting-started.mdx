@@ -7,12 +7,12 @@ icon: Rocket
 import { Step, Steps } from 'fumadocs-ui/components/steps';
 
 <Callout title="In development" type="warn">
-  The plugin API is at version 1.2. New minor versions only add functions, so plugins built for 1.2 keep working. Details on this page can still change before the first release.
+  The plugin API is at version 1.6. New minor versions only add functions, so plugins built for an older 1.x keep working. Details on this page can still change before the first release.
 </Callout>
 
 A Ready Up plugin is a Linux shared library (`.so`) in `game/csgo/readyup/plugins/`. It talks to the server only through a table of C functions that the core hands it. It never touches the engine itself. When CS2 updates, the core gets fixed and your plugin keeps working without a rebuild.
 
-The match flow, skins and the fleet link are all plugins built this way. This page walks through `hello`, the example plugin in the repo. It is plain C and about 200 lines.
+The match flow, practice, skins, the fleet link and the other in-house plugins are all built this way, and use nothing but the public API. This page walks through `hello`, the example plugin in the repo. It is plain C and about 200 lines.
 
 ## Repo layout
 
@@ -22,6 +22,7 @@ The match flow, skins and the fleet link are all plugins built this way. This pa
 | `core/include/readyup/plugin_api.h` | The plugin API. A plugin includes this file. |
 | `core/include/readyup/*_iface.h` | Interfaces that plugins publish to each other and to the core. See [API reference](/cs2/ready-up/sdk/api-reference#interfaces). |
 | `plugins/match/` | The match plugin, `match.so`. |
+| `plugins/essentials/`, `plugins/practice/`, `plugins/whitelist/`, `plugins/midas/` | The essentials, practice, whitelist and Midas plugins. |
 | `plugins/skins/` | The skins plugin, `skins.so`. |
 | `plugins/fleet/` | The fleet link, `fleet.so`. |
 | `plugins/hello/` | The example plugin. |

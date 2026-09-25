@@ -65,7 +65,7 @@ After unloading, the core checks that the library is really gone from memory, an
 
 `READYUP_PLUGIN_API_VERSION` is `(MAJOR << 16) | MINOR`. It is separate from the Ready Up release version.
 
-- **Minor**: new members are added to the end of `ru_api` or of a struct. Nothing is removed, reordered or changed in meaning. A plugin built for 1.0 runs on a 1.2 core.
+- **Minor**: new members are added to the end of `ru_api` or of a struct. Nothing is removed, reordered or changed in meaning. A plugin built for 1.0 runs on a 1.6 core.
 - A plugin that needs a 1.2 member can either require 1.2 in `ru_plugin_info.api_version` (older cores then refuse it), or check `RU_API_HAS(api, member)` at runtime and work without it.
 - **Major**: any incompatible change. The core refuses plugins with another major. Majors change rarely, and together with the plugins in the repo.
 - Every struct starts with `uint32_t struct_size`. Check it before you read fields that were added later. Structs you pass in, such as `ru_player`, carry your `struct_size`, and the core fills only what fits.
@@ -105,7 +105,7 @@ The match plugin uses the stash, so `ru plugin reload match` does not stop a mat
 - the loaded match, the mode (warmup, knife, live, postgame, scrim, practice) and every ready state,
 - the map number, round, scores, the per-map stats, halftime and overtime counters, series wins and map results,
 - the knife round (phase, winner, pick deadline) and the pause state,
-- runtime settings: webhook, heartbeat and admin URLs, the match token, `ru_warmup_*`, `ru_cfg_exec_enable`, `ru_dev_bots_scrim`, demo settings, series-end kick delays, `.ru idle`,
+- runtime settings: webhook, heartbeat and admin URLs, the match token, `ru_warmup_*`, `ru_cfg_exec_enable`, `ru_dev_bots_scrim`, demo settings, series-end kick delays, `.ru mode idle`,
 - webhook events not yet sent, the demo being recorded, and the pending postgame step, with the time left,
 - in fleet mode: the assignment, its config, the state stream counter, pause counters and which round backups were sent.
 

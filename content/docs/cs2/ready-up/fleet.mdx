@@ -105,7 +105,7 @@ All `[fleet]` keys are listed in [Configuration](/cs2/ready-up/configuration#fle
 
 ### Matches
 
-The platform assigns a match to a server. The assignment carries the teams and rosters, the maps and sides, the rules (round limit, overtime, knife side pick time, tiebreak, technical pauses, force ready, forfeit when a team leaves), match admins, engine cvars, and a password for this match.
+The platform assigns a match to a server. The assignment carries the teams and rosters, the maps and sides, the rules (the [ruleset](/cs2/ready-up/esports-mode) and overrides, round limit, overtime, knife side pick time, tiebreak, technical pauses, force ready, forfeit when a team leaves, the `.gg` vote), match admins, engine cvars, and a password for this match.
 
 When a match is assigned, the server:
 
@@ -127,20 +127,23 @@ Platform admins can send these commands to the server. Each one gets exactly one
 | --- | --- |
 | `pause`, `unpause` | Pause or unpause. `unpause` also ends an offline auto-pause. |
 | `force_ready` | Mark one team, or both, as ready. |
-| `start` | Start the match now. |
+| `start` | Start the match now. With `force`, also without GOTV under [Valve's rules](/cs2/ready-up/esports-mode). |
 | `restore_round` | Go back to a round backup the admin picked. The platform sends the backup if the server does not have it. |
 | `restart_map` | Back to warmup on the same map. That map's stats are dropped. |
 | `end_match` | End the match, optionally with a winner. |
-| `change_map` | Change map, before the match is live. |
+| `change_map` | Change map, before the match is live. Workshop maps work too. |
 | `swap_teams` | Swap sides and keep the team 1 / team 2 mapping. |
 | `kick`, `say` | Kick a player, or say something in chat. |
+| `plugins.set` | Turn plugins on or off, as `ru plugin enable` and `disable` do. Not `match` or `fleet`. |
+| `practice.set` | Turn practice mode on or off. Refused while a match is loaded, or without the practice plugin. |
+| `whitelist.set` | Replace the whitelist and turn it on or off. Needs the whitelist plugin. |
 | `exec` | Run one console line. Root admins only. The server logs who ran what. It refuses `ru fleet ...`. |
 
 ### Admins
 
 The platform keeps one admin list for all servers. The server saves a copy in `plugins/match/fleet-admins.json`, so it knows its admins even when it starts while the platform is down.
 
-In fleet mode, `admins.json` is not used. `.ru admins` shows the platform's list, and `add` and `remove` answer `Admins are managed on the platform`. Match admins from the assignment still count.
+The local `admins.json` still counts on top of it, so the server owner stays an admin even when the platform sends no list, or a list without them. `.ru admins list`, `add` and `remove` work on the local file. The platform's list is edited on the platform. Match admins from the assignment count too.
 
 ### Skins
 

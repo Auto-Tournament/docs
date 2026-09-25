@@ -6,9 +6,11 @@
   "pages": [
     "index",
     "install",
+    "plugins",
     "configuration",
     "commands",
     "scrims-and-matches",
+    "esports-mode",
     "skins",
     "fleet",
     "troubleshooting",

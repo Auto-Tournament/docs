@@ -5,7 +5,7 @@ icon: Code
 ---
 
 <Callout title="In development" type="warn">
-  The SDK is at API version 1.2 and Ready Up is not released yet. New minor versions only add functions, so a plugin built today keeps working on later 1.x cores.
+  The SDK is at API version 1.6 and Ready Up is not released yet. New minor versions only add functions, so a plugin built today keeps working on later 1.x cores.
 </Callout>
 
 The Ready Up SDK is how you add your own features to a Ready Up server. Everything Ready Up does beyond loading into CS2 is already a plugin built on it: the match flow, skins and the platform link.
@@ -13,7 +13,7 @@ The Ready Up SDK is how you add your own features to a Ready Up server. Everythi
 ## What the SDK is
 
 - **A versioned C API.** One header, `core/include/readyup/plugin_api.h`. The core hands every plugin a table of function pointers (`ru_api`): chat and console commands, game events, log lines, center-screen HTML, players, entities and schema fields, server commands, config, admins.
-- **Interfaces between plugins.** A plugin can publish a struct of functions under a name, and other plugins can look it up. The match plugin publishes `readyup.match.v1` (`match_iface.h`). The fleet plugin publishes `readyup.fleet.v1` (`fleet_iface.h`), which other plugins use to talk to the Auto Tournament platform. Any plugin can add its own lines to `ru selftest`.
+- **Interfaces between plugins.** A plugin can publish a struct of functions under a name, and other plugins can look it up. The match plugin publishes `readyup.match.v1` (`match_iface.h`). The fleet plugin publishes `readyup.fleet.v1` (`fleet_iface.h`), which other plugins use to talk to the Auto Tournament platform. The practice, whitelist and skins plugins publish `readyup.practice.v1`, `readyup.whitelist.v1` and `readyup.skins.v1`. Midas uses the skins interface to paint weapons gold. Any plugin can add its own lines to `ru selftest`.
 - **Hot reload.** `ru plugin reload <name>` swaps in a new build without a server restart. A plugin can keep its state across the reload.
 - **A build setup.** `readyup_add_plugin(<name> <sources>)` in CMake sets every flag a plugin needs.
 
