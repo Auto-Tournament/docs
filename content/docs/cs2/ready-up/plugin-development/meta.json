@@ -1,5 +1,0 @@
-{
-  "title": "Plugin development",
-  "icon": "Code",
-  "pages": ["getting-started", "api-reference", "threading-and-abi", "engine-surface"]
-}

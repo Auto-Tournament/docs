@@ -1,0 +1,81 @@
+---
+title: Porting from CounterStrikeSharp or Metamod
+description: Map common CounterStrikeSharp and Metamod concepts to Ready Up SDK calls, and what is not possible yet.
+icon: ArrowRightLeft
+---
+
+The recommended setup is the Ready Up suite on its own. If you depend on a CounterStrikeSharp or Metamod plugin, the long-term answer is to port it to the Ready Up SDK. Then it gets the same protection against CS2 updates as the rest of Ready Up.
+
+A port is a rewrite, not a recompile. Ready Up plugins are C or C++ shared libraries. CounterStrikeSharp plugins are C#. The ideas carry over, and most of the plumbing maps one to one.
+
+## The main difference
+
+In CounterStrikeSharp and Metamod, a plugin can reach the engine directly: hook virtual functions, call functions by signature, read memory at an offset. When a CS2 update moves one of those, the plugin breaks until someone fixes it.
+
+In Ready Up, only the core touches the engine. Every function it uses is checked with signatures and identity anchors. A plugin only calls the core's API. So the first question for each feature you port is: does the API have a call for this? The table below answers that for the common cases.
+
+## Concept map
+
+| CounterStrikeSharp | Metamod | Ready Up SDK |
+| --- | --- | --- |
+| `[ConsoleCommand("css_x")]`, `AddCommand` | `CON_COMMAND` | `register_console_command(self, "x", fn, user)` |
+| Chat command (`!x` or `/x`) | `Host_Say` hook | `register_chat_command(self, "!x", fn, user)`. Names start with `.` or `!`. |
+| Hide the chat line of a command | | `register_chat_command_ex` with `RU_CMD_HIDE` |
+| `AddCommandListener` | Hook the command | `register_console_command_ex` with `RU_CMD_OBSERVE`. You see the line, the engine still runs it. You cannot block it. |
+| A subcommand of your own root command | | `register_ru_subcommand(self, "x", ...)` gives `ru x` and `.ru x` |
+| `RegisterEventHandler<EventPlayerDeath>` (post) | `IGameEventListener2` | `subscribe_game_event(self, "player_death", fn, user)`, then `ev_get_int`, `ev_get_string`, `ev_get_player_slot` and the others |
+| `RegisterEventHandler` with `HookMode.Pre`, `HookResult.Stop` | Pre hooks | Not possible. Events cannot be blocked or changed. |
+| `RegisterListener<OnMapStart>`, round start and end | | `subscribe(self, RU_EVENT_MAP_START, ...)`, `RU_EVENT_ROUND_START`, `RU_EVENT_ROUND_END`. These work even when engine events are down. |
+| `OnClientConnected`, `OnClientDisconnect` | `ClientConnect` hooks | `RU_EVENT_PLAYER_CONNECT`, `RU_EVENT_PLAYER_DISCONNECT`, `RU_EVENT_PLAYER_TEAM` |
+| `RegisterListener<OnTick>` | `GameFrame` hook | `on_tick` (simulating frames) or `on_frame` (every frame) |
+| `AddTimer(seconds, ...)` | | No timer object. Keep a deadline and check `tick->now` in `on_tick` or `on_frame`. |
+| `Server.NextFrame` | | `post_to_game_thread(self, fn, user)`. Also safe from your own threads. |
+| `Server.PrintToChatAll` | `UTIL_ClientPrintAll` | `chat_all(self, msg, 0)`, or `RU_CHAT_RAW` without the Ready Up prefix |
+| `player.PrintToChat` | `ClientPrint` | `chat_to_slot(self, slot, msg)` |
+| `player.PrintToCenterHtml` | | `center_html_to_slot(self, slot, html, seconds)`. See the HTML rules below. |
+| `Server.ExecuteCommand` | `ServerCommand` | `server_command(self, "mp_restartgame 1")` |
+| `ConVar.Find("x").SetValue` | `ICvar` | `server_command(self, "x 1")` |
+| `ConVar.Find("x").GetPrimitiveValue` | `ICvar` | Not possible yet. |
+| Your own `FakeConVar` | `ConVar` | Register a console command with the same name that stores the value. The match plugin does this for `ru_webhook_url` and others. |
+| `Utilities.GetPlayers()` | Iterate entities | `for_each_player(self, fn, user)`, `get_player`, `get_player_by_steamid` |
+| `player.SteamID`, `player.Team`, `player.IsBot` | | Fields of `ru_player` |
+| `Utilities.GetPlayerFromSlot` and entity lookup | `IGameResourceService` | `entity_by_index`, `entity_from_handle`, `entity_handle_of`, `entity_classname` |
+| `Schema.GetSchemaValue`, `[SchemaMember]` properties | `SCHEMA_FIELD` | `schema_offset(self, "CCSPlayerPawn", "m_iHealth")`, then read or write at that offset |
+| `Utilities.SetStateChanged` | `NetworkStateChanged` | `entity_mark_changed(self, entity)` |
+| `SetModel`, item attributes, bodygroups | | `entity_set_model`, `econ_attr_set_by_name`, `entity_change_subclass`, `entity_set_bodygroup_by_name`. These need the skins gamedata file. |
+| `AdminManager.PlayerHasPermissions` | | `is_admin(self, steamid64)`. There are no permission flags: a player is an admin or not. `set_admin_provider` decides who is. |
+| Plugin config (JSON in `configs/plugins`) | Config files | `config_get` reads `[<plugin>]` in `readyup.cfg` or `cfg/ReadyUp/<plugin>.cfg`. `data_dir` gives you a folder for your own files. |
+| Shared plugin capabilities | `MetaFactory` interfaces | `provide_interface` and `get_interface` |
+| Hot reload (`css_plugins reload`) | `meta unload` / `meta load` | `ru plugin reload <name>`. Keep state with `stash_put` and `stash_get`. |
+| Logging | | `log`, `log_untagged`, `ru_logf` |
+| Server log lines | Logging listener | `subscribe_log_line` |
+| Stop a round from ending | `TerminateRound` hook | `set_round_termination_suppressed(self, 1)`, for warmup-style free play only |
+| Chat tag in front of a name | Chat hooks | `set_chat_name_prefix(self, steamid64, "[TAG]")` |
+
+## Center HTML
+
+The CS2 client only renders a small part of HTML. What works: `class='fontSize-s'` to `fontSize-xxl`, `fontWeight-Bold`, `<b>`, `<font color='#hex'>`, `<br>`, UTF-8 symbols, and `<img>` with a public PNG URL at its final size. What does not: `<span style>`, `<i>`, `<u>`, SVG, `width` and `height`, and named entities such as `&check;`.
+
+A panel only stays up for a short time. For a steady panel, send it again every frame. An image in a panel sent every frame flashes, so only use images in one-off panels. The ready panel in `plugins/match/readyup/ready_hud.cpp` is a working example.
+
+## Not possible yet
+
+- Hooks on engine functions (`VirtualFunctions`, `MemoryFunction`, `SH_ADD_HOOK`, `DynamicHook`), for example damage or weapon pickup hooks.
+- Blocking or changing a game event, or firing your own.
+- Creating entities, giving items, teleporting players.
+- Menus, and commands run on a client.
+- Reading a cvar's value.
+- Forcing a round to end.
+- Plugins written in C#. There is no .NET runtime.
+
+## Asking for core support
+
+If your plugin needs something the API does not have, open an issue in the [ready-up repo](https://github.com/Auto-Tournament/ready-up/issues). Say:
+
+- what the plugin needs to do, in game terms ("block damage from teammates during warmup"),
+- which CounterStrikeSharp or Metamod call you used for it, if any,
+- how often it runs (once per round, or every frame).
+
+If it fits, the core adds the engine function to its checked list, with signatures and anchors, and exposes it in the next minor API version. Plugins built for the older version keep working. Check for the new member with `RU_API_HAS` before you call it.
+
+You can also ask on [Discord](https://discord.gg/n7gHYau7aW).

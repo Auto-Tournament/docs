@@ -24,7 +24,7 @@ The API is one C header, `core/include/readyup/plugin_api.h`. This page describe
 | 1.1 | Center HTML, players, raw engine events, log lines, schema and entities, round control, admins, config, plugin-to-plugin interfaces, state across reloads. |
 | 1.2 | Untagged log lines, command flags, `ru` subcommands, `on_frame`, feature state, the current map. |
 
-A plugin that requires 1.2 in `ru_plugin_info.api_version` can call everything. A plugin that requires an older minor must check `RU_API_HAS(api, member)` before it calls a newer member. The rules are on [Threading and ABI](/cs2/ready-up/plugin-development/threading-and-abi#versions).
+A plugin that requires 1.2 in `ru_plugin_info.api_version` can call everything. A plugin that requires an older minor must check `RU_API_HAS(api, member)` before it calls a newer member. The rules are on [Threading and ABI](/cs2/ready-up/sdk/threading-and-abi#versions).
 
 ## Exports
 

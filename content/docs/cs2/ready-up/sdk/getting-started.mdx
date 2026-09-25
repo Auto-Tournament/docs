@@ -1,5 +1,5 @@
 ---
-title: Getting started
+title: Build your first plugin
 description: Build the example plugin, load it on a server and hot reload it.
 icon: Rocket
 ---
@@ -20,7 +20,7 @@ The match flow, skins and the fleet link are all plugins built this way. This pa
 | --- | --- |
 | `core/` | The core: loader, engine surface, hooks, events, plugin host, status endpoint. |
 | `core/include/readyup/plugin_api.h` | The plugin API. A plugin includes this file. |
-| `core/include/readyup/*_iface.h` | Interfaces that plugins publish to each other and to the core. See [API reference](/cs2/ready-up/plugin-development/api-reference#interfaces). |
+| `core/include/readyup/*_iface.h` | Interfaces that plugins publish to each other and to the core. See [API reference](/cs2/ready-up/sdk/api-reference#interfaces). |
 | `plugins/match/` | The match plugin, `match.so`. |
 | `plugins/skins/` | The skins plugin, `skins.so`. |
 | `plugins/fleet/` | The fleet link, `fleet.so`. |
@@ -130,7 +130,7 @@ Try it: change `HELLO_VERSION` in `hello.c`, build, copy, reload. `.hello` answe
 
 When you copy a new file over a loaded one, do not write into the old file. Copy it next to it and rename it into place (`mv`). The server still has the old file mapped.
 
-A reloaded plugin starts with no state, unless it kept some with `stash_put`. If the new file fails to load, the plugin stays unloaded. Put the old file back and reload again. See [What survives a reload](/cs2/ready-up/plugin-development/threading-and-abi#what-survives-a-reload).
+A reloaded plugin starts with no state, unless it kept some with `stash_put`. If the new file fails to load, the plugin stays unloaded. Put the old file back and reload again. See [What survives a reload](/cs2/ready-up/sdk/threading-and-abi#what-survives-a-reload).
 
 ### dev-deploy.sh
 
@@ -177,7 +177,7 @@ Inside the repo, add a folder under `plugins/` and register it in CMake:
 readyup_add_plugin(myplugin myplugin.c)
 ```
 
-Then add `add_subdirectory(plugins/myplugin)` to the top-level `CMakeLists.txt`. `readyup_add_plugin` sets the flags a plugin needs: hidden symbols, `--no-undefined`, a version script that exports only the three entry points, and `-fno-gnu-unique` for C++. See [Threading and ABI](/cs2/ready-up/plugin-development/threading-and-abi#build-flags).
+Then add `add_subdirectory(plugins/myplugin)` to the top-level `CMakeLists.txt`. `readyup_add_plugin` sets the flags a plugin needs: hidden symbols, `--no-undefined`, a version script that exports only the three entry points, and `-fno-gnu-unique` for C++. See [Threading and ABI](/cs2/ready-up/sdk/threading-and-abi#build-flags).
 
 A plugin exports three functions:
 
@@ -189,6 +189,6 @@ READYUP_PLUGIN_EXPORT int readyup_plugin_load(const ru_api* api, uint32_t core_a
 READYUP_PLUGIN_EXPORT void readyup_plugin_unload(void);
 ```
 
-Start from `plugins/hello/hello.c`. The [API reference](/cs2/ready-up/plugin-development/api-reference) lists every function.
+Start from `plugins/hello/hello.c`. The [API reference](/cs2/ready-up/sdk/api-reference) lists every function.
 
 A plugin built outside the repo only needs `plugin_api.h` (and any `*_iface.h` it uses). Build it with the same flags.
