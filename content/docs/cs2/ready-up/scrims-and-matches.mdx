@@ -25,7 +25,7 @@ A scrim or match moves through phases: warmup, knife round (if any), live, and p
 
 A scrim needs no match config. Anyone on the server can play.
 
-1. The server starts idle. When a player joins CT or T, Ready Up starts the scrim warmup.
+1. The server starts idle. When a player joins CT or T, Ready Up starts the scrim warmup and restarts the game, so the score starts at 0:0.
 2. Each player on CT or T types `.r`. The ready panel shows who is ready.
 3. When everyone on CT and T is ready, a 5 second countdown starts.
 4. With `scrim_knife=1` (the default), a knife round is played. The winners pick a side. See [Knife round](#knife-round).
@@ -204,7 +204,7 @@ While the panel reaches players, it replaces chat for the flow: ready changes, t
 
 The first time a player joins CT or T on a map, a welcome card shows once they have spawned, for about 5 seconds, before the panel. It shows the `hud_brand` header, the Ready Up build, the player's name and team, and the mode.
 
-Each player has one panel in the middle of the screen. When two things want it at once, the more urgent one wins: the Workshop download bar, then the welcome card and admin test panels, then the ready panel. The ready panel comes back by itself when the other one is gone.
+Each player has one panel in the middle of the screen. When two things want it at once, the more urgent one wins: the map change card and the Workshop download bar, then the welcome card and admin test panels, then the ready panel. The ready panel comes back by itself when the other one is gone.
 
 The panel needs two engine functions (`LegacyGameEventListener` and the game event manager). If a CS2 update breaks them, the panel and the welcome card turn off and chat takes over. `ru selftest` shows this under `[features]`.
 

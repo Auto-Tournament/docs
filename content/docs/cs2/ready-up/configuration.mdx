@@ -116,7 +116,7 @@ Keep the three timing keys (`hud_tick_ms`, `hud_resend_ms`, `hud_duration_s`) at
 
 The logo must be a public PNG, already scaled to the size you want. SVG does not work, and the client ignores `width` and `height`. An image in a panel that is resent every frame flashes. The CS2 client only renders a small part of HTML. Admins can test what works in game with `.ru hud test 1` to `.ru hud test 7`. `8` to `11` measure the panel: rows, width and image sizes. `.ru hud anim` measures how fast the client redraws it.
 
-Each player has one panel in the middle of the screen. When two things want it at once, the more urgent one wins: the Workshop download bar, then the welcome card and test panels, then the ready panel.
+Each player has one panel in the middle of the screen. When two things want it at once, the more urgent one wins: the map change card and the Workshop download bar, then the welcome card and test panels, then the ready panel.
 
 With `ready_hud=0` the panel is off and the chat reminders come back. Ready-up still works.
 
