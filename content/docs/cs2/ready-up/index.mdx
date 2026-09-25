@@ -5,7 +5,7 @@ icon: BadgeCheck
 ---
 
 <Callout title="In development" type="warn">
-  Ready Up is not released yet. [Auto Tournament CS2](/cs2/plugin) is still the supported plugin, and you should keep using it for now. Ready Up will replace it in a later release. These pages describe how Ready Up works today and what is planned. Expect breaking changes.
+  Ready Up is not released yet. [Auto Tournament CS2](/cs2/plugin) is still the supported plugin, and you should keep using it for now. Ready Up will replace it in a later release. These pages describe how Ready Up works today. Expect breaking changes.
 </Callout>
 
 Ready Up runs the match flow on a CS2 server. Players ready up, the match goes live, and results go back to Auto Tournament. It does the same job as [Auto Tournament CS2](/cs2/plugin), MatchZy and Get5. It is not a fork of any of them. It reuses their chat commands and event names where that makes sense, so moving over is easy.
@@ -22,10 +22,12 @@ Ready Up runs the match flow on a CS2 server. Players ready up, the match goes l
 - Pauses that both teams must confirm to end, and a captain forfeit.
 - Practice mode with bot helpers.
 - A small panel in the middle of the screen that shows who is ready.
-- Admins stored in Postgres, so several servers share one list.
-- Webhooks and a heartbeat for Auto Tournament.
+- GOTV demos for each map, with an optional upload.
+- Admins, settings and crash recovery in small JSON files. There is no database.
+- A local status endpoint (`/health`, `/status`) for monitoring tools.
+- Webhooks and a heartbeat for Auto Tournament, or one WebSocket link to the platform in [fleet mode](/cs2/ready-up/fleet).
 
-Skins (weapon paints, knives, gloves, agents) are a separate, optional part. See [Skins](/cs2/ready-up/skins).
+Skins (weapon paints, knives, gloves, agents) are a separate, optional plugin. See [Skins](/cs2/ready-up/skins).
 
 ## No Metamod or CounterStrikeSharp
 
@@ -50,16 +52,28 @@ The details are in [Engine surface](/cs2/ready-up/plugin-development/engine-surf
 
 ## Core and plugins
 
-Ready Up is being split into a small core and plugins. The core owns everything that touches the engine. Plugins only call a versioned C API, so a CS2 update needs a core fix only.
+Ready Up is a small core and a set of plugins. The core owns everything that touches the engine. Plugins only call a versioned C API, so a CS2 update needs a core fix only. Plugins can be reloaded without a server restart.
 
-| Part | What it does | Status |
+| Part | File | What it does |
 | --- | --- | --- |
-| Core | Loading, engine surface, hooks, events, chat and console commands, the plugin host | Works |
-| Match | Ready-up, scrims, knife round, pauses, match configs, webhooks, admins, practice | Works, but is still built into the core. Moving it to its own plugin is planned. |
-| Skins | Weapon paints, knives, gloves, agents | Works, but is still built into the core. Moving it to its own plugin is planned. |
-| `hello` | A small example plugin | Works. For developers only, never shipped. |
+| Core | `readyup/bin/linuxsteamrt64/libserver.so` | Loading, engine surface, hooks, events, chat and console commands, the plugin host, `ru selftest`, the status endpoint. It runs on its own, but then there is no match flow. |
+| Match | `readyup/plugins/match.so` | Ready-up, scrims, knife round, pauses, practice, match configs, admins, webhooks, demos, stats. |
+| Skins | `readyup/plugins/skins.so` | Weapon paints, knives, gloves and agents. Optional, and not in the default bundle. |
+| Fleet | `readyup/plugins/fleet.so` | The link to the Auto Tournament platform. See [Fleet mode](/cs2/ready-up/fleet). Not in the release packages yet. |
+| Hello | `readyup/plugins/hello.so` | A small example plugin for developers. |
 
-The plugin host, API version 1.0 and hot reload (`ru plugin reload <name>`) work today. See [Plugin development](/cs2/ready-up/plugin-development/getting-started).
+The plugin API is at version 1.2. See [Plugin development](/cs2/ready-up/plugin-development/getting-started).
+
+## Coming soon
+
+These are being built now and are not on this site yet:
+
+- Pause types with limits (`.tac`, `.tech`), and `.forcepause` for admins.
+- Team names in game.
+- `.forceready` for admins.
+- A forfeit when a whole team leaves.
+- Workshop maps.
+- Resuming a match on another server after a failure ([failover](/cs2/ready-up/fleet#failover)).
 
 ## Next
 

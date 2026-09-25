@@ -1,12 +1,14 @@
 ---
 title: Scrims and matches
-description: How ready-up, the knife round, pauses and the ready panel work.
+description: How ready-up, the knife round, pauses, the ready panel and the end of a map work.
 icon: Swords
 ---
 
 <Callout title="In development" type="warn">
-  Ready Up is not released yet. The knife round is new and still being tested.
+  Ready Up is not released yet. Details on this page can still change.
 </Callout>
+
+The match flow is the match plugin, `match.so`. Without it, the server runs as plain CS2 with the core only.
 
 Ready Up has four modes. `ru state` shows the current one.
 
@@ -16,6 +18,8 @@ Ready Up has four modes. `ru state` shows the current one.
 | Scrim | No match is loaded and a player joins CT or T. Players ready up, then the scrim goes live. |
 | Match | A match was loaded from Auto Tournament. Only roster players can join. |
 | Practice | An admin typed `.prac`. Cheats and practice settings are on. |
+
+A scrim or match moves through phases: warmup, knife round (if any), live, and postgame at the end of each map.
 
 ## Scrims
 
@@ -27,16 +31,21 @@ A scrim needs no match config. Anyone on the server can play.
 4. With `scrim_knife=1` (the default), a knife round is played. The winners pick a side. See [Knife round](#knife-round).
 5. Ready Up runs `ReadyUp/live.cfg`, restarts the game, and the scrim is live on the next round start.
 
-In a scrim, CT is team 1 and T is team 2. There is no whitelist and no team lock.
+In a scrim, CT is team 1 and T is team 2. There is no whitelist and no team lock. Scrims are not reported to Auto Tournament.
 
 `.ru idle` stops scrim warmup until `.ru scrim` or the next map. Use it if you want a plain CS2 server for a while.
 
 ## Matches
 
-Auto Tournament loads a match with `ru match load <url>`. Ready Up then:
+A match comes from Auto Tournament in one of two ways:
+
+- **Standalone:** Auto Tournament runs `ru match load <url>` over RCON. Ready Up downloads the config with `ru_match_token` as the Bearer token.
+- **Fleet mode:** the platform assigns the match over the fleet link. See [Fleet mode](/cs2/ready-up/fleet#what-the-platform-controls).
+
+When a match loads, Ready Up:
 
 - sends `series_start` to Auto Tournament,
-- saves the match in Postgres, so a restarted server can pick it up again,
+- saves the match in `match/state.json`, so a restarted server can pick it up again,
 - kicks bots and sets `bot_quota 0`,
 - turns on CS2's round backups (`mp_backup_round_auto 1`),
 - changes to the first map in `maplist`, if the server is on another map,
@@ -53,7 +62,9 @@ While a match is loaded:
 
 When every roster player is connected and ready, the match goes live. If the map's side is `knife`, the knife round comes first. An admin can start it early with `.ru start`.
 
-Ready Up records a GOTV demo for each map, named `ru_<match>_m<map number>_<map>_<time>`. Demo upload is not done yet.
+With `ru_warmup_enable 0` there is no ready-up for matches at all: no warmup rules, no panel and no knife round. The match goes live on the next round start. Use that only when something else starts the match.
+
+The `cvars` from the match config are applied after `live.cfg`, so they win over it.
 
 ### Match config
 
@@ -71,6 +82,7 @@ Ready Up reads the same match config Auto Tournament sends to Auto Tournament CS
 | `maxRounds`, `overtimeMode`, `overtimeSegments`, `maxOvertimes` | Round limit and overtime. |
 | `damageTiebreak`, `damageTiebreakSuddenDeath` | What to do when overtime runs out. |
 | `knifeDecisionSeconds` | Time for the side pick. Default 60. |
+| `clinch_series` | End the series as soon as a team has won more than half the maps. Default `true`. |
 
 The response can be the config itself, or a wrapper `{ id, slug, config }`.
 
@@ -91,12 +103,29 @@ The knife round works from the server log alone. It uses engine events when they
 | Player | `.pause`, `.p` or `.tech` | `.unpause` or `.up`. Both teams must type it. |
 | Admin | `.ru pause` | `.ru unpause`. Ends the pause right away. |
 
-Pauses only work during a loaded match. Ready Up uses CS2's own `mp_pause_match`, so the pause starts at the next freeze time. There are no pause limits yet. `.tech` is a normal pause for now.
+Pauses only work during a loaded match. Ready Up uses CS2's own `mp_pause_match`, so the pause starts at the next freeze time. `.tech` marks the pause as technical in events, but works the same as `.pause`. There are no pause limits yet. Pause types with limits are coming.
+
+In fleet mode, a live match also pauses on its own when the server loses the platform for too long. See [Offline auto-pause](/cs2/ready-up/fleet#offline-auto-pause).
 
 ## Forfeit and give up
 
 - `.ff` or `.forfeit`: the team captain forfeits the match. The captain is `captain_steamid64` in the match config. Without a captain, `.ff` does not work.
 - `.gg`: sends a `player_gg` event to Auto Tournament. It does not end the match on its own.
+
+## End of a map
+
+When a map is decided, Ready Up switches to the postgame phase. `ru state` and the heartbeat show `postgame`.
+
+1. Ready Up sends `map_result` with the map score, the series score and the player stats.
+2. It waits before the next step. Without a demo, 10 seconds. With a demo, `tv_delay` + 15 seconds, plus 10 more when `tv_delay` is above 0. The demo stops when GOTV has sent everything, then uploads if `ru_demo_upload_url` is set.
+3. If the series goes on, Ready Up changes to the next map, which starts in match warmup.
+4. If the series is over (no maps left, or a team has won more than half of them and `clinch_series` is on), Ready Up sends `series_end`. Players are kicked after the series-end kick delay (5, 10 or 60 seconds, depending on the demo). Two seconds later the match is unloaded and the server goes idle.
+
+A scrim also goes through postgame, but no one is kicked. It unloads when the wait in step 2 is over.
+
+### Demos
+
+Ready Up records a GOTV demo when a map goes live, to `game/csgo/ReadyUp/` by default. The name format, the folder and an optional upload URL are console settings. See [Demos and series end](/cs2/ready-up/commands#demos-and-series-end).
 
 ## Practice
 
@@ -112,21 +141,28 @@ During scrim and match warmup, each player sees a small panel in the middle of t
 - `X/Y ready`,
 - each player per side with ✔ or ✖ (CT blue, T orange, your own name in bold),
 - a hint to type `.r` or `.ur`,
-- the countdown, when it runs.
+- the countdown, when it runs,
+- the `ru_warmup_message_html` line, if set.
 
-After a knife round it shows the side pick instead. It hides when the match goes live. While the panel is up, Ready Up does not send "type .r" reminders in chat. Chat still announces warmup, the countdown, the knife winner and LIVE.
+When the knife round starts, the panel shows KNIFE ROUND and stays up for `hud_knife_hold_s` seconds (30 by default), also while the round runs. After the knife round it shows the side pick. It hides when the match goes live.
+
+While the panel reaches players, it replaces chat for the flow: ready changes, the countdown, the knife start, the knife winner and the side pick are only shown in the panel. Chat still gets the LIVE line, admin actions, and replies that explain why a command was refused. With `ready_hud=0`, or when a panel send fails, the chat messages come back.
 
 The first time a player joins CT or T on a map, a welcome card shows for about 5 seconds before the panel.
 
-The panel needs two engine functions (`LegacyGameEventListener` and the game event manager). If a CS2 update breaks them, the panel and the welcome card turn off and chat reminders take over. `ru selftest` shows this under `[hud]` and `[features]`.
+The panel needs two engine functions (`LegacyGameEventListener` and the game event manager). If a CS2 update breaks them, the panel and the welcome card turn off and chat takes over. `ru selftest` shows this under `[features]`.
 
 Settings are in [Configuration](/cs2/ready-up/configuration#welcome-screen-and-hud).
 
 ## Recovery after a restart
 
-If Postgres is set up, Ready Up saves the loaded match and the name of the round backup file. When the server restarts, it loads the match again. `.ru recover [round]` asks Auto Tournament to restore the match, optionally to a given round.
+Ready Up saves the loaded match and the name of the round backup file in `game/csgo/readyup/plugins/match/state.json`. When the server restarts, it loads the match again. `.ru recover [round]` asks Auto Tournament to restore the match, optionally to a given round.
+
+`ru plugin reload match` does not stop a match. Ready states, scores, the knife round, pauses and the stats carry over. See [What survives a reload](/cs2/ready-up/plugin-development/threading-and-abi#what-survives-a-reload).
 
 ## Events sent to Auto Tournament
+
+This section is about standalone servers. In fleet mode, events go over the fleet link instead.
 
 With `ru_webhook_url` set, Ready Up sends events to `<url>/<slug>` (or `<url>/<matchid>`), with `ru_match_token` as the Bearer token. The names follow MatchZy and Get5 where they exist:
 

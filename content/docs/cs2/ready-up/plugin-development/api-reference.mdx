@@ -1,16 +1,16 @@
 ---
 title: API reference
-description: Every type and function in plugin_api.h, API version 1.0.
+description: The types and functions in plugin_api.h (API version 1.2), and the interfaces plugins share.
 icon: BookOpen
 ---
 
-The whole API is one C header, `core/include/readyup/plugin_api.h`. A plugin includes only this file. This page describes version 1.0.
+The API is one C header, `core/include/readyup/plugin_api.h`. This page describes version 1.2. The header has the exact signatures and a comment on every member. When this page and the header differ, the header is right.
 
 ## Versions
 
 ```c
 #define READYUP_PLUGIN_API_VERSION_MAJOR 1
-#define READYUP_PLUGIN_API_VERSION_MINOR 0
+#define READYUP_PLUGIN_API_VERSION_MINOR 2
 #define READYUP_PLUGIN_API_VERSION ((MAJOR << 16) | MINOR)
 
 #define RU_API_VERSION_MAJOR(v)  /* v >> 16 */
@@ -18,7 +18,13 @@ The whole API is one C header, `core/include/readyup/plugin_api.h`. A plugin inc
 #define RU_API_HAS(ptr, member)  /* is member inside ptr->struct_size? */
 ```
 
-The rules for versions are on [Threading and ABI](/cs2/ready-up/plugin-development/threading-and-abi#versions).
+| Version | Added |
+| --- | --- |
+| 1.0 | Logging, server commands, chat, chat and console commands, ticks, lifecycle events, posted tasks, the data folder. |
+| 1.1 | Center HTML, players, raw engine events, log lines, schema and entities, round control, admins, config, plugin-to-plugin interfaces, state across reloads. |
+| 1.2 | Untagged log lines, command flags, `ru` subcommands, `on_frame`, feature state, the current map. |
+
+A plugin that requires 1.2 in `ru_plugin_info.api_version` can call everything. A plugin that requires an older minor must check `RU_API_HAS(api, member)` before it calls a newer member. The rules are on [Threading and ABI](/cs2/ready-up/plugin-development/threading-and-abi#versions).
 
 ## Exports
 
@@ -35,7 +41,7 @@ Called right after the library is opened, before anything else. It must not call
 ```c
 typedef struct ru_plugin_info {
   uint32_t struct_size;  /* sizeof(ru_plugin_info) */
-  uint32_t api_version;  /* READYUP_PLUGIN_API_VERSION you built against */
+  uint32_t api_version;  /* READYUP_PLUGIN_API_VERSION you need */
   const char* name;      /* file name without ".so", [a-z0-9_-] */
   const char* version;
   const char* author;
@@ -51,7 +57,7 @@ The core refuses the plugin if `name` does not match the file name, if the API m
 int readyup_plugin_load(const ru_api* api, uint32_t core_api_version);
 ```
 
-Runs on the game thread. Register your commands, ticks and event subscriptions here. Keep the `api` pointer: it stays valid until unload returns.
+Runs on the game thread. Register your commands, ticks and subscriptions here. Keep the `api` pointer: it stays valid until unload returns.
 
 Return `0` on success. Any other value aborts the load. The core then removes what you already registered and closes the library.
 
@@ -61,7 +67,7 @@ Return `0` on success. Any other value aborts the load. The core then removes wh
 void readyup_plugin_unload(void);
 ```
 
-Runs on the game thread, when none of your code is running. Stop and join your threads and free your memory. The core removes all your registrations afterwards, whether or not you removed them yourself.
+Runs on the game thread, when none of your code is running. Stop and join your threads, and free your memory. The core removes all your registrations afterwards, whether or not you removed them yourself.
 
 ## ru_api
 
@@ -69,62 +75,29 @@ The core passes this table to `readyup_plugin_load`. Every function takes `api->
 
 | Member | Type |
 | --- | --- |
-| `struct_size` | `uint32_t`. Check it with `RU_API_HAS` before you use a member added after 1.0. |
+| `struct_size` | `uint32_t`. `RU_API_HAS` uses it. |
 | `api_version` | `uint32_t`. The core's API version. |
 | `core_version` | `const char*`. The core's build, for example `"0.9.0 (abc1234)"`. |
 | `self` | `ru_plugin*`. Your plugin's handle. Pass it to every call. |
 
-Unless noted, call these functions only from the game thread. From a callback you always are.
+Call these functions only from the game thread, unless the table says "any thread". From a callback you always are on the game thread.
 
-### log
+### 1.0: basics
 
-```c
-void (*log)(ru_plugin* self, int level, const char* msg);
-```
-
-Writes one line to the server console as `plugin[<name>]: <msg>`. `level` is an `ru_log_level`. `RU_LOG_DEBUG` lines only show with `debug=1` in `readyup.cfg`. A trailing newline is optional. Safe from any thread.
-
-`ru_logf(api, level, fmt, ...)` is a printf-style helper in the header. It formats into a 1024-byte buffer.
-
-### server_command
-
-```c
-int (*server_command)(ru_plugin* self, const char* cmd);
-```
-
-Queues a server console command, for example `"mp_restartgame 1"`. Returns `1` if queued, `0` if the command buffer is not available yet.
-
-### chat_all
-
-```c
-int (*chat_all)(ru_plugin* self, const char* msg, uint32_t flags);
-```
-
-Sends a chat message to everyone, with the Ready Up chat prefix. Pass `RU_CHAT_RAW` in `flags` to leave the prefix out. Returns `1` if sent.
-
-### chat_to_slot
-
-```c
-int (*chat_to_slot)(ru_plugin* self, int slot, const char* msg);
-```
-
-Sends a chat message to one player slot. No prefix is added. Returns `0` if the slot is unknown or single-player chat is not available.
-
-### register_chat_command
-
-```c
-ru_handle (*register_chat_command)(ru_plugin* self, const char* name, ru_command_fn fn, void* user);
-```
-
-Registers a chat command such as `".hello"`. The name must start with `.` or `!`, followed by `[a-z0-9_-]`. It must not be a core command (`.ru`, `.r`, `.pause` and the others) or a command another plugin owns. Only real players trigger chat commands, not bots. Returns `0` on failure. The reason is logged.
-
-### register_console_command
-
-```c
-ru_handle (*register_console_command)(ru_plugin* self, const char* name, ru_command_fn fn, void* user);
-```
-
-Registers a server console and RCON command, a single token such as `"hello_status"`. `ru` and every core command are reserved and always win. Returns `0` on failure.
+| Function | What it does |
+| --- | --- |
+| `log(self, level, msg)` | Any thread. One line to the console as `plugin[<name>]: <msg>`. `RU_LOG_DEBUG` lines only show with `debug=1`. `ru_logf(api, level, fmt, ...)` is a printf-style helper. |
+| `server_command(self, cmd)` | Queue a console command, for example `"mp_restartgame 1"`. `1` = queued. |
+| `chat_all(self, msg, flags)` | Chat to everyone, with the Ready Up prefix. `RU_CHAT_RAW` leaves the prefix out. |
+| `chat_to_slot(self, slot, msg)` | Chat to one player slot. No prefix. |
+| `register_chat_command(self, name, fn, user)` | A chat command such as `".hello"`. Must start with `.` or `!`, then `[a-z0-9_-]`. Must not be taken by the core or another plugin. Only real players trigger it. `0` on failure; the reason is logged. |
+| `register_console_command(self, name, fn, user)` | A console and RCON command, one token such as `"hello_status"`. `ru` and core commands are reserved. |
+| `on_tick(self, fn, user)` | `fn` once per simulating server frame. |
+| `subscribe(self, type, fn, user)` | Lifecycle events of one type, or all with `RU_EVENT_ANY`. See [Events](#events). |
+| `unregister(self, handle)` | Remove any registration. Safe from inside that same callback. |
+| `post_to_game_thread(self, fn, user)` | Any thread. Run `fn(user)` on the game thread at the next frame. Dropped if the plugin unloads first. |
+| `slot_for_steamid(self, steamid64)` | Slot of a connected player, or `-1`. |
+| `data_dir(self)` | Your data folder: `csgo/readyup/plugins/<name>/`, as an absolute path. |
 
 Both command callbacks get an `ru_command_ctx`:
 
@@ -139,71 +112,74 @@ typedef struct ru_command_ctx {
   int argc;                 /* argv[0] is the command itself */
   const char* const* argv;
 } ru_command_ctx;
-
-typedef void (*ru_command_fn)(void* user, const ru_command_ctx* ctx);
 ```
 
-### on_tick
+Tick callbacks get an `ru_tick_info`: `frame` (simulating frames since start), `now` (monotonic seconds) and, since 1.2, `simulating`.
 
-```c
-ru_handle (*on_tick)(ru_plugin* self, ru_tick_fn fn, void* user);
-```
+### 1.1: output and players
 
-Calls `fn` once per simulating server frame, after the core's own frame work.
+| Function | What it does |
+| --- | --- |
+| `center_html_to_slot(self, slot, html, seconds)` | A center-screen HTML panel to one player. Never a broadcast. |
+| `center_html_all(self, html, seconds)` | The same panel to every connected human, one at a time. Returns how many got it. |
+| `get_player(self, slot, out)` | The connected player in a slot. |
+| `get_player_by_steamid(self, steamid64, out)` | The connected human with this Steam64 ID. |
+| `for_each_player(self, fn, user)` | Every connected human, then every known bot. Return `0` from `fn` to stop. |
 
-```c
-typedef struct ru_tick_info {
-  uint32_t struct_size;
-  uint64_t frame;  /* simulating frames seen since the process started */
-  double now;      /* monotonic seconds */
-} ru_tick_info;
+You own the `ru_player` struct. Set `struct_size` before you pass it in. It has `slot`, `steamid64` (`0` for bots), `team`, `is_bot`, `connected`, `name[128]`, and since 1.2 `userid` (the `<N>` in log lines, which `kickid` takes).
 
-typedef void (*ru_tick_fn)(void* user, const ru_tick_info* tick);
-```
+### 1.1: engine events and log lines
 
-### subscribe
+| Function | What it does |
+| --- | --- |
+| `subscribe_game_event(self, name, fn, user)` | An engine game event by name, such as `"player_death"`. Delivered at once, on the game thread, while the engine dispatches it. Keep the callback short and never keep `ev`. |
+| `ev_get_int`, `ev_get_float`, `ev_get_uint64`, `ev_get_string` | Read a key from the event, with a default. |
+| `ev_get_player_slot`, `ev_get_player_controller`, `ev_get_player_pawn` | The player behind a key such as `"userid"` or `"attacker"`. Pointers are valid for this frame only. |
+| `subscribe_log_line(self, fn, user)` | Every server log line, queued. The core's own output is filtered out. |
 
-```c
-ru_handle (*subscribe)(ru_plugin* self, uint32_t type, ru_event_fn fn, void* user);
-```
+### 1.1: schema and entities
 
-Subscribes to one lifecycle event type, or to all with `RU_EVENT_ANY`. See [Events](#events).
+| Function | What it does |
+| --- | --- |
+| `schema_offset(self, class, field)` | Byte offset of a networked field, looked up by name, for example `("CCSPlayerPawn", "m_EconGloves")`. `-1` if unknown. Never hard-code offsets. |
+| `entity_system_status(self)` | `RU_ENTSYS_PENDING`, `_OK` or `_FAILED`. Until OK, every lookup below returns NULL. |
+| `entity_by_index`, `entity_from_handle`, `entity_handle_of` | Find entities. Keep handles across frames, never pointers. |
+| `entity_classname(self, entity)` | For example `"weapon_ak47"`. |
+| `entity_mark_changed(self, entity)` | Send the whole entity again, for fields written after its first snapshot. |
+| `econ_attr_set_by_name`, `entity_change_subclass`, `entity_set_model`, `entity_set_bodygroup_by_name` | Item attributes, knife subclass, model and bodygroup. These need `engine-surface.skins.json`. Without it they return `0`. |
 
-### unregister
+### 1.1: round control, admins, config
 
-```c
-int (*unregister)(ru_plugin* self, ru_handle handle);
-```
+| Function | What it does |
+| --- | --- |
+| `set_round_termination_suppressed(self, on)` | Keep rounds from ending, for warmup and practice. There is no function to force a round end. |
+| `set_chat_name_prefix(self, steamid64, prefix)` | A chat prefix for one player, such as `[CAP]`. NULL or `""` clears it. Removed on unload. |
+| `is_admin(self, steamid64)` | Any thread, may block. Asks the admin provider first, then the core. |
+| `set_admin_provider(self, fn, user)` | Decide who is an admin. One provider at a time. `fn` returns `1`, `0`, or `-1` for "no opinion". It can run on any thread. The match plugin registers one. |
+| `config_get(self, key, buf, len)` | A setting from `cfg/ReadyUp/<plugin>.cfg`, then from the `[<plugin>]` section of `readyup.cfg`. Returns the length, or `-1` if the key is not set. |
+| `debug_enabled(self)` | Any thread. `debug=1`. |
+| `config_dir(self)` | Any thread. The folder that holds `readyup.cfg`. |
 
-Removes a command, tick or subscription. Safe to call from inside that same callback. Returns `1` if removed.
+### 1.1: between plugins, and across reloads
 
-### post_to_game_thread
+| Function | What it does |
+| --- | --- |
+| `provide_interface(self, name, version, iface)` | Publish a struct of function pointers under a name such as `"readyup.match.v1"`. One provider per name. Removed on unload. |
+| `get_interface(self, name, min_version)` | Look one up. NULL if missing or too old. Valid only until your callback returns: look it up again in every callback, because the provider can reload. |
+| `stash_put(self, key, data, len)` | Keep up to 1 MiB of bytes in core memory until the next load of the same plugin. `len 0` deletes it. Not written to disk. |
+| `stash_get(self, key, buf, cap)` | Read it back. Returns the full size, or `-1`. |
 
-```c
-int (*post_to_game_thread)(ru_plugin* self, ru_task_fn fn, void* user);
-```
+### 1.2
 
-Runs `fn(user)` on the game thread at the next server frame. Safe from any thread. Use it to hand results from your own worker threads back to the game thread. If the plugin unloads first, the task is dropped and never runs.
-
-```c
-typedef void (*ru_task_fn)(void* user);
-```
-
-### slot_for_steamid
-
-```c
-int (*slot_for_steamid)(ru_plugin* self, uint64_t steamid64);
-```
-
-Returns the player slot of a connected player, or `-1`.
-
-### data_dir
-
-```c
-const char* (*data_dir)(ru_plugin* self);
-```
-
-Returns the folder for your plugin's data and config files: `csgo/readyup/plugins/<name>/`, as an absolute path.
+| Function | What it does |
+| --- | --- |
+| `log_untagged(self, level, msg)` | Any thread. Like `log`, but the line reads `[ReadyUp] <msg>`, without the plugin tag. For log formats tools already parse. |
+| `register_chat_command_ex(self, name, flags, fn, user)` | With `RU_CMD_HIDE`, the sender's line is not shown in chat. Best effort: it needs the ClientCommand hook. |
+| `register_console_command_ex(self, name, flags, fn, user)` | With `RU_CMD_OBSERVE`, the engine still runs the command and you only watch it, for example `tv_delay`. Observers never conflict. |
+| `register_ru_subcommand(self, name, fn, user)` | `ru <name>` in the console and `.ru <name>` in chat both call `fn`. `argv[0]` is `ru` or `.ru`. The core's own subcommands are reserved. Chat senders are not checked: call `is_admin` yourself. |
+| `on_frame(self, fn, user)` | Every server frame, simulating or not. For timers that must run during a map change or on an empty server. |
+| `feature_state(self, name)` | `1` on, `0` pending, `-1` off, for a core feature (`knife`, `ready_hud`, ...), an engine dependency (`fn:<name>`, `cmdbuf`, `eventmgr`, ...), or `events_live`. The same names `ru selftest` shows. |
+| `current_map(self)` | The current map, or `""` before the first map. |
 
 ## Handles
 
@@ -215,7 +191,7 @@ Each registration returns a handle. It is unique for the life of the server proc
 
 ## Events
 
-The core turns engine game events and server log lines into one set of lifecycle events. Once its engine event listener is up, events come from the engine. Before that, they come from log lines. `source` says which. The core picks one source for each fact, so you do not get the same round or player change twice. The one exception is around the moment the engine listener comes up at boot.
+The core turns engine game events and server log lines into one set of lifecycle events. Once its engine event listener is up, events come from the engine. Before that, they come from log lines. `source` says which. The core picks one source for each fact, so you do not get the same round or player change twice.
 
 | Type | Value | Fields set |
 | --- | --- | --- |
@@ -228,65 +204,66 @@ The core turns engine game events and server log lines into one set of lifecycle
 | `RU_EVENT_PLAYER_DISCONNECT` | 6 | `slot`, `steamid64`, `name`, `reason` |
 | `RU_EVENT_PLAYER_TEAM` | 7 | `slot`, `steamid64`, `name`, `team`, `old_team` |
 
-Every event also has `map`, the current map.
-
-```c
-typedef struct ru_event {
-  uint32_t struct_size;
-  uint32_t type;        /* ru_event_type */
-  uint32_t source;      /* RU_SOURCE_ENGINE (0) or RU_SOURCE_LOG (1) */
-  int slot;             /* -1 if not known */
-  uint64_t steamid64;
-  const char* name;     /* "" if none */
-  const char* map;      /* "" if not known */
-  int team;
-  int old_team;
-  int winner;           /* ru_team, 0 if not known */
-  int reason;
-  int round;
-  int team_ct_score;    /* -1 if not known */
-  int team_t_score;     /* -1 if not known */
-} ru_event;
-
-typedef void (*ru_event_fn)(void* user, const ru_event* ev);
-```
+Every event also has `map`, the current map. Unknown numbers are `-1` (`slot`, scores) or `0` (`winner`).
 
 ## Enums
 
 ```c
 typedef enum ru_log_level {
-  RU_LOG_INFO = 0,
-  RU_LOG_WARN = 1,
-  RU_LOG_ERROR = 2,
+  RU_LOG_INFO = 0, RU_LOG_WARN = 1, RU_LOG_ERROR = 2,
   RU_LOG_DEBUG = 3   /* only with debug=1 */
 } ru_log_level;
 
 typedef enum ru_team {
-  RU_TEAM_UNASSIGNED = 0,
-  RU_TEAM_SPECTATOR = 1,
-  RU_TEAM_T = 2,
-  RU_TEAM_CT = 3
+  RU_TEAM_UNASSIGNED = 0, RU_TEAM_SPECTATOR = 1, RU_TEAM_T = 2, RU_TEAM_CT = 3
 } ru_team;
 
-enum { RU_CHAT_RAW = 1u << 0 };  /* chat_all: no Ready Up prefix */
+enum { RU_CHAT_RAW = 1u << 0 };                         /* chat_all: no prefix */
+enum { RU_CMD_HIDE = 1u << 0, RU_CMD_OBSERVE = 1u << 1 }; /* *_command_ex flags */
 ```
 
-## Planned for 1.1
+## Interfaces
 
-These will be added to the end of `ru_api`. The core already has the code for each. The work is to expose it. They are needed to move match and skins out of the core.
+Plugins publish interfaces with `provide_interface`, and others find them with `get_interface`. Each interface is a C struct of function pointers that starts with `struct_size`. Members are only ever added at the end. Check `struct_size` before you use a member, and look the interface up again in every callback.
 
-| Group | Functions |
+### readyup.match.v1
+
+`core/include/readyup/match_iface.h`. Published by `match.so`. The core reads it to fill the match part of `/status`.
+
+| Member | What it does |
 | --- | --- |
-| Center HTML | `center_html_to_slot`, `center_html_all` |
-| Players | `get_player`, `for_each_player` (slot, SteamID, name, team, bot, connected) |
-| Raw engine events | `subscribe_game_event("player_death", fn)` with `ev_get_int`, `ev_get_float`, `ev_get_uint64`, `ev_get_string`, `ev_get_player_slot`. Delivered at once, on the game thread. |
-| Log lines | `subscribe_log_line` |
-| Schema and entities | `schema_offset`, `entity_by_index`, `entity_from_handle`, `entity_handle_of`, `entity_classname`, `entity_mark_changed`, `econ_attr_set_by_name`, `entity_change_subclass`, `entity_set_model`, `entity_set_bodygroup_by_name` |
-| Match control | `terminate_round`, `set_chat_name_prefix` |
-| Admins | `is_admin`, `set_admin_provider` |
-| Config | `config_get`: reads `cfg/ReadyUp/<plugin>.cfg`, then the `[plugin]` section of `readyup.cfg` |
-| Chat | an `RU_CMD_HIDE` flag to hide a command from chat |
-| Plugin to plugin | `provide_interface`, `get_interface`. The match plugin will publish `readyup.match.v1` (mode, roster, ready state). |
-| State across reloads | `stash_put`, `stash_get`: keep a block of bytes in the core between an unload and the next load. |
+| `get_status(out)` | Fills `ru_match_status`: `update_safe`, `summary_json` (the flat `/status` summary), `state_json` (the match state, or NULL when nothing is loaded) and `ru_mode`. |
 
-Names and signatures can still change until 1.1 ships. Use `RU_API_HAS(api, member)` before you call any of them.
+Without match.so, `/status` shows `"match_plugin": "none"` and `update_safe: true`.
+
+### readyup.fleet.v1
+
+`core/include/readyup/fleet_iface.h`. Published by `fleet.so`. The core reads `get_status` for `/status`. The match and skins plugins use the rest.
+
+| Member | Thread | What it does |
+| --- | --- | --- |
+| `get_status(out)` | any | Link state, server ID, reconnects, spool size, the offline auto-pause countdown. Returns `0` when standalone. |
+| `instance_id()` | any | Random per load of fleet.so. When it changes, fleet.so was reloaded and your handlers are gone. Register them again. |
+| `connection_state()` | any | An `ru_fleet_link_state`: standalone, unenrolled, enrolling, connecting, online, offline, rejected. |
+| `send_event(type, json, epoch, flags)` | any | Queue a message to the platform. `RU_FLEET_RELIABLE` spools it to disk until the platform acks it. Never blocks. |
+| `send_reply(type, json, epoch, flags, ref)` | any | The same, as an answer to message `ref`. |
+| `send_snapshot(reason, extra_json)` | any | Send the full match state now. Only while online. |
+| `register_handler(type, fn, user)` | game | Receive platform messages of one type, or `"*"` for all. You must unregister in your own unload. |
+| `unregister_handler(id)` | game | Remove a handler. |
+| `publish_state(json, availability)` | any | The current match state and availability, used in `hello` and snapshots. |
+| `add_capability(name)` | game | Tell the platform what this server can do, for example `match.v1` or `skins.v1`. |
+
+Handlers also get two local messages that never go over the wire: `local.connection` (the link went up or down) and `local.offline_timeout` (the offline auto-pause time was reached).
+
+### Selftest lines
+
+`core/include/readyup/selftest_iface.h`. A plugin adds its own lines to `ru selftest` by publishing `readyup.selftest.<its name>`:
+
+```c
+typedef struct ru_selftest_iface_v1 {
+  uint32_t struct_size;
+  void (*run)(ru_selftest_add_fn add, void* ctx);
+} ru_selftest_iface_v1;
+```
+
+`run` calls `add(ctx, status, name, detail)` once per check. `status` is `OK`, `FAIL`, `PEND`, `SKIP`, `INFO` or `WARN`. `run` can be called from any thread, even while the plugin unloads. It must be fast, must not block, and must not call any API member except `log`.

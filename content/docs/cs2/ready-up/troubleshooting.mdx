@@ -9,18 +9,19 @@ When you ask for help or open an [issue](https://github.com/Auto-Tournament/read
 - the CS2 version (`version` in the server console),
 - the Ready Up build (`ru` in the server console),
 - the output of `ru selftest`,
+- the output of `ru plugin list`,
 - the relevant part of the server console log.
 
-Ready Up does not write passwords from `readyup_db.json` to the log.
+Ready Up does not write tokens or passwords to the log.
 
 ## ru selftest
 
-Run `ru selftest` in the server console. Admins can type `.ru selftest` in chat: the result goes to chat, the full report to the console.
+Run `ru selftest` in the server console. Admins can type `.ru selftest` in chat: the result goes to chat, the full report to the console. The last report is also at `/selftest` on the [status endpoint](/cs2/ready-up/fleet#status-endpoint).
 
 The first line names the Ready Up build, the CS2 version and build ID, and the CS2 version the engine surface was made for:
 
 ```text
-selftest: Ready Up 0.1.0 (abc1234) on CS2 1.41.8.3 (build 25492732); engine-surface for 1.41.8.3
+selftest: Ready Up 0.1.0 (abc1234) on CS2 1.41.8.4 (build 25515854); engine-surface for 1.41.8.4
 ```
 
 Then come these sections:
@@ -32,10 +33,9 @@ Then come these sections:
 | `[vtable slots]` | The virtual functions Ready Up patches or calls. |
 | `[struct layouts]` | Struct offsets, such as the command argument layout. |
 | `[schema]` | Every game field Ready Up reads, with its offset. |
-| `[runtime]` | The live hooks (GameFrame, ClientCommand, command buffer, log listener), engine events, the entity system, the database and chat output. |
+| `[runtime]` | The live hooks (GameFrame, ClientCommand, command buffer, log listener), engine events, the entity system and chat output. |
 | `[funchook detour sites (hookcheck)]` | Whether each detour is installed, or could still be installed. |
-| `[plugins]` | The plugin API version, the plugins folder, loaded plugins and load errors. |
-| `[hud]` | The ready panel, and the `hud_brand` / `hud_logo_url` header. |
+| `[plugins]` | The plugin API version, the plugins folder, loaded plugins, load errors, and the plugins' own checks (for example the ready panel header, the fleet link, skins). |
 | `[features]` | Each feature: `on`, `OFF` or `pending`, what it needs, and what is missing. |
 
 Each check line starts with a status:
@@ -44,7 +44,7 @@ Each check line starts with a status:
 | --- | --- |
 | `OK` | Works. |
 | `FAIL` | Broken. Counts against the result. |
-| `PEND` | Not known yet. For example the entity system before the first map, or the database while it connects. Run the selftest again after a map has loaded. |
+| `PEND` | Not known yet. For example the entity system before the first map. Run the selftest again after a map has loaded. |
 | `WARN`, `INFO`, `SKIP` | Information only. |
 
 The last line is the result:
@@ -77,9 +77,8 @@ feature ready_hud DISABLED: needs fn:LegacyGameEventListener. Everything else ke
 | `events` | Engine game events: round lifecycle and stats. Without them, Ready Up reads the server log instead. |
 | `ready_hud`, `welcome_html`, `hud_brand` | The ready panel, the welcome card and their header. |
 | `round_term_suppression` | Keeps rounds from ending during warmup and practice. |
-| `client_command_hook` | Team joins, the admin and captain chat prefix. |
+| `client_command_hook` | Team joins, hidden chat commands, the admin and captain chat prefix. |
 | `player_chat_print` | Chat to a single player. |
-| `skins`, `skins_bodygroups` | Skins, and gloves and legacy weapon models. |
 | `plugins` | The plugin host. |
 
 ### Selftest in CI
@@ -112,7 +111,7 @@ Include the crash log when you report a crash.
 
 There is no Ready Up banner in the console, and `ru` gives `Unknown command`.
 
-- Check `gameinfo.gi`. `Game csgo/readyup` must be above `Game csgo`. A CS2 update rewrites the file, so run the patcher again. See [After a CS2 update](/cs2/ready-up/install#after-a-cs2-update).
+- Check `gameinfo.gi`. `Game csgo/readyup` must be above `Game csgo`. A CS2 update rewrites the file, so run the installer or the patcher again. See [After a CS2 update](/cs2/ready-up/install#after-a-cs2-update).
 - Check that `game/csgo/readyup/bin/linuxsteamrt64/libserver.so` exists, not one folder deeper.
 - If you have `gameinfo_branchspecific.gi`, patch it too.
 - With Metamod: Metamod's line must be first and Ready Up's directly below. See [Metamod](/cs2/ready-up/install#metamod).
@@ -120,6 +119,16 @@ There is no Ready Up banner in the console, and `ru` gives `Unknown command`.
 ### Ready Up turned itself off
 
 The log says Ready Up is disabled, and `ru selftest` has `FAIL readyup enabled`. A function Ready Up cannot run without was not found, usually after a CS2 update. The server runs as plain CS2. Check [GitHub](https://github.com/Auto-Tournament/ready-up/issues) for a `cs2-update` issue and wait for a fixed `engine-surface.json` or a new build.
+
+### ru works, but .r and the other commands do nothing
+
+The match flow is a plugin. Run `ru plugin list`. If `match` is missing:
+
+- check that `game/csgo/readyup/plugins/match.so` exists, or install the `match` component,
+- check the console for lines that start with `plugin:`, and `ru selftest` under `[plugins]` for load errors,
+- check that `READYUP_PLUGINS=0` is not set.
+
+`ru plugin load match` loads it without a restart.
 
 ### Chat commands do nothing
 
@@ -129,17 +138,22 @@ The log says Ready Up is disabled, and `ru selftest` has `FAIL readyup enabled`.
 
 ### Nobody is admin
 
-Add the first admin from the server console: `ru admins add <steamid64>`. This needs `readyup_db.json`.
+Add the first admin from the server console: `ru admins add <steamid64>`. In fleet mode, add admins on the platform instead.
+
+### admins.json or loadouts.json was ignored
+
+Look for a `<name>.corrupt-<time>` file next to it, and a line in the console. Ready Up moves a file aside when it is not valid JSON, has no `"version"`, or has a newer version than it knows. Fix the file and put it back under its normal name.
 
 ### The ready panel does not show
 
 - `ready_hud=1` in `readyup.cfg`.
 - `ready_hud` is `on` in `ru selftest`. If it is `OFF`, a CS2 update broke a function it needs. Chat reminders are used instead.
+- `ru_warmup_enable` is `1`. With `0`, loaded matches have no ready-up at all.
 - Do not add `mp_warmup_start` to your configs. CS2's WARMUP text covers the panel.
 
 ### The panel blinks
 
-Set `hud_tick_ms=0`, `hud_resend_ms=0` and `hud_duration_s=1`, then `ru reload`. Do not put an image in a panel that is resent every frame.
+Set `hud_tick_ms=0`, `hud_resend_ms=0` and `hud_duration_s=1`. Do not put an image in a panel that is resent every frame.
 
 ### Commands queued for later never run
 
@@ -154,10 +168,19 @@ Ready Up does its work in server frames. An empty server that hibernates runs no
    ```
 
 2. Run `ru_webhook_url` and `ru_match_token` without a value in the console. Both must be set.
-3. Events are only sent while a match is loaded.
+3. Events are only sent while a match is loaded. Scrims are not sent.
 
-### Database errors
+### The fleet link does not connect
 
-- `ru selftest` shows the database under `[runtime]`.
-- Check the host, port, name, user and password in `readyup_db.json`.
-- Test the connection from the CS2 machine with `psql`.
+- `ru fleet status` shows the state and the last error.
+- `standalone`: there is no `url` in `[fleet]` and no `credentials.json`. See [Enroll a server](/cs2/ready-up/fleet#enroll-a-server).
+- `rejected`: the platform refused the code, key or token. A code works once and runs out after 15 minutes. Get a new one and run `ru fleet enroll`.
+- `offline`: the platform cannot be reached. Check the URL, DNS and the certificate. Ready Up only uses `https://` and `wss://` unless `insecure_dev=1`.
+- Check that `game/csgo/readyup/plugins/fleet.so` exists and `ru plugin list` shows `fleet`.
+
+### The status endpoint does not answer
+
+- `ru status_http` shows the address and port.
+- The default port is the game port + 7. Another server on the same machine may already use it. Set `status_http_port`.
+- With a non-loopback `status_http_bind`, a token of 16 characters or more is required, or the endpoint does not start.
+- From another machine, send the token from `status.json`.

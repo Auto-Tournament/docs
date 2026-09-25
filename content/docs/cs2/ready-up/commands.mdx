@@ -10,7 +10,9 @@ icon: SquareTerminal
 
 Chat commands start with a dot, for example `.r`. Admin commands in chat start with `.ru`. In the server console and over RCON, the same commands start with `ru` and no dot, for example `ru start`.
 
-Type `ru` or `ru help` in the server console for the full list. In chat, `.ru help` shows a short list, and `.ru` alone shows the version.
+Type `ru` or `ru help` in the server console for the full list. It shows the core's commands, then every command the loaded plugins add. In chat, `.ru help` shows a short list.
+
+Most commands on this page come from the match plugin. Without `match.so`, only the core commands work.
 
 ## Player commands
 
@@ -19,7 +21,7 @@ Type `ru` or `ru help` in the server console for the full list. In chat, `.ru he
 | `.r`, `.ready` | Mark yourself ready. Typing it again does not unready you. |
 | `.ur`, `.unready`, `.nr`, `.notready` | Mark yourself not ready. |
 | `.pause`, `.p` | Pause the match. |
-| `.tech` | The same as `.pause` for now. |
+| `.tech` | Pause the match, marked as a technical pause. |
 | `.unpause`, `.up` | Ask to unpause. Both teams must type it. |
 | `.stay`, `.switch`, `.swap` | After the knife round: keep your side, or switch. Any player on the winning team can pick. |
 | `.ct`, `.t` | After the knife round: pick a side. |
@@ -32,6 +34,8 @@ Type `ru` or `ru help` in the server console for the full list. In chat, `.ru he
 With no match loaded, only the ready commands work. The others say they need a live match. You must be on CT or T to ready up.
 
 With a match loaded, only players on the match roster can use these commands.
+
+There are no pause limits yet. Pause types with limits (`.tac`, `.tech`) are coming.
 
 ### Practice
 
@@ -46,7 +50,7 @@ These only work in practice mode.
 
 ## Admin commands
 
-Admin commands need admin rights, see [Who is an admin](#who-is-an-admin). Anyone else who types one gets `not authorized`.
+Admin commands need admin rights. See [Who is an admin](#who-is-an-admin). Anyone else who types one gets `not authorized`.
 
 | Command | What it does |
 | --- | --- |
@@ -61,54 +65,84 @@ Admin commands need admin rights, see [Who is an admin](#who-is-an-admin). Anyon
 | `.ru idle` | Go idle. Clears any loaded match. Scrim warmup stays off until `.ru scrim` or the next map. |
 | `.ru scrim` | Turn scrim warmup back on after `.ru idle`. |
 | `.ru reload` | Load `readyup.cfg` again. |
-| `.ru admins add <steamid64\|name>` | Add an admin. A name is a part of the name of a connected player. |
-| `.ru admins remove <steamid64\|name>` | Remove an admin. |
+| `.ru admins add <steamid64\|name>` | Add an admin. A name is a part of the name of a connected player. Not in fleet mode. |
+| `.ru admins remove <steamid64\|name>` | Remove an admin. Not in fleet mode. |
 | `.ru selftest` | Run the selftest. The full report goes to the server console, the result and the first failures go to chat. |
 | `.ru hudtest <1-7>` | Show a test panel to yourself for 10 seconds. `1` fonts, `2` images, `3` unicode, `4` SVG, `5` PNG, `6` another PNG, `7` your `hud_brand` header. |
 | `.ru plugin list` | List loaded plugins. |
 | `.ru plugin load\|unload\|reload <name>` | Load, unload or reload a plugin. See [Plugin development](/cs2/ready-up/plugin-development/getting-started#hot-reload). |
 | `.ru version` | Show the version. |
+| `.fleet status`, `.fleet reconnect` | Fleet link status, or reconnect now. `.ru fleet ...` does the same. See [Fleet mode](/cs2/ready-up/fleet). |
+
+`ru match load` only works from the console or RCON, not from chat.
+
+`.ru <name>` also reaches a plugin's chat command `.<name>`, so `.ru fleet status` runs `.fleet status`.
 
 ## Who is an admin
 
 A player is an admin if one of these is true:
 
-- The Steam64 ID is in the `admins` list of the loaded match config. Auto Tournament fills this in.
+- The Steam64 ID is in the `admins` list of the loaded match config.
 - The Steam64 ID is in the admin list that Auto Tournament serves at `ru_admins_url`.
-- The Steam64 ID is in the `readyup_admins` table in Postgres (`.ru admins add`).
+- Standalone: the Steam64 ID is in `admins.json` (`.ru admins add`).
+- Fleet mode: the Steam64 ID is in the platform's admin list. `admins.json` is not used.
 
 The server console and RCON are always allowed.
 
-The first admin in the database must be added from the server console, because no one in chat has rights yet:
+### admins.json
+
+`game/csgo/readyup/plugins/match/admins.json`:
+
+```json
+{
+  "version": 1,
+  "admins": [
+    { "steamid64": "76561198000000000", "name": "alice" }
+  ]
+}
+```
+
+`ru admins add` and `remove` write it for you. You can also edit it by hand. Ready Up reads it again within 30 seconds after it changes. Write it in one step: to a temp file, then rename it. A file that is not valid JSON, or has no `"version"`, is moved to `admins.json.corrupt-<time>`, and Ready Up starts with no admins from the file.
+
+The first admin must be added from the server console (or in the file), because no one in chat has rights yet:
 
 ```text
 ru admins add 76561198000000000
 ```
 
+Each server has its own file. To share admins between servers, copy the file, point them at the same `ru_admins_url`, or use [fleet mode](/cs2/ready-up/fleet).
+
+In fleet mode, `ru admins` shows the platform's list, and `add` and `remove` answer `Admins are managed on the platform`.
+
 ## Console and RCON commands
 
 Run these in the server console or over RCON.
 
-### General
+### Core
+
+These work without any plugin.
 
 | Command | What it does |
 | --- | --- |
 | `ru`, `ru help` | Show the build and all commands. |
-| `ru selftest` | Check the engine surface, hooks, schema, events, database, plugins and features. Ends with `PASS` or `FAIL`. See [Troubleshooting](/cs2/ready-up/troubleshooting#ru-selftest). |
-| `ru sigtest` | Check only the engine functions. Prints `OK`, `WARN` or `FAIL` for each. |
-| `ru state`, `ru status` | Show the mode, roster, ready players and flags. |
+| `ru version` | Show the version. |
 | `ru reload` | Load `readyup.cfg` again. |
-| `ru admins`, `ru admins add\|remove <steamid64\|name>` | List, add or remove admins. |
-| `ru plugin list`, `ru plugin load\|unload\|reload <name>` | Manage plugins. |
+| `ru selftest` | Check the engine surface, hooks, schema, events, plugins and features. Ends with `PASS` or `FAIL`. See [Troubleshooting](/cs2/ready-up/troubleshooting#ru-selftest). |
+| `ru sigtest` | Check only the engine functions. Prints `OK`, `WARN` or `FAIL` for each. |
+| `ru status_http` | The address of the status endpoint, a token hint and counters. |
+| `ru plugin list` | List loaded plugins and the API version. |
+| `ru plugin load\|unload\|reload <name>` | Load, unload or reload `readyup/plugins/<name>.so`. |
 
 ### Modes
 
 | Command | What it does |
 | --- | --- |
+| `ru state`, `ru status` | Show the mode, roster, ready players and flags. |
 | `ru mode` | Show the current mode. |
 | `ru mode idle`, `ru idle` | Go idle. Same as `.ru idle`. |
 | `ru mode practice`, `ru practice` | Turn practice mode on. |
 | `ru scrim` | Turn scrim warmup back on. |
+| `ru admins`, `ru admins add\|remove <steamid64\|name>` | List, add or remove admins. |
 
 ### Matches
 
@@ -120,10 +154,11 @@ Run these in the server console or over RCON.
 | `ru end` | End the match with no winner and reset the server. |
 | `ru side stay\|switch\|ct\|t` | Pick the side after the knife round. |
 | `ru recover [round]` | Ask Auto Tournament to restore the match. |
+| `ru_match_stats` | Print the current map's stats as one JSON line. |
 
 ### Auto Tournament
 
-Auto Tournament sets these for you. Run a command without a value to see the current value. Ready Up saves them in Postgres, if there is one, so they survive a restart.
+Auto Tournament sets these for you over RCON. Run a command without a value to see the current value. Ready Up saves them in `match/state.json`, so they survive a restart.
 
 | Command | What it does |
 | --- | --- |
@@ -133,9 +168,26 @@ Auto Tournament sets these for you. Run a command without a value to see the cur
 | `ru_admins_url <url>`, `ru_admins_url clear` | URL of the admin list. |
 | `ru_admins_refresh_seconds <seconds>` | How often to fetch the admin list again: `0` (never) or `10` to `3600`. |
 
-<Callout title="Planned" type="info">
-  A full set of `ru_` commands that mirror the `at_` commands of Auto Tournament CS2 is planned. Auto Tournament can then control both plugins the same way. Until then, only the commands on this page exist.
-</Callout>
+In [fleet mode](/cs2/ready-up/fleet), none of these are needed. The platform talks to the server over one WebSocket.
+
+### Demos and series end
+
+Ready Up records a GOTV demo when a map goes live. These settings are kept across `ru plugin reload match`, but not across a server restart.
+
+| Command | Default | What it does |
+| --- | --- | --- |
+| `ru_demo_recording_enabled 0\|1` | `1` | Record demos. |
+| `ru_demo_path <dir/>` | `ReadyUp/` | Folder for demos, relative to `game/csgo/`. Must end with `/`. |
+| `ru_demo_name_format "<format>"` | `{TIME}_{MATCH_ID}_{MAP}_{TEAM1}_vs_{TEAM2}` | File name of each demo. |
+| `ru_demo_upload_url <url>\|clear` | empty | Upload each demo here after the map. Empty keeps demos on disk only. |
+| `ru_demo_upload_method POST\|PUT` | `POST` | HTTP method of the upload. |
+| `ru_demo_upload_header "<Name>" "<value>"` | none | Add or replace a header. An empty value removes it. No headers are built in. |
+| `ru_demo_upload_headers_clear` | | Remove all upload headers. |
+| `ru_demo_upload_attempts <1-10>` | `3` | Tries per upload. Network errors, 429 and 5xx are retried. |
+| `ru_demo_status` | | Show the settings, the recording and the last upload. |
+| `ru_series_end_kick_delay_no_demo <s>` | `5` | Extra seconds before players are kicked at series end, without a demo. |
+| `ru_series_end_kick_delay_demo_no_upload <s>` | `10` | The same, with a demo that is not uploaded. |
+| `ru_series_end_kick_delay_demo_upload <s>` | `60` | The same, with a demo that is uploaded. |
 
 ### Warmup
 
@@ -143,8 +195,8 @@ These change Ready Up's own warmup. They apply the next time warmup rules are se
 
 | Command | Default | What it does |
 | --- | --- | --- |
-| `ru_warmup_enable 0\|1` | `1` | Keep a loaded match in warmup until everyone is ready, and show the warmup message. With `0` there is no ready-up for matches: the match goes live on the next round start. |
-| `ru_warmup_message_html <html>` | built in | The warmup message. Takes `{ready_count}`, `{connected_count}` and `{total_count}`. `default` restores the built-in message. |
+| `ru_warmup_enable 0\|1` | `1` | The ready-up gate for loaded matches. With `0` there is no ready-up for matches: no warmup rules, no ready panel, no knife round. The match goes live on the next round start. Scrims are not affected. To hide only the panel, use `ready_hud=0`. |
+| `ru_warmup_message_html <html>` | built in | Extra line in the ready panel. Takes `{ready_count}`, `{connected_count}` and `{total_count}`. `default` restores the built-in message. |
 | `ru_warmup_respawn 0\|1` | `1` | Respawn after death. |
 | `ru_warmup_ignore_win_conditions 0\|1` | `1` | Rounds do not end. |
 | `ru_warmup_roundtime_minutes <1-120>` | `60` | Round time. |
@@ -153,5 +205,26 @@ These change Ready Up's own warmup. They apply the next time warmup rules are se
 | `ru_warmup_buy_anywhere 0\|1` | `1` | Buy anywhere. |
 | `ru_warmup_infinite_ammo 0\|1` | `1` | Infinite ammo. `1` sets `sv_infinite_ammo 2`, so players still reload. |
 | `ru_cfg_exec_enable 0\|1` | `0` | Run the `cfg/ReadyUp/*.cfg` file for every mode change. See [Configuration](/cs2/ready-up/configuration#when-the-files-run). |
+| `ru_dev_bots_scrim 0\|1\|cfg` | `cfg` | Testing only. Override `dev_bots_scrim`. `cfg` goes back to the value in `readyup.cfg`. |
 
-These values are not saved. They reset when the server restarts.
+These values are kept across `ru plugin reload match`, but not across a server restart.
+
+### Fleet
+
+These come from the fleet plugin. See [Fleet mode](/cs2/ready-up/fleet).
+
+| Command | What it does |
+| --- | --- |
+| `ru fleet status` | Link state, server ID, session and spool. `ru fleet` alone does the same. |
+| `ru fleet enroll [url] <code\|key>` | Enroll this server with the platform. Console and RCON only, never from chat. |
+| `ru fleet reconnect` | Reconnect now instead of waiting for the next try. |
+
+### Skins
+
+These come from the skins plugin. See [Skins](/cs2/ready-up/skins).
+
+| Command | What it does |
+| --- | --- |
+| `skins_status` | Show the plugin's state. |
+| `skins_refresh [steamid64]` | Load loadouts again now, for one player or everyone connected. |
+| `skins_debug_as <bot slot> <steamid64\|0>` | Testing only, needs `debug=1`: a bot uses a player's loadout. |

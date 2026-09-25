@@ -8,10 +8,6 @@ import { Step, Steps } from 'fumadocs-ui/components/steps';
 
 This page is for people who work on the core. Plugin authors do not need it: plugins never touch the engine.
 
-<Callout title="Paths are moving" type="info">
-  The core source is moving from `src/readyup/` to `core/src/`. This page names the current files. The move changes paths only, not the code.
-</Callout>
-
 ## The rule
 
 If code depends on a byte pattern, an offset, a vtable index, a struct layout, a hook or an engine interface, it belongs in the core. Everything else is policy and belongs in a plugin.
@@ -85,7 +81,7 @@ A layout, such as the `argc` and `argv` offsets of `CCommand`, is only trusted w
 
 ## Features
 
-Every feature lists the engine surface it needs in `src/readyup/features.cpp`. For example, `ready_hud` needs the GameFrame hook, `LegacyGameEventListener` and the game event manager.
+Every feature lists the engine surface it needs in `core/src/readyup/features.cpp`. For example, `ready_hud` needs the GameFrame hook, `LegacyGameEventListener` and the game event manager.
 
 - A feature is on only while all its needs are met.
 - If a need is known to be missing, the feature turns off and logs one line: `feature <name> DISABLED: needs <what>. Everything else keeps working.`
@@ -180,8 +176,16 @@ If only a struct offset moved, check `layouts` and the `mov_disp` anchors. Game 
 
 ## Skins
 
-The skins code uses its own set of functions (paints, knife subclass, models, bodygroups). They are described in `docs/skins-engine-surface.md` in the repo.
+Skins need their own engine functions (item attributes, knife subclass, models, bodygroups). The core still owns them, but their entries live in a separate file, `gamedata/engine-surface.skins.json`, that only ships with the skins package. It sits next to the core as `readyup/bin/linuxsteamrt64/engine-surface.skins.json`.
 
-<Callout title="Planned" type="info">
-  When skins moves to its own plugin, its entries move to `gamedata/engine-surface.skins.json`, which only ships with the skins package. A core without skins will then not look for them, and the matching API functions will return 0.
-</Callout>
+- At start, the core adds the entries from that file to its own list. A file may only add entries, not change the core's.
+- Without the file, the core does not look for these functions, and the matching API functions (`econ_attr_set_by_name`, `entity_change_subclass`, `entity_set_model`, `entity_set_bodygroup_by_name`) return 0.
+- The core only reads the file at start. After you add or change it, restart the server.
+
+Check both files together:
+
+```bash
+build/readyup_sigcheck /path/to/libserver.so gamedata/engine-surface.json gamedata/engine-surface.skins.json
+```
+
+`plugins/skins/docs/engine-surface.md` in the repo describes each skins function and how it was checked.

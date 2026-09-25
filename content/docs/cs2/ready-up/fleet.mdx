@@ -1,0 +1,233 @@
+---
+title: Fleet mode
+description: Connect Ready Up servers to the Auto Tournament platform, what the platform controls, and the local status endpoint.
+icon: Network
+---
+
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+
+<Callout title="Not ready for use" type="warn">
+  The Ready Up side of fleet mode is built and tested against a mock platform. The Auto Tournament side (enrollment, the WebSocket gateway, match assignment) is still being built and is not released. The fleet plugin, `fleet.so`, is also not in the release packages yet. Build it from source to try it. Everything on this page can still change.
+</Callout>
+
+A Ready Up server runs in one of two modes:
+
+- **Standalone.** Auto Tournament drives the server over RCON and webhooks: `ru match load`, `ru_webhook_url`, `ru_heartbeat_url`. Admins and skins come from local JSON files. This is how the rest of these pages describe it.
+- **Fleet mode.** The server keeps one outbound WebSocket to the platform. The platform sends matches, commands, the admin list and skins loadouts over it. The server streams match state, events and round backups back. No RCON, no webhooks, and no settings to set by hand on each server after it is enrolled.
+
+Fleet mode is the fleet plugin, `readyup/plugins/fleet.so`. Without it, or without a platform URL, the server is standalone.
+
+## Enroll a server
+
+A server enrolls once. It then keeps its own token and reconnects on its own. There are two ways to enroll.
+
+| Way | Use it for | What you need |
+| --- | --- | --- |
+| One-time code | Adding one server by hand. | A code from the platform, for example `RUE-7F3K-9QX2-LM4D-P8TW`. It works once and runs out after 15 minutes. |
+| Fleet enrollment key | Scripted installs, containers, CS2 Server Manager. | A reusable key (`rfk_...`) from the platform. Every server that uses it enrolls on its own. |
+
+<Steps>
+
+<Step>
+
+### Get a code or a key
+
+Create it on the platform. The code is shown once.
+
+</Step>
+
+<Step>
+
+### Give it to the server
+
+Either put it in the `[fleet]` section of `readyup.cfg` and restart (or run `ru plugin reload fleet`):
+
+```text title="readyup.cfg"
+[fleet]
+url=https://tournament.example.com
+enroll_code=RUE-7F3K-9QX2-LM4D-P8TW
+```
+
+Or, for a key:
+
+```text title="readyup.cfg"
+[fleet]
+url=https://tournament.example.com
+enroll_key=rfk_...
+```
+
+Or run this in the server console:
+
+```text
+ru fleet enroll https://tournament.example.com RUE-7F3K-9QX2-LM4D-P8TW
+```
+
+Enrollment never works from chat, so the code does not end up in chat logs.
+
+</Step>
+
+<Step>
+
+### Check it
+
+```text
+ru fleet status
+```
+
+It shows the link state (`online`, `offline`, `enrolling`, `rejected` and others), the server ID, the session and how many messages wait to be sent. `ru selftest` also has a line for the fleet link.
+
+</Step>
+
+</Steps>
+
+After enrollment, the server stores its identity in `game/csgo/readyup/plugins/fleet/`:
+
+- `install_id`, a random ID written once. A server that enrolls again with the same key gets its old record back instead of a new one.
+- `credentials.json`, with the server ID, the token and the platform URL. Only the file's owner can read it. The token is never written to the log.
+
+A code is spent after one use, so you can remove it from the config. A key can stay. Keep the `plugins/fleet/` folder when you update or move the server.
+
+### Tokens
+
+- The platform rotates the token every 90 days on its own. The server saves the new one and keeps working.
+- If the platform revokes the server, the link closes and the server keeps running standalone. With a key in the config, it enrolls again. With a code, it waits for a new `ru fleet enroll`. A refused code is never retried.
+
+### Connection security
+
+- Only `wss://` and `https://`. The certificate is always checked.
+- For a private certificate authority, set `ca_file`. To pin the platform's public key, set `pin_sha256`.
+- `insecure_dev=1` allows `ws://` and `http://`, but only to a loopback or private (RFC 1918) address. For development only.
+- The token only goes in the `Authorization` header, never in a URL.
+
+All `[fleet]` keys are listed in [Configuration](/cs2/ready-up/configuration#fleet-keys).
+
+## What the platform controls
+
+### Matches
+
+The platform assigns a match to a server. The assignment carries the teams and rosters, the maps and sides, the rules (round limit, overtime, knife side pick time, tiebreak), match admins, engine cvars, and a password for this match.
+
+When a match is assigned, the server:
+
+1. ends a running scrim without reporting it, tells players `This server was assigned a tournament match. Thanks for playing!`, and kicks everyone who is not on the roster, a spectator or an admin after 5 seconds,
+2. sets `sv_password` to the match password,
+3. changes to the first map and starts the match warmup.
+
+From there the match runs as described in [Scrims and matches](/cs2/ready-up/scrims-and-matches). The whitelist and team lock still apply.
+
+The platform can change a running match: add or remove a player, rename a team, change the password or the rules. When the match is over or cancelled, the platform unassigns it. The server clears the password, kicks players and goes back to idle.
+
+A match loaded by hand with `ru match load` is never reported to the platform. While one is loaded, the server answers new assignments with `busy`. Do not load local matches on a fleet server.
+
+### Admin commands
+
+Platform admins can send these commands to the server. Each one gets exactly one answer.
+
+| Command | What it does |
+| --- | --- |
+| `pause`, `unpause` | Pause or unpause. `unpause` also ends an offline auto-pause. |
+| `force_ready` | Mark one team, or both, as ready. |
+| `start` | Start the match now. |
+| `restore_round` | Go back to a round backup the admin picked. The platform sends the backup if the server does not have it. |
+| `restart_map` | Back to warmup on the same map. That map's stats are dropped. |
+| `end_match` | End the match, optionally with a winner. |
+| `change_map` | Change map, before the match is live. |
+| `swap_teams` | Swap sides and keep the team 1 / team 2 mapping. |
+| `kick`, `say` | Kick a player, or say something in chat. |
+| `exec` | Run one console line. Root admins only. The server logs who ran what. It refuses `ru fleet ...`. |
+
+### Admins
+
+The platform keeps one admin list for all servers. The server saves a copy in `plugins/match/fleet-admins.json`, so it knows its admins even when it starts while the platform is down.
+
+In fleet mode, `admins.json` is not used. `.ru admins` shows the platform's list, and `add` and `remove` answer `Admins are managed on the platform`. Match admins from the assignment still count.
+
+### Skins
+
+If the server has the skins plugin and skins are turned on for the platform, the platform sends each player's loadout. StatTrak counters live on the platform. See [Loadouts from the platform](/cs2/ready-up/skins#loadouts-from-the-platform).
+
+### Not yet
+
+These are designed but not built yet:
+
+- Server-wide settings from the platform (chat prefix, demo settings, kick delays). Until then, set them on the server.
+- Draining a server (finish the current match, take no new one).
+- Uploading demos to the platform. Demos stay on disk, or go to `ru_demo_upload_url` if it is set.
+- [Failover](#failover) to another server.
+
+## What the server sends
+
+- The match state, on every change. Each change has a number, so the platform can tell if it missed one. A full copy goes out on each reconnect and every 60 seconds.
+- Events: ready, pauses, rounds, the knife result, map results, the series end, demos.
+- Round backups. CS2 writes a backup file at the start of each round. The server sends it to the platform about 1.5 seconds later, inside the WebSocket.
+
+Scrims and local matches are never reported.
+
+## When the platform is down
+
+The server keeps playing on what it already has: the match config, the admin list and loadouts.
+
+- Everything it would have sent is kept on disk, up to 50,000 messages or 64 MB (`spool_max_msgs`, `spool_max_mb`). It is sent when the link is back.
+- It reconnects on its own, with a growing wait between tries. `ru fleet reconnect` tries now.
+- In warmup and during the knife round, nothing changes. Admins in chat still work.
+- When idle, scrims run as usual.
+
+### Offline auto-pause
+
+A live match pauses on its own when the platform has been gone for `offline_pause_minutes` (3 by default). The pause starts at the next freeze time. Players see `Paused: server lost contact with the tournament platform`. An admin in game can unpause, or the platform can after it is back. `/status` shows a countdown while the link is down.
+
+Set `offline_pause_minutes=0` to turn this off.
+
+## Failover
+
+If a server dies during a match, the plan is that the platform notices, proposes a spare server, and an admin confirms. The admin picks which round backup to go back to. Nothing moves on its own.
+
+Today the server side can restore a round backup on command (`restore_round`), also from a backup the platform sends. Resuming a match on a different server is coming.
+
+## Status endpoint
+
+The core serves a small read-only HTTP endpoint. It works in both modes, and with no plugins at all. Monitoring tools, uptime checks and CS2 Server Manager use it. It never talks to the game thread directly, so a slow client cannot slow the server down.
+
+By default it listens on `127.0.0.1`, on the game port + 7 (`27022` for a server on `27015`).
+
+| Path | What it returns |
+| --- | --- |
+| `/health` | `200 {"ok":true,"uptime_s":...}`, or `503` when the engine surface is off or the selftest failed. No match data. No token needed. |
+| `/status` | JSON: versions, the selftest result, the platform link, whether it is safe to update, and a summary of the match. |
+| `/stream` | The same data as Server-Sent Events: one snapshot, then only changes. |
+| `/metrics` | Prometheus text. Only with `status_http_metrics=1`. |
+| `/selftest` | The last selftest report as text. `/selftest?run=1` starts a new one (at most every 30 seconds). |
+
+The core runs a selftest on its own 15 seconds after the first map, so `/health` has a result.
+
+```bash
+curl -s http://127.0.0.1:27022/status
+```
+
+The `summary` in `/status` has flat fields for a table row: `mode`, `phase`, `map`, `round`, `score`, `series_score`, `players`, `match_id`, `teams`, `paused` and more. Without `match.so`, it says `"match_plugin": "none"`.
+
+`update_safe` is `true` when nothing is lost by restarting or updating the server now: idle, a scrim, practice, or a finished series with no demo upload left. It is `false` from the moment a real match loads until the series is over.
+
+### Token
+
+Requests from the same machine need no token. Anything else must send `Authorization: Bearer <token>` (or `X-ReadyUp-Token`, or `?token=`). `/health` never needs one.
+
+If you set `status_http_bind` to a non-loopback address, you must also set `status_http_token` (16 characters or more), or the endpoint does not start. The endpoint is plain HTTP. For remote access, put a reverse proxy with TLS in front. The status token is separate from the fleet token.
+
+### status.json
+
+At start, the core writes `game/csgo/readyup/status.json`:
+
+```json
+{ "port": 27022, "bind": "127.0.0.1", "token": "rst_...", "pid": 12345, "game_port": 27015, "started_at": 1790340000 }
+```
+
+This is how local tools find the endpoint. If you do not set a token, the generated one is kept in this file and used again after a restart.
+
+Settings are in [Configuration](/cs2/ready-up/configuration#status-endpoint).
+
+## CS2 Server Manager
+
+[CS2 Server Manager](/cs2/server-manager) can read each server's `status.json` and `/stream` to show a live table of all Ready Up servers, and wait for `update_safe` before it restarts or updates a server during a match. This is being added to CS2 Server Manager now and is not released yet.
+
+Later, CS2 Server Manager will also enroll with the platform as a host agent. The platform can then start, stop, restart and update servers through it, and write the fleet key into new servers so they enroll on their own.
