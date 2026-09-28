@@ -1,0 +1,78 @@
+---
+title: License key
+description: Paste your license key in Settings, see its status, and show an optional "Licensed" line on public event pages.
+icon: KeyRound
+---
+
+If you use Auto Tournament commercially, you need a license. This page is about the license key in the platform. For who needs a license and what it costs, see [Licensing and commercial use](/reference/licensing).
+
+**A license never blocks anything.** The platform does not lock, disable or limit any feature. If something is off, you see a notice. That is all.
+
+## Add your key
+
+1. Open **Settings** > **License**.
+2. Paste the whole key into **License key**. It looks like `ATL1.<payload>.<signature>`.
+3. Select **Save key**.
+
+The key is checked on your own server, offline. No internet call is needed.
+
+After you save, the key itself is not shown again. You only see the license ID. To swap it, paste a new key in **Replace the license key**. To remove it, select **Remove key**.
+
+If a key fails the checks, it is still saved and shown as "This key could not be verified." A key from a newer signing key can start to work after you update the platform.
+
+## What you see
+
+The **License** tab shows a summary, for example:
+
+> Licensed to NTLAN · Platform S · 6 servers · updates until 2027-09-01
+
+It also shows the license ID and a **Check this license** link to the public check page on autotournament.gg. A founder license shows "updates for life" instead of a date. A license for a single event also shows the event dates.
+
+Admins also get a **License** card on the admin home, with the same summary and a link to **Settings**. With no key, the card says "No commercial license key. Free for non-commercial use." and links to Pricing.
+
+Only admins see any of this. Players never see anything about licensing, unless you turn on the public line below.
+
+## Notices
+
+The platform shows a notice, and only a notice, when:
+
+- The key could not be verified.
+- The key is a Servers key. It covers CS2 Server Manager and Ready Up, not the platform.
+- An event license is over, or has not started yet.
+- This version is newer than your updates cover (see below).
+- You run more game servers than the license allows.
+
+Every game server running our software counts, including spare, practice and test servers.
+
+## Products and updates
+
+There are two products:
+
+- **Servers**: CS2 Server Manager and Ready Up.
+- **Platform**: the platform, CS2 Server Manager and Ready Up.
+
+A yearly license covers every version whose `x.y.0` release date is on or before the license's "updates until" date. That includes the later patches of those versions. For example, if 1.4.0 came out before your date, 1.4.1 and 1.4.2 are covered too. Founder licenses are lifetime and cover every version.
+
+If you run a newer version than your license covers, you get a notice. It still works. Renew to cover it.
+
+## Show "Licensed" on public event pages
+
+Turn on **Show "Licensed" on public event pages** in **Settings** > **License**.
+
+- It is off by default.
+- It adds a "Licensed" line on public event pages. The line links to the license's public check page.
+- It only shows while the saved key is valid and is a Platform key.
+
+## CS2 Server Manager and Ready Up
+
+Your game servers have their own license setting. On a server machine, CS2 Server Manager can store the key for you:
+
+| Command | What it does |
+| --- | --- |
+| `csm license set` | Save a license key in the server config. |
+| `csm license status` | Show the status of the saved key. |
+| `csm license clear` | Remove the saved key. |
+
+`csm license set` writes `readyup_license_key` into the server config. Ready Up reads it. In the server console, `ru license` shows the status.
+
+The platform does not send its key to CS2 Server Manager. Set the key on the servers yourself. See the [CS2 Server Manager](/cs2/server-manager) docs and the [command reference](/cs2/server-manager/commands).
