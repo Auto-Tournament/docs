@@ -65,14 +65,29 @@ Turn on **Show "Licensed" on public event pages** in **Settings** > **License**.
 
 ## CS2 Server Manager and Ready Up
 
-Your game servers have their own license setting. On a server machine, CS2 Server Manager can store the key for you:
+Your game servers use the same key. You don't have to set it on each one.
+
+### The platform hands it over
+
+When you save, replace or remove the key in **Settings** > **License**, every CS2 Server Manager (CSM) host connected to your platform picks it up on its next update-hold poll. CSM applies it to all of its servers, the same as `csm license set` or `csm license clear`. The game servers use it from their next map load or restart.
+
+- **Both products work on the game servers.** Ready Up accepts a Servers key and a Platform key.
+- **The platform's key wins.** It replaces a key you set by hand with `csm license set`.
+- **No key in the platform?** CSM only clears a key it got from the platform. A key you set by hand stays.
+- **Platform not reachable?** Nothing changes.
+- **A failed hand-off is only a warning.** You find it in CSM's `auto_update_monitor.log`. Nothing is ever blocked.
+- **The key is never written to logs.**
+
+### Set it by hand
+
+You can still manage the key on a server machine with CSM:
 
 | Command | What it does |
 | --- | --- |
 | `csm license set` | Save a license key in the server config. |
-| `csm license status` | Show the status of the saved key. |
+| `csm license status` | Show the status of the saved key. It also tells you when the key came from the platform. |
 | `csm license clear` | Remove the saved key. |
 
 `csm license set` writes `readyup_license_key` into the server config. Ready Up reads it. In the server console, `ru license` shows the status.
 
-The platform does not send its key to CS2 Server Manager. Set the key on the servers yourself. See the [CS2 Server Manager](/cs2/server-manager) docs and the [command reference](/cs2/server-manager/commands).
+See the [CS2 Server Manager](/cs2/server-manager) docs and the [command reference](/cs2/server-manager/commands).
