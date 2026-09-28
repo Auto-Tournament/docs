@@ -229,6 +229,12 @@ This is how local tools find the endpoint. If you do not set a token, the genera
 
 Settings are in [Configuration](/cs2/ready-up/configuration#status-endpoint).
 
+## With CS2 Server Manager (beta)
+
+CS2 Server Manager (CSM) is being extended to link a whole machine to the platform with one command. After that, you create servers from the platform, and each new server enrolls itself with a fleet enrollment key that CSM writes for it. You do not copy codes.
+
+This is in development. There is no final command to show yet, and the machines page in the platform is not released. Until then, enroll each server yourself with `ru fleet enroll <url> <code>`, or with `url`, `enroll_code` or `enroll_key` in `cfg/ReadyUp/fleet.cfg`, as above.
+
 ## CS2 Server Manager
 
 [CS2 Server Manager](/cs2/server-manager) can read each server's `status.json` and `/stream` to show a live table of all Ready Up servers, and wait for `update_safe` before it restarts or updates a server during a match. This is being added to CS2 Server Manager now and is not released yet.
