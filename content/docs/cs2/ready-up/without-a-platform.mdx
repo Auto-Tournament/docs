@@ -1,0 +1,96 @@
+---
+title: Use without a platform
+description: Run scrims, practice and single matches with Ready Up on its own, with no Auto Tournament platform.
+icon: Swords
+---
+
+<Callout title="In development" type="warn">
+  Ready Up is not released yet. Details can still change.
+</Callout>
+
+You do not need Auto Tournament to use Ready Up. Leave the fleet `url` empty and the fleet plugin stays idle. The server then works on its own, and everything it needs is kept in small JSON files on the server. There is no database.
+
+| What | Where it comes from without a platform |
+| --- | --- |
+| Scrims | Built in. Nothing to set up. |
+| Practice | The practice plugin. |
+| Matches | A match config you load with `ru match load <url>`. |
+| Admins | `plugins/essentials/admins.json`, edited with `ru admins add` and `ru admins remove`. |
+| Skins | `plugins/skins/loadouts.json`, or leave skins out. |
+| Demos and round backups | Kept on the server's disk. |
+| Crash recovery | `plugins/match/state.json`. |
+| Status | The [status endpoint](/cs2/ready-up/fleet#status-endpoint), and `ru match state`. |
+
+## Scrims
+
+Scrims need no setup. See [Scrims](/cs2/ready-up/scrims-and-matches#scrims) for the full flow.
+
+1. Players join CT or T. They see a welcome card and the ready panel.
+2. Each player types `.r`. `.ur` undoes it.
+3. When everyone on CT and T is ready, a 5 second countdown starts.
+4. If the knife round is on (it is by default), the winners type `.stay` or `.switch`.
+5. The scrim goes live.
+
+Admin shortcuts that help in scrims: `.roundknife` (knife round on or off), `.playout` (play every round), `.readyrequired <n>` (players a team needs ready) and `.whitelist`.
+
+## Practice
+
+Install the practice plugin. It is in both bundles.
+
+- An admin types `.prac` to turn practice mode on, and `.exitprac` to turn it off.
+- Everyone gets cheats, infinite ammo and a full grenade set, and sees flash times and damage in chat.
+- The tools are in [Commands](/cs2/ready-up/commands#practice): `.savepos`, `.loadpos`, `.spawn`, `.rethrow`, `.bot`, `.noflash`, `.god` and more.
+
+For a server that is only for practice, set `always=1` in `cfg/ReadyUp/practice.cfg`. Core, essentials and practice are enough. Add the whitelist plugin to keep it private. See [Plugins](/cs2/ready-up/plugins).
+
+## Load a match
+
+A match config is a JSON file in the MatchZy and Get5 style. Put it at any `http://` or `https://` address the server can reach, then run this in the server console, or as an admin in chat:
+
+```text
+ru match load https://example.com/match.json
+```
+
+The address must start with `http://` or `https://`. A local file path does not work. If the address needs a token, set `ru_match_token <token>` first. It is sent as a Bearer token.
+
+A small config:
+
+```json
+{
+  "matchid": 1001,
+  "num_maps": 1,
+  "maplist": ["de_nuke"],
+  "map_sides": ["knife"],
+  "team1": {
+    "name": "Team One",
+    "players": { "76561198000000001": "alice", "76561198000000002": "bob" }
+  },
+  "team2": {
+    "name": "Team Two",
+    "players": { "76561198000000003": "carol", "76561198000000004": "dave" }
+  }
+}
+```
+
+Then:
+
+1. The server changes to the first map and goes into match warmup.
+2. Only the roster, spectators and admins may stay, and roster players are put on their team.
+3. Everyone types `.r`. The knife round runs if `map_sides` says `knife`.
+4. The match goes live. Pauses, restores and forfeits work as in [Scrims and matches](/cs2/ready-up/scrims-and-matches#matches).
+
+Useful admin commands: `.ru match state`, `.ru match start force`, `.ru match restart`, `.ru match end`. All config keys are in [Match config](/cs2/ready-up/scrims-and-matches#match-config).
+
+## Demos
+
+Ready Up records a GOTV demo for each map and keeps it on the server's disk, in `game/csgo/ReadyUp/` by default. Change the folder and the file name with `ru_demo_path` and `ru_demo_name_format`. See [Demos and series end](/cs2/ready-up/commands#demos-and-series-end).
+
+To also send demos somewhere, set `ru_demo_upload_url`. The local copy stays either way.
+
+## Events
+
+You can still get match events. Set `ru_webhook_url` to a base address and Ready Up posts events to it. See [Events sent to Auto Tournament](/cs2/ready-up/scrims-and-matches#events-sent-to-auto-tournament).
+
+## Add a platform later
+
+Nothing needs to change on the server. Follow [Fleet mode](/cs2/ready-up/fleet#enroll-a-server). The server then takes its matches, admins and skins from the platform.

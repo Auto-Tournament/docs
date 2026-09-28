@@ -11,7 +11,7 @@ icon: SquareTerminal
 ## How commands work
 
 - **Player commands** start with a dot in chat, for example `.r`.
-- **Ready Up commands** are `.ru <command> <subcommand>`, for example `.ru match start` or `.ru map change de_mirage`. Most of them are for admins.
+- **Ready Up commands** are `.ru <command> <subcommand>`, for example `.ru match start` or `.ru map change de_mirage`. Every `.ru` command is for admins, except `.ru`, `.ru version`, `.ru help`, `.ru list` and `.ru dm status|top|hud`.
 - In the **server console** and over **RCON**, the same commands start with `ru` and no dot: `ru match start`. The console is always allowed.
 - A player can also type `ru ...` in their **own game console**, like Metamod's `meta` or CounterStrikeSharp's `css_` commands. The same admin checks apply, and nothing shows in chat.
 
@@ -42,12 +42,13 @@ These come from the match plugin.
 | `.gg` | Give up. Sends `player_gg` to Auto Tournament, or starts a surrender vote when the match allows it. See [Forfeit and give up](/cs2/ready-up/scrims-and-matches#forfeit-and-give-up). |
 | `.stop` | Ask to go back to the start of the current round. Only when the match allows it, and the other team must agree. |
 | `.ff`, `.forfeit` | Forfeit the match. Only the team captain from the match config can do this. |
+| `.admin [message]` | Call an admin. Works in every mode. Every admin in game gets a chat line and a card, and the platform gets an `admin_called` event. You can call once every `admin_call_cooldown_s` seconds (60 by default). |
+| `.coach ct\|t`, `.uncoach` | Become a coach of a team, or stop. See the `coaches` key in [Scrims and matches](/cs2/ready-up/scrims-and-matches#match-config). |
+| `.spec` | Move yourself to spectators. Not for a player on a loaded match's roster. |
+| `.settings` | Show the match server settings. |
 | `.help` | Show the player commands. In practice mode, it shows the practice tools. |
-| `.ru match state` | Show the mode, roster, who is ready, and the rules. |
-| `.ru match rules` | Show the rules in use. See [Esports mode](/cs2/ready-up/esports-mode#check-what-is-in-use). |
-| `.ru mode show` | Show the current mode. |
-| `.ru admins` | List the admins. |
-| `.ru version` | Show the Ready Up build. |
+| `.ruversion`, `.ru version`, `.ru` | Show the Ready Up build. |
+| `.ru help`, `.ru list` | List the commands you can use. Players see only the public ones, admins see all. |
 | `.skins reload` | Load your skins again. Only with the skins plugin, and not while a match is live. |
 
 With no match loaded, only the ready commands and `.forceready` work. The others say they need a live match. You must be on CT or T to ready up.
@@ -93,6 +94,8 @@ From the match plugin.
 | `.ru match unpause`, `.fup`, `.forceunpause` | Unpause right away. The teams do not need to confirm. This also ends a pause CS2 started on its own. |
 | `.ru match tech team1\|team2`, `.ru match tac team1\|team2` | Call a technical pause or a tactical timeout for a team. The team's limits apply. |
 | `.ru match side stay\|switch\|ct\|t` | Pick the side after the knife round for the winning team. |
+| `.ru match state`, `.ru match rules` | Show the mode, roster, who is ready, and the rules in use. See [Esports mode](/cs2/ready-up/esports-mode#check-what-is-in-use). |
+| `.ru settings show`, `.ru settings set <setting> <value>` | Show or change a match server setting. `.roundknife` (or `.rk`), `.playout`, `.whitelist` and `.readyrequired <n>` are chat shortcuts for the common ones. |
 
 ### Modes
 
@@ -101,7 +104,9 @@ From the match plugin.
 | `.ru mode idle` | Plain CS2. Clears any loaded match. No scrim warmup until `.ru mode scrim` or the next map. |
 | `.ru mode scrim` | Turn scrim warmup back on. |
 | `.ru mode practice`, `.prac`, `.tactics` | Turn practice mode on, or off again. Needs the practice plugin. Refused while a match is loaded. |
-| `.ru practice on\|off\|status` | The same, from the practice plugin. `status` is open to everyone. |
+| `.ru mode show` | Show the current mode. |
+| `.exitprac`, `.match` | Turn practice mode off. `.match` only does this while practice is on. |
+| `.ru practice on\|off\|status` | The same, from the practice plugin. |
 
 ### Maps
 
@@ -112,6 +117,9 @@ From the essentials plugin.
 | `.ru map change <name\|workshop id\|link> [force]` | Change map. Takes a map name (`de_mirage`), a Workshop ID (`3084291314`), `ws:<id>`, `workshop/<id>`, or a pasted Workshop link. |
 | `.ru map reload [force]` | Load the current map again. A Workshop map reloads by its ID. |
 | `.ru map restart [force]` | Restart the game (`mp_restartgame 1`). A loaded match stays loaded. |
+| `.map <name\|workshop id\|link> [force]` | Chat shortcut for `.ru map change`. |
+| `.reloadmap [force]` | Chat shortcut for `.ru map reload`. |
+| `.ru map defaults`, `.ru map default <mode> <map\|clear>` | Show or set the default map for a mode such as `ffa`, `tdm`, `practice` or `warmup`. |
 
 During a knife round or a live map, these are refused unless you add `force`.
 
@@ -123,7 +131,7 @@ From the essentials plugin.
 
 | Command | What it does |
 | --- | --- |
-| `.ru admins [list]` | List the admins in `admins.json`. Open to everyone. |
+| `.ru admins [list]` | List the admins in `admins.json`. |
 | `.ru admins add <steamid64\|name>` | Add an admin. A name is part of the name of a connected player. |
 | `.ru admins remove <steamid64\|name>` | Remove an admin. |
 
@@ -137,6 +145,20 @@ From the whitelist plugin.
 | `.ru whitelist add\|remove <steamid64>` | Add or remove a player. |
 | `.ru whitelist list` | Show the list. |
 | `.ru whitelist clear` | Empty the list. |
+
+### Midas, deathmatch and addons
+
+From the optional plugins. See [Plugins](/cs2/ready-up/plugins).
+
+| Command | What it does |
+| --- | --- |
+| `.ru midas` | Show who is Midas and why. |
+| `.ru midas give <player>` | Give Midas to a player (part of a name, or a Steam64 ID). Run it again to take it back. |
+| `.ru midas take <player>` | Take a given Midas back. |
+| `.ru dm ffa [map]`, `.ru dm tdm [map]` | Start free for all or team deathmatch. Loads the map you give, else the mode's default map, else the current map. |
+| `.ru dm off` | Back to competitive. |
+| `.ru dm status`, `.ru dm top`, `.ru dm hud` | Deathmatch state, top 5 and your rank, and your leaderboard on or off. **Open to everyone.** |
+| `ru addons` | Show the state of each Workshop addon. |
 
 ### Plugins and server
 
