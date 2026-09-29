@@ -7,6 +7,18 @@ description: Release notes for each version of Ready Up, the native CS2 server p
 
 Ready Up is the native CS2 server plugin that replaces Auto Tournament CS2. Newest first. Each entry is the [GitHub release](https://github.com/Auto-Tournament/ready-up/releases) for that version. [Docs](/cs2/ready-up).
 
+## v0.1.0-beta.3
+
+<p className="text-sm text-fd-muted-foreground">2026-09-29 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/ready-up/releases/tag/v0.1.0-beta.3)</p>
+
+Install with `install.sh --channel beta` (or `--version v0.1.0-beta.3`).
+
+### New
+- Plain-http platforms: `insecure = 1` in `cfg/ReadyUp/fleet.cfg`, or `ru fleet enroll [url] <code|key> --insecure`, allows `http://` to any host (explicit opt-in; the token travels unencrypted). `insecure_dev` still works. Without the opt-in, plain http is refused with a message naming both options. ([#125](https://github.com/Auto-Tournament/ready-up/pull/125))
+
+### Fixed
+- Enrolling over https and getting a `ws://` address for the same host now connects with `wss://`. ([#125](https://github.com/Auto-Tournament/ready-up/pull/125))
+
 ## v0.1.0-beta.2
 
 <p className="text-sm text-fd-muted-foreground">2026-09-29 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/ready-up/releases/tag/v0.1.0-beta.2)</p>

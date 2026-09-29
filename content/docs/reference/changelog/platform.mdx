@@ -7,6 +7,59 @@ description: Release notes for each version of the Auto Tournament platform.
 
 Versions before 3.0 were released as **MatchZy Auto Tournament** (MAT). Their notes are under [Earlier versions](#earlier-versions). **3.0 is in beta**: the `3.0.0-beta.N` releases below are the 3.0 notes until 3.0.0 ships. See [Upgrading to 3.0](/guides/upgrading-to-3). Newest first. Each entry is the [GitHub release](https://github.com/Auto-Tournament/auto-tournament/releases) for that version. [Docs](/).
 
+## v3.0.0-beta.21
+
+<p className="text-sm text-fd-muted-foreground">2026-09-29 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.21)</p>
+
+- ci: run E2E on 8 shards instead of 4 ([#459](https://github.com/Auto-Tournament/auto-tournament/pull/459))
+- fix(players): linked Discord shows in the players list and the Discord bot lookup ([#461](https://github.com/Auto-Tournament/auto-tournament/pull/461))
+- feat(servers): 'Use for tournament matches' toggle per server ([#463](https://github.com/Auto-Tournament/auto-tournament/pull/463))
+- test(failover): keep the auto-scaler out of the failover specs; tolerate a settled proposal ([#464](https://github.com/Auto-Tournament/auto-tournament/pull/464))
+- chore(ui): drop Admin nav link; registration wording covers every sign-in ([#460](https://github.com/Auto-Tournament/auto-tournament/pull/460))
+- feat(players): profile picture priority Steam > Discord > Google > others > placeholder ([#465](https://github.com/Auto-Tournament/auto-tournament/pull/465))
+- feat(servers): machines first, auto-created servers explained, license reminder ([#462](https://github.com/Auto-Tournament/auto-tournament/pull/462))
+- feat(players): Steam is optional (accounts without Steam) ([#466](https://github.com/Auto-Tournament/auto-tournament/pull/466))
+- chore(ui): game-neutral core wording; Ready Up instead of the old plugin name ([#467](https://github.com/Auto-Tournament/auto-tournament/pull/467))
+- fix(cs2): players without a Steam account are left out of CS2 rosters ([#468](https://github.com/Auto-Tournament/auto-tournament/pull/468))
+- chore(ui): rounds/overtime rules only for CS2 tournaments (1771 part 2) ([#469](https://github.com/Auto-Tournament/auto-tournament/pull/469))
+
+## v3.0.0-beta.20
+
+<p className="text-sm text-fd-muted-foreground">2026-09-29 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.20)</p>
+
+- feat(players): a linked Discord account supplies the Discord ID ([#458](https://github.com/Auto-Tournament/auto-tournament/pull/458))
+
+## v3.0.0-beta.19
+
+<p className="text-sm text-fd-muted-foreground">2026-09-29 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.19)</p>
+
+- feat(auth): local admin connects sign-in methods ([#456](https://github.com/Auto-Tournament/auto-tournament/pull/456))
+- chore: remove DiceBear; in-house placeholder avatar ([#457](https://github.com/Auto-Tournament/auto-tournament/pull/457))
+
+## v3.0.0-beta.18
+
+<p className="text-sm text-fd-muted-foreground">2026-09-29 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.18)</p>
+
+- fix(local-admin): no password strength rules; admins choose their own ([#451](https://github.com/Auto-Tournament/auto-tournament/pull/451))
+- fix(layout): no Steam error toast on a fresh install ([#453](https://github.com/Auto-Tournament/auto-tournament/pull/453))
+- copy(license consent): "One last thing" after the admin setup steps ([#452](https://github.com/Auto-Tournament/auto-tournament/pull/452))
+- feat(auth): TOTP setup works smoothly with password managers ([#454](https://github.com/Auto-Tournament/auto-tournament/pull/454))
+- fix(ui): reload after installing a code module; Add machine says run as the csm user, not root ([#455](https://github.com/Auto-Tournament/auto-tournament/pull/455))
+
+## v3.0.0-beta.17
+
+<p className="text-sm text-fd-muted-foreground">2026-09-29 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.17)</p>
+
+- feat(fleet): --insecure in the link / enroll commands on a plain-http site ([#450](https://github.com/Auto-Tournament/auto-tournament/pull/450))
+
+## v3.0.0-beta.16
+
+<p className="text-sm text-fd-muted-foreground">2026-09-29 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.16)</p>
+
+- docs: add CHANGELOG.md pointing to the docs changelog and GitHub releases ([#447](https://github.com/Auto-Tournament/auto-tournament/pull/447))
+- fix(fleet): hand out wss:// behind a TLS proxy; FRONTEND_BASE_URL wins ([#448](https://github.com/Auto-Tournament/auto-tournament/pull/448))
+- feat(auth): first admin via setup code + local admin login; env vars imported once ([#449](https://github.com/Auto-Tournament/auto-tournament/pull/449))
+
 ## v3.0.0-beta.15
 
 <p className="text-sm text-fd-muted-foreground">2026-09-29 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.15)</p>

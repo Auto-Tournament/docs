@@ -7,6 +7,46 @@ description: Release notes for each version of CS2 Server Manager (csm).
 
 CS2 Server Manager (`csm`) runs several CS2 servers on one Linux machine. Newest first. Each entry is the [GitHub release](https://github.com/Auto-Tournament/cs2-server-manager/releases) for that version. [Docs](/cs2/server-manager).
 
+## v1.14.2
+
+<p className="text-sm text-fd-muted-foreground">2026-09-29 · [Release on GitHub](https://github.com/Auto-Tournament/cs2-server-manager/releases/tag/v1.14.2)</p>
+
+### Changed
+- csm always runs as the user who runs it; there is no dedicated service user and no `CS2_USER` override. Running csm as root is refused, except `sudo csm setup-host`, `sudo csm install-deps` and `sudo csm self-update`. ([#83](https://github.com/Auto-Tournament/cs2-server-manager/pull/83))
+- csm keeps its state in that user's home folder, never next to the binary in a system folder like `/usr/local/bin`.
+- Quiet terminal: commands print their own result; internal log lines stay in the log files (`CSM_VERBOSE=1` shows them).
+
+### Upgrading
+Re-link hosts as the user that runs csm (`csm link <url> <code>` from Servers → Machines → Add machine, then `csm agent install`).
+
+## v1.14.1
+
+<p className="text-sm text-fd-muted-foreground">2026-09-29 · [Release on GitHub](https://github.com/Auto-Tournament/cs2-server-manager/releases/tag/v1.14.1)</p>
+
+### Fixed
+- A new instance (`csm instance create`, or a server the platform creates) skips numbers that belong to a classic `server-N` folder or whose game port is in use. On hosts that still had server-1..3, the first instance took port 27015 and could not start. ([#82](https://github.com/Auto-Tournament/cs2-server-manager/pull/82))
+
+### Upgrading
+`sudo csm self-update`
+
+## v1.14.0
+
+<p className="text-sm text-fd-muted-foreground">2026-09-29 · [Release on GitHub](https://github.com/Auto-Tournament/cs2-server-manager/releases/tag/v1.14.0)</p>
+
+### New
+- `csm link http://<host>:<port> <code> --insecure` links to a platform on plain http, any host. Without `--insecure`, plain http is refused with a clear message (the token would travel unencrypted; https is recommended). ([#81](https://github.com/Auto-Tournament/cs2-server-manager/pull/81))
+
+### Fixed
+- Linking over https to a platform behind a TLS proxy no longer fails with "ws:// is refused": a `ws://` answer for the same host is upgraded to `wss://`. ([#80](https://github.com/Auto-Tournament/cs2-server-manager/pull/80))
+- `csm ci status` works as root or any user; `csm ci setup|update|remove` give one consistent "run as the CS2 user" message. ([#78](https://github.com/Auto-Tournament/cs2-server-manager/pull/78))
+- `csm link -h` points to Servers → Machines → Add machine.
+
+### Docs
+- `CHANGELOG.md` points to the docs changelog. ([#79](https://github.com/Auto-Tournament/cs2-server-manager/pull/79))
+
+### Upgrading
+`sudo csm self-update`
+
 ## v1.13.0
 
 <p className="text-sm text-fd-muted-foreground">2026-09-29 · [Release on GitHub](https://github.com/Auto-Tournament/cs2-server-manager/releases/tag/v1.13.0)</p>
