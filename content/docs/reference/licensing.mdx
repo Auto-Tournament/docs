@@ -88,6 +88,21 @@ The organizations listed above are free even when they charge entry. Everyone wh
 
 This is Pricing v3, valid from 28 September 2026. Licenses bought under Pricing v1 (per seat) or Pricing v2 keep their terms. If the pricing doesn't fit your case, email and we'll work it out. More worked examples are on [Licensing & pricing](https://autotournament.gg/pricing), and the full rules are in the [Commercial License Terms](https://autotournament.gg/terms).
 
+## What a licensed server sends
+
+Without a license key, the platform sends nothing to Auto Tournament. With a key saved, it checks in with autotournament.gg once a day: shortly after startup, when the key changes, and then daily. It sends:
+
+- the license key, so its id and signature can be checked (only the id is stored)
+- a random id for this installation, made once
+- the number of game servers
+- the platform version
+- counts since the last check-in: finished matches, tournaments with activity, and the largest team count
+- for an event license, your answer to "Planning something new?" (testing, a new event, or moved dates), if you gave one
+
+It sends no names, addresses, players or match details. The check-in never blocks or slows anything. If it fails (offline, a LAN without internet), nothing happens. You can see the time of the last check-in and the full list under **Settings > License**. If the answer has a note for you, for example more servers in use than your pack covers, it shows there. How long we keep the data is in the [Privacy Policy](https://autotournament.gg/privacy#license-checkin).
+
+For an event license that is used on days outside its dates, the admin dashboard may show a small note asking what's going on. Testing and setting up need no action. It shows at most once every 30 days, and you can turn it off for that license.
+
 ## Unlicensed commercial use
 
 If we notify you in writing that your use is commercial and unlicensed, PolyForm gives you 32 days (first notice only) to come into compliance: stop the commercial use or buy a license, and put right past use. To settle past use, we offer a back-dated license at the normal price plus 50%. If you don't come into compliance within 32 days, all your PolyForm licenses end and we may claim compensation under the Norwegian Copyright Act (åndsverkloven § 81).
