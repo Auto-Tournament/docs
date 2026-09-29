@@ -24,15 +24,33 @@ Any sign-in method can be someone's account. The first time someone signs in wit
 
 People can link more sign-in methods, Steam included, on **/me/connections**. Games that need Steam, such as CS2, only put players with a linked Steam account on their servers.
 
+## Admin sign-in
+
+Local admin accounts (username and password) do not have a button on the login page. Admins sign in at:
+
+```text
+https://tournament.example.com/login/admin
+```
+
+Enter the username, the password and, when two-factor sign-in is on, the code from your authenticator app. Bookmark the page.
+
+The first local admin is created on a new install: the container log prints a one-time setup code, and you enter it at `/setup`. See [First login](/getting-started/first-login).
+
+Locked out? Run this on the host. It prints a new one-time code for `/setup`:
+
+```bash
+docker exec auto-tournament reset-admin
+```
+
 ## Admin access
 
-Admin rights belong to a Steam ID, whatever button you used to sign in. You get admin in one of these ways:
+You get admin rights in one of these ways:
 
-- On a new install, the first Steam user who signs in becomes admin. See [First login](/getting-started/first-login).
+- You are a local admin (see above).
 - An existing admin edits your player on the **Players** page and turns on **Is admin**.
 - Your Steam64 ID is in `ADMIN_STEAM_IDS` in `.env`. See [If you are not admin](/getting-started/first-login#if-you-are-not-admin).
 
-There is no admin list for Discord, Keycloak, GitHub or Google accounts. When you sign in with one of them, you get the rights of the Steam account it is linked to.
+Admin rights belong to the account, whatever button you used to sign in.
 
 ## Callback address
 
