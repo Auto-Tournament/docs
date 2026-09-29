@@ -6,8 +6,8 @@ icon: Network
 
 import { Step, Steps } from 'fumadocs-ui/components/steps';
 
-<Callout title="Not ready for use" type="warn">
-  The Ready Up side of fleet mode is built and tested against a mock platform. The Auto Tournament side (enrollment, the WebSocket gateway, match assignment) is still being built and is not released. Everything on this page can still change.
+<Callout title="Beta" type="info">
+  Fleet mode is in beta: Ready Up 0.1.0-beta.3 and later, Auto Tournament 3.0 betas and CS2 Server Manager 1.14. Details can still change between betas.
 </Callout>
 
 A Ready Up server runs in one of two modes:
@@ -231,12 +231,14 @@ Settings are in [Configuration](/cs2/ready-up/configuration#status-endpoint).
 
 ## With CS2 Server Manager (beta)
 
-CS2 Server Manager (CSM) is being extended to link a whole machine to the platform with one command. After that, you create servers from the platform, and each new server enrolls itself with a fleet enrollment key that CSM writes for it. You do not copy codes.
+CS2 Server Manager (csm) links a whole machine to the platform with one command. After that, you create servers from the platform (or auto-scaling creates them), and each new server enrolls itself with a fleet key csm writes for it. You do not copy codes.
 
-This is in development. There is no final command to show yet, and the machines page in the platform is not released. Until then, enroll each server yourself with `ru fleet enroll <url> <code>`, or with `url`, `enroll_code` or `enroll_key` in `cfg/ReadyUp/fleet.cfg`, as above.
+1. In the platform, go to **Servers → Machines → Add machine** and copy the `csm link …` command.
+2. Run it on the machine as the user that runs csm (not root), then start the host agent with `csm agent install`.
+3. Use **Create server** on the machine. See [Host a CS2 tournament](/guides/host-cs2-tournament) for the full walk-through.
 
 ## CS2 Server Manager
 
-[CS2 Server Manager](/cs2/server-manager) can read each server's `status.json` and `/stream` to show a live table of all Ready Up servers, and wait for `update_safe` before it restarts or updates a server during a match. This is being added to CS2 Server Manager now and is not released yet.
+[CS2 Server Manager](/cs2/server-manager) can read each server's `status.json` and `/stream` to show a live table of all Ready Up servers, and wait for `update_safe` before it restarts or updates a server during a match. Available in CS2 Server Manager 1.12 and later (`csm status`).
 
 Later, CS2 Server Manager will also enroll with the platform as a host agent. The platform can then start, stop, restart and update servers through it, and write the fleet key into new servers so they enroll on their own.
