@@ -1,0 +1,117 @@
+---
+title: Webhooks and teams API
+description: Send match events to another website, and let it push its teams into Auto Tournament.
+icon: Webhook
+---
+
+Use this when another website works next to your event. For example, the LAN party's own site wants to show each player a "connect now" banner when their match is ready.
+
+Two parts:
+
+- **Webhooks.** Auto Tournament sends a signed `POST` to the website when a match changes. When the match is ready, it includes the server address, the password and a `steam://connect` link.
+- **Teams API.** The website sends its teams (name, tag, players' Steam64 IDs) with its own IDs. Auto Tournament creates or updates its teams to match, and sends those IDs back in the webhooks.
+
+The full reference, with a sample payload for every event, is in [docs/WEBHOOKS.md](https://github.com/Auto-Tournament/auto-tournament/blob/main/docs/WEBHOOKS.md).
+
+## Add a webhook
+
+1. Open **Settings → Webhooks** and click **Add endpoint**.
+2. Paste the website's URL. Pick the events, or keep **All event types**.
+3. If the website uses the teams API, write its token label in **Teams API source**. Then the payloads carry the website's own team IDs.
+4. Copy the **signing secret** and give it to the website. It is shown only once.
+
+Click **Send test event** to send an example of any event. It looks like a real one, with made-up server details, and says `"test": true`.
+
+<Callout type="info">
+  At a LAN event the website often runs on the LAN (`192.168.x.x`, `10.x.x.x`). Turn on **Allow webhooks to private and local addresses** first. Without it, Auto Tournament only sends to public addresses.
+</Callout>
+
+## Events
+
+| Event | Sent when |
+| --- | --- |
+| `match.ready` | Players can connect: the match is on a server. Sent again if the server or password changes. |
+| `match.live` | The match went live. |
+| `match.map_started` | A new map started. |
+| `match.score_updated` | The round score changed. At most once every 5 seconds per match. |
+| `match.map_ended` | A map ended. |
+| `match.finished` | The match is over. |
+| `match.cancelled` | The match was cancelled or deleted. |
+| `match.reset` | The match was restarted or taken off its server. |
+
+`match.ready`, `match.live`, the map events and `match.score_updated` include `connect`:
+
+```json
+"connect": {
+  "host": "10.0.0.21",
+  "port": 27015,
+  "password": "k3Lp9QzT2w",
+  "steam_url": "steam://connect/10.0.0.21:27015/k3Lp9QzT2w",
+  "console": "connect 10.0.0.21:27015; password k3Lp9QzT2w"
+}
+```
+
+Show the banner on `match.ready`. Remove it on `match.finished`, `match.cancelled` or `match.reset`.
+
+Every payload has both teams with Auto Tournament's `id` and the website's `external_id`, every player's `steam_id64`, the maps and the score.
+
+## Check the signature
+
+Every request has the header `X-AT-Signature: t=<time>,v1=<signature>`. The signature is HMAC-SHA256 of `<time>.<raw body>`, with the signing secret as the key.
+
+```js title="Node.js"
+const crypto = require('crypto');
+
+function verify(secret, header, rawBody) {
+  let t = null;
+  const sigs = [];
+  for (const part of header.split(',')) {
+    const [k, v] = part.split('=');
+    if (k === 't') t = Number(v);
+    if (k === 'v1') sigs.push(v);
+  }
+  if (!t || Math.abs(Date.now() / 1000 - t) > 300) return false;
+  const expected = crypto.createHmac('sha256', secret).update(`${t}.${rawBody}`).digest();
+  return sigs.some((s) => {
+    const got = Buffer.from(s, 'hex');
+    return got.length === expected.length && crypto.timingSafeEqual(got, expected);
+  });
+}
+```
+
+Use the raw body, before you parse the JSON. PHP and Python versions are in [docs/WEBHOOKS.md](https://github.com/Auto-Tournament/auto-tournament/blob/main/docs/WEBHOOKS.md#verifying-the-signature).
+
+## Retries
+
+- The website must answer `2xx` within 10 seconds. Otherwise Auto Tournament tries again: after 10 s, 30 s, 2 min, 10 min, 30 min, 1 h, 2 h, 4 h and 8 h.
+- An event can arrive twice. Use its `id` to skip duplicates.
+- Use `data.sequence` to put a match's events in order.
+- If a website keeps failing for the whole retry time, Auto Tournament turns its webhook off and shows a notice in **Settings → Webhooks**.
+
+The **Delivery log** shows every request, its answer, and a **Resend** button. It hides the server details.
+
+## Teams API
+
+Add an integrator token to `.env` and recreate the app container:
+
+```bash title=".env"
+API_TOKENS_INTEGRATOR=ntlan:paste-a-secret-here
+```
+
+The token only works for `/api/integrations/...`. The label (`ntlan`) is the website's **source**. Keep it the same, because the website's team IDs are stored under it.
+
+Send a team:
+
+```bash
+curl -X PUT http://localhost:3069/api/integrations/teams/team-4711 \
+  -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
+  -d '{"name":"Ninjas in Pyjamas","tag":"NIP","players":[
+        {"steamId":"76561198000000001","name":"alpha"}]}'
+```
+
+- Sending the same team twice changes nothing.
+- The new player list replaces the old one.
+- Steam64 IDs must be strings of 17 digits.
+- `POST /api/integrations/teams/batch` sends many teams at once.
+- `GET /api/integrations/teams/:externalId` reads one team back.
+- A team that is playing a match right now keeps its players until the match ends. The API answers `409` if you try to change them.
