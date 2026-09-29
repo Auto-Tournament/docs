@@ -7,7 +7,7 @@ icon: Rocket
 import { Step, Steps } from 'fumadocs-ui/components/steps';
 
 <Callout title="In development" type="warn">
-  The plugin API is at version 1.6. New minor versions only add functions, so plugins built for an older 1.x keep working. Details on this page can still change before the first release.
+  The plugin API is at version 1.6. New minor versions only add functions, so plugins built for an older 1.x keep working. Details on this page can still change while Ready Up is in beta.
 </Callout>
 
 A Ready Up plugin is a Linux shared library (`.so`) in `game/csgo/readyup/plugins/`. It talks to the server only through a table of C functions that the core hands it. It never touches the engine itself. When CS2 updates, the core gets fixed and your plugin keeps working without a rebuild.

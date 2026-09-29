@@ -6,8 +6,8 @@ icon: Download
 
 import { Step, Steps } from 'fumadocs-ui/components/steps';
 
-<Callout title="Not released yet" type="warn">
-  There is no Ready Up release on GitHub yet. Until there is one, the installer cannot download anything on its own. Use the zips that CI builds for every commit, with `--zip`. See [Install from a zip file](#install-from-a-zip-file).
+<Callout title="In beta" type="warn">
+  Ready Up is in beta. v0.1.0-beta.1 and v0.1.0-beta.2 are out as pre-releases. Install the latest beta with `install.sh --channel beta`, or pin one with `--version v0.1.0-beta.2`. See the [Ready Up changelog](/reference/changelog/ready-up).
 </Callout>
 
 ## What you need
@@ -129,7 +129,7 @@ The release zips also carry a copy of the installer, `game/csgo/readyup/tools/in
 
 ### Install from a zip file
 
-Until the first release, download the zips from a CI run of the [ready-up repo](https://github.com/Auto-Tournament/ready-up/actions), then:
+To install from a zip you already have, for example a CI build from the [ready-up repo](https://github.com/Auto-Tournament/ready-up/actions), or on an offline server:
 
 ```bash
 bash install.sh --zip ready-up-essentials-<version>-linuxsteamrt64.zip essentials --accept-license=noncommercial
