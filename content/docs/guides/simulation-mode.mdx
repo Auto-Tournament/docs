@@ -15,7 +15,7 @@ In simulation mode, every match is played by bots. The veto is done automaticall
 ## What you need
 
 - A test install of Auto Tournament.
-- At least one CS2 server with [Auto Tournament CS2](/cs2/plugin) (formerly MatchZy Enhanced), added on the **Servers** page.
+- At least one CS2 server with [Auto Tournament CS2](/cs2/plugin), added on the **Servers** page.
 - Teams, or players for a shuffle tournament. The players do not need to be real Steam accounts that join.
 
 ## Turn it on with the Docker image
@@ -31,7 +31,7 @@ Simulation is off in production builds. The published Docker image does not show
 Add this line to `.env`:
 
 ```bash title=".env"
-MATCHZY_ENABLE_SIMULATION_IN_PROD=true
+AT_ENABLE_SIMULATION_IN_PROD=true
 ```
 
 </Step>
@@ -41,7 +41,7 @@ MATCHZY_ENABLE_SIMULATION_IN_PROD=true
 ### Recreate the app container
 
 ```bash
-docker compose up -d --force-recreate matchzy-tournament
+docker compose up -d --force-recreate auto-tournament
 ```
 
 </Step>

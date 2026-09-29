@@ -21,8 +21,8 @@ With Auto Tournament, admins usually control matches from the web app. See [Runn
 | `.stay` | After the knife round: keep your side. |
 | `.switch`, `.swap` | After the knife round: switch sides. |
 | `.ct`, `.t` | After the knife round: pick a side. |
-| `.stop` | Ask to restore the current round. Both teams must type it. Only when `matchzy_stop_command_available` is on. |
-| `.gg` | Vote to give up the match. Only when `matchzy_gg_enabled` is on. |
+| `.stop` | Ask to restore the current round. Both teams must type it. Only when `at_stop_command_available` is on. |
+| `.gg` | Vote to give up the match. Only when `at_gg_enabled` is on. |
 | `.coach ct`, `.coach t` | Become the coach of a team. `.uncoach` stops it. |
 | `.help` | List the commands you can use. |
 | `.version` | Show the plugin version. |
@@ -34,7 +34,7 @@ See [Who is an admin](/cs2/plugin/configuration#who-is-an-admin).
 | Command | What it does |
 | --- | --- |
 | `.start`, `.forcestart`, `.force` | Start the match now, even if not everyone is ready. |
-| `.forceready` | Mark a team ready. Only when `matchzy_allow_force_ready` is on. |
+| `.forceready` | Mark a team ready. Only when `at_allow_force_ready` is on. |
 | `.restart`, `.rr` | Restart the match. |
 | `.endmatch`, `.forceend` | End and reset the match. |
 | `.forcepause`, `.fp` | Pause as an admin. Only an admin can unpause it. |
@@ -54,7 +54,7 @@ See [Who is an admin](/cs2/plugin/configuration#who-is-an-admin).
 | `.match`, `.exitprac` | Leave practice mode and start match mode. |
 | `.testevent`, `.te` | Send a test event to the event URL. |
 
-Practice mode has more commands for grenades, bots and spawns, for example `.bot`, `.savenade <name>`, `.loadnade <name>`, `.rethrow`, `.showspawns` and `.noflash`. They work as in [MatchZy](https://shobhit-pathak.github.io/MatchZy/).
+Practice mode has more commands for grenades, bots and spawns, for example `.bot`, `.savenade <name>`, `.loadnade <name>`, `.rethrow`, `.showspawns` and `.noflash`. They work the same way as in the plugin Auto Tournament CS2 is forked from.
 
 ## Console and RCON commands
 
@@ -64,12 +64,11 @@ Run these in the server console, or over RCON. They do not need a player.
 
 | Command | What it does |
 | --- | --- |
-| `matchzy_loadmatch_url "<url>" ["<header>" "<value>"]` | Download and load a match config. The optional header is sent with the request. |
-| `matchzy match load "<url>"` | The same as `matchzy_loadmatch_url`. |
-| `matchzy_loadmatch <file>` | Load a match config from a file, relative to `csgo/`. |
-| `matchzy_clear_queued_match` | Drop a match that waits for the current series to reset. |
-| `matchzy_addplayer <steam64> <team1\|team2\|spec> "<name>"` | Add a player to the loaded match. |
-| `matchzy_removeplayer <steam64>` | Remove a player from all teams. |
+| `at_loadmatch_url "<url>" ["<header>" "<value>"]` | Download and load a match config. The optional header is sent with the request. |
+| `at_loadmatch <file>` | Load a match config from a file, relative to `csgo/`. |
+| `at_clear_queued_match` | Drop a match that waits for the current series to reset. |
+| `at_addplayer <steam64> <team1\|team2\|spec> "<name>"` | Add a player to the loaded match. |
+| `at_removeplayer <steam64>` | Remove a player from all teams. |
 | `css_restart`, `css_endmatch` | Restart or end the match, as the chat commands. |
 
 If you load a match while the last series is still in postgame, it does not load right away. It waits until the series resets. The reply ends with `queued_match=<id>`. A new load replaces a waiting one. `css_restart` and `css_endmatch` drop it.
@@ -78,27 +77,27 @@ If you load a match while the last series is still in postgame, it does not load
 
 | Command | What it does |
 | --- | --- |
-| `matchzy_version` | Show the plugin version. |
-| `matchzy_match_report` | Build the match report as JSON and push it to the report URL. If there is no report URL, it prints the JSON. |
-| `matchzy_get_match_stats <matchId>` | Print the stats of a match from the plugin database as JSON. |
-| `matchzy_get_pending_events` | Show how many events wait in the retry queue. |
-| `matchzy_clear_event_queue` | Delete all waiting and failed events from the retry queue. |
-| `matchzy_check_for_updates` | Ask Steam if this CS2 server is up to date. |
+| `at_version` | Show the plugin version. |
+| `at_match_report` | Build the match report as JSON and push it to the report URL. If there is no report URL, it prints the JSON. |
+| `at_get_match_stats <matchId>` | Print the stats of a match from the plugin database as JSON. |
+| `at_get_pending_events` | Show how many events wait in the retry queue. |
+| `at_clear_event_queue` | Delete all waiting and failed events from the retry queue. |
+| `at_check_for_updates` | Ask Steam if this CS2 server is up to date. |
 
 ### Backups
 
 | Command | What it does |
 | --- | --- |
-| `matchzy_listbackups <matchId>` | List round backups of a match. |
-| `matchzy_loadbackup <file>` | Restore a backup file. |
-| `matchzy_loadbackup_url <url>` | Restore a backup from a URL. |
+| `at_listbackups <matchId>` | List round backups of a match. |
+| `at_loadbackup <file>` | Restore a backup file. |
+| `at_loadbackup_url <url>` | Restore a backup from a URL. |
 
 ### Config
 
 | Command | What it does |
 | --- | --- |
-| `matchzy_reload_config` | Run `cfg/MatchZy/config.cfg` again. |
-| `reload_admins` | Load `cfg/MatchZy/admins.json` again. |
+| `at_reload_config` | Run `cfg/AutoTournamentCS2/config.cfg` again. |
+| `reload_admins` | Load `cfg/AutoTournamentCS2/admins.json` again. |
 
 All settings on the [Configuration](/cs2/plugin/configuration) page are console commands too. Run them with a value to change a setting on a running server.
 

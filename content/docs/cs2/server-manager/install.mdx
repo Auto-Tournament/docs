@@ -59,7 +59,7 @@ In the menu, choose **Install** > **Install or redeploy servers**.
 
 The installer asks:
 
-- **MatchZy storage:** shared MySQL (the default) or one SQLite file per server. Shared MySQL keeps all match stats in one place and runs in a Docker container. You can also point it at your own MySQL server.
+- **Shared MySQL storage:** shared MySQL (the default) or one SQLite file per server. Shared MySQL keeps all match stats in one place and runs in a Docker container. You can also point it at your own MySQL server.
 - **Number of servers.** The default is 3.
 - **Game port and GOTV port** of server 1. The defaults are `27015` and `27020`.
 - **CS2 user.** The default is `cs2servermanager`.
@@ -126,8 +126,8 @@ sudo NUM_SERVERS=5 RCON_PASSWORD='a-long-random-password' csm bootstrap
 | `CS2_USER` | `cs2servermanager` | Linux user for the servers. |
 | `HOSTNAME_PREFIX` | `CS2 Server` | Start of each server name. |
 | `RCON_PASSWORD` | a fixed default | RCON password. Always set it. |
-| `MATCHZY_DB_ENGINE` | `mysql` | `sqlite` for one SQLite file per server. |
-| `MATCHZY_SKIP_DOCKER` | `0` | `1` to skip the MySQL container. |
+| `AT_DB_ENGINE` | `mysql` | `sqlite` for one SQLite file per server. |
+| `AT_SKIP_DOCKER` | `0` | `1` to skip the MySQL container. |
 | `ENABLE_METAMOD` | `1` | `0` to install without Metamod. |
 | `UPDATE_MASTER` | `1` | `0` to skip the game update. |
 | `FRESH_INSTALL` | `0` | `1` to start over from a clean install. |

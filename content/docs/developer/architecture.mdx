@@ -52,8 +52,8 @@ To add a tournament type, write a generator and add it to the registry.
 
 The API talks to CS2 servers in two directions:
 
-- **To the server:** RCON, in `rconService`. When you add a server, `serverInitializationService` sets `matchzy_server_id`, `matchzy_bootstrap_token` and `matchzy_bootstrap_url` over RCON, in that order. The plugin then downloads its settings from `GET /api/servers/:id/bootstrap`.
-- **From the server:** the plugin posts events to `/api/events` and match reports to `/api/events/report`, and downloads match configs from `/api/matches/<slug>.json`. Each request carries `SERVER_TOKEN` in the `X-MatchZy-Token` header. `matchEventHandler` applies the events.
+- **To the server:** RCON, in `rconService`. When you add a server, `serverInitializationService` sets `at_server_id`, `at_bootstrap_token` and `at_bootstrap_url` over RCON, in that order. The plugin then downloads its settings from `GET /api/servers/:id/bootstrap`.
+- **From the server:** the plugin posts events to `/api/events` and match reports to `/api/events/report`, and downloads match configs from `/api/matches/<slug>.json`. Each request carries `SERVER_TOKEN` in the `X-Auto-Tournament-Token` header. `matchEventHandler` applies the events.
 
 `matchAllocationService` picks a free server for each ready match. `matchConfigBuilder` builds the match config that the plugin downloads. The plugin side is described in [Events and report API](/cs2/plugin/events).
 

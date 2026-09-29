@@ -9,7 +9,7 @@ icon: Wrench
 App log:
 
 ```bash
-docker compose logs -f matchzy-tournament
+docker compose logs -f auto-tournament
 ```
 
 In the app, **Admin Tools** has a **Server Events Monitor** that shows events from each server as they arrive, and the **Application Logs**.
@@ -49,13 +49,13 @@ Auto Tournament cannot reach the server over RCON.
 - Check that the firewall allows TCP on the game port from the Auto Tournament machine.
 - If Auto Tournament runs in Docker on the same machine as the server, use the LAN IP, not `localhost`.
 
-### Server can't reach MAT (webhook), or no events
+### Server can't reach Auto Tournament (webhook), or no events
 
 RCON works, but the server cannot send events back.
 
 1. On the CS2 machine, run `curl <webhook-url>/api/events/test`. It must answer `"success":true`.
 2. If it fails, fix the **Webhook URL** in **Settings** > **Integrations & Webhooks**, DNS or the firewall.
-3. Check that Auto Tournament CS2 (formerly MatchZy Enhanced) is loaded: run `css_plugins list` in the server console. The plugin still shows up as MatchZy.
+3. Check that Auto Tournament CS2 is loaded: run `css_plugins list` in the server console. The plugin shows up as Auto Tournament CS2.
 4. Click **Retry** on the server.
 
 ### IP banned
@@ -87,8 +87,8 @@ Without CS2 Server Manager, update the server with SteamCMD and restart it. Then
 
 The CS2 plugin cannot reach **its own** database on the game server. This is not the Auto Tournament database.
 
-- With CS2 Server Manager and its MySQL container: run `sudo csm`, open **Tools** and choose **MatchZy DB: verify/repair**.
-- With your own MySQL: check `game/csgo/cfg/MatchZy/database.json` (with CS2 Server Manager: `/home/cs2servermanager/overrides/game/csgo/cfg/MatchZy/database.json`), that the database host is reachable, and the user and password.
+- With CS2 Server Manager and its MySQL container: run `sudo csm`, open **Tools** and choose **Auto Tournament CS2 DB: verify/repair**.
+- With your own MySQL: check `game/csgo/cfg/AutoTournamentCS2/database.json` (with CS2 Server Manager: `/home/cs2servermanager/overrides/game/csgo/cfg/AutoTournamentCS2/database.json`), that the database host is reachable, and the user and password.
 
 Restart the server and click **Refresh Status**.
 

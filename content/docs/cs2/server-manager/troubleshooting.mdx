@@ -18,7 +18,7 @@ sudo csm doctor
 - **Ownership under `/home/<cs2user>`**: files owned by root instead of the CS2 user.
 - **Steam Runtime installed (SteamRT3)**, on systems that need it.
 - **CS2 shared libs (libv8.so) present** on each server.
-- **MatchZy per-server config (shared database)**: servers on one MySQL database that would overwrite each other's settings.
+- **Auto Tournament CS2 per-server config (shared database)**: servers on one MySQL database that would overwrite each other's settings.
 
 Add `--yes` to apply all fixes without questions, or `--server 2` to check one server. Without a terminal (for example from a script), `doctor` only applies fixes with `--yes`.
 
@@ -109,7 +109,7 @@ Run `sudo csm install-deps`. It turns on the apt source that has SteamCMD and tr
 
 ## The same server shows up several times in Auto Tournament
 
-The servers share one MySQL database and overwrite each other's settings. Run `sudo csm doctor` and follow the steps under **MatchZy per-server config (shared database)**. See [Several servers on one database](/cs2/server-manager/configuration#several-servers-on-one-database).
+The servers share one MySQL database and overwrite each other's settings. Run `sudo csm doctor` and follow the steps under **Auto Tournament CS2 per-server config (shared database)**. See [Several servers on one database](/cs2/server-manager/configuration#several-servers-on-one-database).
 
 ## Other problems during install
 

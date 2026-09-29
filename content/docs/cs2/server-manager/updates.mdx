@@ -71,7 +71,7 @@ sudo csm monitor
 When Steam reports a new CS2 version, the plugin writes this line to the server log:
 
 ```text
-[MATCHZY_UPDATE_AVAILABLE] required_version=<number>
+[AT_UPDATE_AVAILABLE] required_version=<number>
 ```
 
 The monitor looks for this line in each server's log. When it finds one:
@@ -82,7 +82,7 @@ The monitor looks for this line in each server's log. When it finds one:
 
 To update an idle server, the monitor announces the restart in chat, stops the server, updates it, starts it and checks that it answers RCON again. It does this one server at a time and never touches a server with players on it.
 
-The plugin's default `matchzy_safeautoupdater_action warn_only` is fine for this. The server keeps running and the monitor restarts it once it is idle.
+The plugin's default `at_safeautoupdater_action warn_only` is fine for this. The server keeps running and the monitor restarts it once it is idle.
 
 After an update, the monitor waits an hour before it updates the same server again, so a server that keeps reporting an update does not restart in a loop.
 
