@@ -1,0 +1,191 @@
+---
+title: Plugins
+description: What each Ready Up plugin does, which ones to install, and how to turn one on or off.
+icon: Blocks
+---
+
+<Callout title="In development" type="warn">
+  Ready Up is not released yet. Plugins and their settings can still change.
+</Callout>
+
+Ready Up is a core plus plugins. The core loads into CS2 and owns every engine call. Each feature is a plugin, `game/csgo/readyup/plugins/<name>.so`. None of them needs another to be loaded: each one checks what else is there and works on its own.
+
+## Which plugins to install
+
+Most servers want the **Essentials** bundle: core, essentials, match, fleet and practice. Add single plugins with the installer, for example `bash install.sh whitelist`.
+
+| Server | Plugins |
+| --- | --- |
+| Scrims, pickups and Auto Tournament matches | The Essentials bundle. |
+| Tournament match server with Valve's rules | Core, essentials and match (fleet if you use the platform). Use [esports mode](/cs2/ready-up/esports-mode). Leave out skins and midas: they do nothing under Valve's rules anyway. |
+| Practice server | Core, essentials and practice, with `always=1` in `practice.cfg`. Add whitelist to keep it private. |
+| Fun or community server | Essentials, plus deathmatch, Midas and addons from the Full bundle. |
+| Community server with skins | Essentials, plus skins. Read the [ban risk](/cs2/ready-up/skins) first. |
+
+Match plugins do not mix. Never run MatchZy, Get5 or Auto Tournament CS2 next to Ready Up's match plugin. See the [FAQ](/cs2/ready-up/faq#running-other-plugins).
+
+## The plugins
+
+### Match
+
+The match flow: ready-up, scrims, the knife round, pauses, match configs, webhooks, demos, stats, the ready panel and the welcome card. See [Scrims and matches](/cs2/ready-up/scrims-and-matches).
+
+Without it, the core runs on its own. It still checks the engine and serves `/status`, but there is no match flow.
+
+### Essentials
+
+The server basics, kept apart from the match flow so every kind of server has them:
+
+- The admin list, `plugins/essentials/admins.json`, and `.ru admins`. See [Who is an admin](/cs2/ready-up/commands#who-is-an-admin).
+- `.ru map change`, `.ru map reload` and `.ru map restart`. See [Maps](/cs2/ready-up/commands#maps).
+
+On a map change, every player sees a `Changing map to ...` card. While the server downloads a Workshop map, they see a progress bar in the middle of the screen, with the percent and megabytes, until the map starts.
+
+Without essentials, only the admins from a match config, the Auto Tournament admin list or the platform count.
+
+### Practice
+
+Practice mode and its tools. An admin types `.prac` to turn it on and again to turn it off. Practice runs `cfg/ReadyUp/prac.cfg` (cheats, a full grenade set, infinite ammo, buy anywhere, respawn) and respawns everyone with it. Turning it off runs `idle.cfg`.
+
+Practice cannot start while a match is loaded. Its tools never work under [Valve's rules](/cs2/ready-up/esports-mode).
+
+In practice mode, everyone sees feedback in chat: how long a flash blinded someone, the damage of each hit, and the total damage of each HE grenade or molotov. `feedback=0` turns it off.
+
+The tools are listed in [Commands](/cs2/ready-up/commands#practice).
+
+Settings, in `cfg/ReadyUp/practice.cfg` or the `[practice]` section of `readyup.cfg`:
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `always` | `0` | `1` makes a dedicated practice server. Practice turns on when the plugin loads and on every map, unless a match is loaded. An admin's `.prac` still turns it off until the next map. |
+| `feedback` | `1` | Flash, damage and grenade lines in chat during practice. |
+
+### Fleet
+
+The link to the Auto Tournament platform. It stays idle until you set a platform `url`, so it is safe on a standalone server. See [Fleet mode](/cs2/ready-up/fleet).
+
+### Whitelist
+
+For practice and scrim servers: only listed players may stay. Anyone else who joins is kicked with `Not on this server's whitelist`. Admins and bots are never kicked.
+
+It is off until an admin turns it on:
+
+```text
+ru whitelist add 76561198000000000
+ru whitelist on
+```
+
+While a match is loaded, the whitelist stands down, and the match roster decides who can play. The list and the on/off state are saved in `plugins/whitelist/whitelist.json`, so they survive a restart. Commands are in [Commands](/cs2/ready-up/commands#whitelist).
+
+### Skins
+
+Weapon paints, knives, gloves and agents. Only in the Full bundle, because Valve can ban servers that run skin changers. See [Skins](/cs2/ready-up/skins).
+
+### Midas
+
+A fun plugin. Every weapon a Midas player picks up turns gold, and stays gold when someone else picks it up. It is off by default, and never active under [Valve's rules](/cs2/ready-up/esports-mode).
+
+A Midas player is:
+
+- anyone in `midas_steamids`,
+- a player an admin gave it to with `.ru midas give <player>` (again takes it back; `.ru midas` shows who is Midas and why), and
+- with `best_player=1`, the best player of the map so far, by ADR or kills. Only in scrims, unless `best_player_in_matches=1`.
+
+With the skins plugin loaded, gold is a gold paint kit ("Gold Brick" by default). Without skins, and on knives, grenades and the bomb, the weapon gets a gold color instead.
+
+For the real thing, add the **readyup_midas** Workshop addon (Workshop ID `3809620654`): mirror-polished gold models for all weapons, knives and equipment. Midas players also keep the gold model on the grenades they throw and the bomb they plant. Mount it with the [Addons](#addons) plugin:
+
+```text title="cfg/ReadyUp/addons.cfg"
+workshop_addons=3809620654
+```
+
+Settings, in `cfg/ReadyUp/midas.cfg` or the `[midas]` section of `readyup.cfg`. The plugin reads them again every 5 seconds.
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `enabled` | `0` | `1` turns Midas on. |
+| `midas_steamids` | empty | Steam64 IDs, comma separated. |
+| `best_player` | `0` | `1`: the best player of the map is Midas too. |
+| `best_player_stat` | `adr` | `adr` or `kills`. Ties go to the other stat, then fewer deaths, then the current Midas. |
+| `best_player_when` | `round` | `round`: pick at each round start, once `best_player_min_rounds` rounds are played. `half`: pick at the start of each half. |
+| `best_player_min_rounds` | `3` | Rounds before the first pick. |
+| `best_player_in_matches` | `0` | `1`: also pick in real matches. |
+| `finish` | `auto` | `auto`: a paint kit through the skins plugin when it is loaded, a color otherwise. `tint`: always the color. |
+| `paint_kit` | `1025` | Any paint kit ID. `1025` is "Gold Brick", which fits every gun. |
+| `paint_wear`, `paint_seed` | `0.0`, `0` | Wear (0 is Factory New) and pattern seed of the paint. |
+| `color` | `255,200,40` | The color, as `r,g,b` or `r,g,b,a`. |
+
+### Deathmatch
+
+Free for all and team deathmatch on CS2's own deathmatch mode. Only in the Full bundle. It does nothing until an admin switches it on.
+
+```text
+.ru dm ffa de_dust2
+.ru dm tdm
+.ru dm off
+```
+
+- `.ru dm ffa [map]` is free for all. `.ru dm tdm [map]` is team deathmatch. Both load a map: the one you give, else the default map for the mode (`.ru map default ffa <map>`), else the current map again.
+- The first player or team to the kill limit (30 for free for all, 100 for teams), or the leader when the time limit runs out (10 minutes), wins. A winner card shows, then the next game starts.
+- A small leaderboard (top 5 and your rank) is on every player's screen. There is also spawn protection, an optional headshot-only mode and weapon rounds.
+- `.ru dm status`, `.ru dm top` and `.ru dm hud` (hides your leaderboard) are open to everyone. Everything else is admin-only.
+- While it is on, the match plugin steps aside: no scrim warmup and no ready panel. Loading a match ends deathmatch.
+
+Settings are in `cfg/ReadyUp/deathmatch.cfg`. Every line ships commented out with its default, so remove the `//` to change one.
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `kill_limit_ffa`, `kill_limit_tdm` | `30`, `100` | Kills to win. `0` means no limit. |
+| `time_limit_minutes` | `10` | Minutes per game. `0` means no limit. |
+| `spawn_protection_seconds` | `2` | Spawn protection after each respawn. |
+| `headshot_only` | `0` | `1`: only headshots do damage. |
+| `hud`, `hud_interval_ms` | `1`, `1000` | The leaderboard, and how often it is redrawn. |
+| `end_delay_seconds` | `10` | How long the winner card shows before the next game. |
+| `restart` | `restartgame` | `restartgame` or `reload` (load the map again). |
+| `weapon_rounds` | `weapon_deagle,weapon_awp,weapon_ssg08` | Weapons for weapon rounds. |
+| `weapon_round_every_minutes` | `0` | Start a weapon round this often. `0` turns them off. |
+| `weapon_round_seconds` | `60` | How long a weapon round lasts. |
+| `weapon_round_restrict_buy` | `0` | `1`: nobody can buy other guns during a weapon round. |
+| `restore_game_type`, `restore_game_mode` | `0`, `1` | What `.ru dm off` goes back to. `0` and `1` is competitive, `0` and `2` is wingman. |
+
+### Addons
+
+Steam Workshop addons without Metamod. The server downloads the addons you list and mounts them on every map change. Only in the Full bundle. It is idle until you list an addon.
+
+1. Make sure the item is **Public** or **Unlisted** on the Workshop. A hidden item cannot be downloaded.
+2. Put its ID in `cfg/ReadyUp/addons.cfg`. The file is read again every 5 seconds.
+
+   ```text
+   workshop_addons=3809620654,1234567890
+   ```
+
+3. Run `ru addons` to see the state of each addon.
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `workshop_addons` | empty | Workshop item IDs, comma separated. |
+| `precache` | `auto` | Resources to load with every map. `auto` means every model the addons contain, so models do not show as ERROR. Add paths after `auto,` for more. |
+
+The map that is loaded when the server starts loads before plugins do, so it gets no addons. Change the map once after a start.
+
+### Hello
+
+A small example plugin that adds `.hello` in chat. Start here to write your own. See the [Ready Up SDK](/cs2/ready-up/sdk).
+
+## Turn a plugin on or off
+
+```text
+ru plugin list
+ru plugin disable skins
+ru plugin enable skins
+```
+
+`disable` unloads the plugin and keeps it off after a restart. `enable` loads it and keeps it on. The choice is saved in `game/csgo/readyup/plugins/plugins.json`. The files stay, so you can turn it back on at any time.
+
+`ru plugin load`, `unload` and `reload` do the same for one run only. The next restart loads every plugin that is not disabled. `ru plugin reload <name>` swaps in a new build without a restart. For the match plugin, a running match keeps going.
+
+Admins can use all of these in chat as `.ru plugin ...`.
+
+In fleet mode, the platform can turn plugins on and off too, except `match` and `fleet`.
+
+To remove a plugin's files, use the installer: `bash install.sh --remove <name>`.
