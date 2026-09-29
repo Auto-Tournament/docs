@@ -5,10 +5,10 @@
     "index",
     "steam",
     "discord",
-    "keycloak",
     "github",
     "google",
     "twitch",
-    "epic"
+    "epic",
+    "oidc"
   ]
 }
