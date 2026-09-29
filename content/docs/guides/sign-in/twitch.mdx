@@ -1,0 +1,44 @@
+---
+title: Twitch
+description: Turn on Sign in with Twitch.
+icon: Twitch
+---
+
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+
+Users sign in with their Twitch account. Auto Tournament asks Twitch for no extra scopes: it only reads the account id, name and picture. See [Sign-in providers](/guides/sign-in) for how accounts and admin access work.
+
+<Steps>
+
+<Step>
+
+### Register an application
+
+1. Open the [Twitch Developer Console](https://dev.twitch.tv/console/apps) and sign in (Twitch asks you to turn on two-factor authentication first).
+2. Click **Register Your Application**.
+3. Enter a name, for example `Auto Tournament`.
+4. Under **OAuth Redirect URLs**, paste the callback URL from **Settings → Sign-in → Twitch** in Auto Tournament. It looks like `https://tournament.example.com/api/auth/twitch/callback`.
+5. Category: **Website Integration**. Client type: **Confidential**. Click **Create**.
+6. Click **Manage**, copy the **Client ID**, then click **New Secret** and copy the **Client Secret**.
+
+</Step>
+
+<Step>
+
+### Turn it on in Auto Tournament
+
+In **Settings → Sign-in → Twitch**, paste the Client ID and Client Secret, turn it on and save. The **Sign in with Twitch** button appears on the login page right away.
+
+Prefer environment variables? Set `AUTH_TWITCH_ENABLED=true`, `TWITCH_CLIENT_ID` and `TWITCH_CLIENT_SECRET` and restart. They are imported once.
+
+</Step>
+
+<Step>
+
+### Test it
+
+Open `/login` in a private browser window and click **Sign in with Twitch**. If Twitch answers "redirect_mismatch", the OAuth Redirect URL does not match the callback URL shown in Settings exactly.
+
+</Step>
+
+</Steps>

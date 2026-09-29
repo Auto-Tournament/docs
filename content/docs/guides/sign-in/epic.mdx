@@ -1,0 +1,46 @@
+---
+title: Epic Games
+description: Turn on Sign in with Epic Games.
+icon: Gamepad2
+---
+
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+
+Users sign in with their Epic Games account, for example for Rocket League tournaments. Auto Tournament uses Epic Account Services with the **Basic Profile** permission only: it reads the account id and display name. Epic gives no profile picture. See [Sign-in providers](/guides/sign-in) for how accounts and admin access work.
+
+<Steps>
+
+<Step>
+
+### Create a product and an application
+
+1. Open the [Epic Games Developer Portal](https://dev.epicgames.com/portal) and sign in. Create an organization if you have none.
+2. Create a **Product**, for example `Auto Tournament`.
+3. Open the product, go to **Epic Account Services** and create an **Application**.
+4. In the application, under **Permissions**, keep **Basic Profile** (nothing else is needed).
+5. Under **Linked Clients**, create a client with a client policy that allows sign-in (for example **GameClient** or a custom policy with *Account Services* sign-in). Copy the **Client ID** and **Client Secret**.
+6. Under the application's **Redirect URLs**, add the callback URL from **Settings → Sign-in → Epic Games** in Auto Tournament. It looks like `https://tournament.example.com/api/auth/epic/callback`.
+
+Epic may ask you to fill in the brand settings (name, logo, privacy policy URL) before the application can be used by anyone other than your organization.
+
+</Step>
+
+<Step>
+
+### Turn it on in Auto Tournament
+
+In **Settings → Sign-in → Epic Games**, paste the Client ID and Client Secret, turn it on and save. The **Sign in with Epic Games** button appears on the login page right away.
+
+Prefer environment variables? Set `AUTH_EPIC_ENABLED=true`, `EPIC_CLIENT_ID` and `EPIC_CLIENT_SECRET` and restart. They are imported once.
+
+</Step>
+
+<Step>
+
+### Test it
+
+Open `/login` in a private browser window and click **Sign in with Epic Games**. If Epic shows an error about the redirect URL, it does not match the callback URL shown in Settings exactly.
+
+</Step>
+
+</Steps>

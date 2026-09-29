@@ -6,7 +6,7 @@ icon: Mail
 
 import { Step, Steps } from 'fumadocs-ui/components/steps';
 
-Users sign in with their Google account and link it to Steam once. Auto Tournament asks Google for the `openid`, `email` and `profile` scopes. It identifies the account by its Google account ID, not the email address. Set up [Steam](/guides/sign-in/steam) first. See [Sign-in providers](/guides/sign-in) for how linking and admin access work.
+Users sign in with their Google account. Auto Tournament asks Google for the `openid`, `email` and `profile` scopes. It identifies the account by its Google account ID, not the email address. See [Sign-in providers](/guides/sign-in) for how accounts and admin access work.
 
 <Callout type="warn">
   Google only accepts redirect URIs on a public domain with `https://`, or on `http://localhost`. A LAN address such as `http://192.168.1.50:3069` does not work. Use a domain with HTTPS, see [Reverse proxy](/guides/reverse-proxy).
@@ -51,25 +51,11 @@ To change it later, open **Clients**, click the client, edit the URI and click *
 
 <Step>
 
-### Add the values to `.env`
+### Turn it on in Auto Tournament
 
-```bash title=".env"
-AUTH_GOOGLE_ENABLED=true
-GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com
-GOOGLE_CLIENT_SECRET=your-google-client-secret
-```
+In **Settings → Sign-in → Google**, paste the Client ID and Client Secret, turn it on and save. The callback URL to register is shown there with a copy button. The **Sign in with Google** button appears on the login page right away.
 
-The button only appears when all three are set.
-
-</Step>
-
-<Step>
-
-### Restart the app
-
-```bash
-docker compose up -d --force-recreate matchzy-tournament
-```
+Prefer environment variables? Set `AUTH_GOOGLE_ENABLED=true`, `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` and restart. They are imported once.
 
 </Step>
 
@@ -79,8 +65,7 @@ docker compose up -d --force-recreate matchzy-tournament
 
 1. Open `FRONTEND_BASE_URL/login` in a private browser window.
 2. Click **Sign in with Google** and pick your Google account.
-3. The first time, you see **Connect your Steam account**. Click **Connect with Steam** and sign in with Steam.
-4. Sign out, then click **Sign in with Google** again. You are now signed in as your Steam account without the Steam step.
+3. You are signed in. Someone new gets an account of their own when registration is open (**Settings → Players & Access**). Steam can be linked later on **/me/connections**.
 
 While the app is in **Testing**, only the test users you add under **Audience** can sign in. To let anyone with a Google account sign in, open **Audience** and click **Publish app**. The scopes Auto Tournament asks for do not need Google's app verification.
 

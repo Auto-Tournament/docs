@@ -6,7 +6,7 @@ icon: GitBranch
 
 import { Step, Steps } from 'fumadocs-ui/components/steps';
 
-Users sign in with their GitHub account and link it to Steam once. Auto Tournament asks GitHub only for the `read:user` scope, which is read access to the public profile. Set up [Steam](/guides/sign-in/steam) first. See [Sign-in providers](/guides/sign-in) for how linking and admin access work.
+Users sign in with their GitHub account. Auto Tournament asks GitHub only for the `read:user` scope, which is read access to the public profile. See [Sign-in providers](/guides/sign-in) for how accounts and admin access work.
 
 <Steps>
 
@@ -46,25 +46,11 @@ For example `https://tournament.example.com/api/auth/github/callback`. If you al
 
 <Step>
 
-### Add the values to `.env`
+### Turn it on in Auto Tournament
 
-```bash title=".env"
-AUTH_GITHUB_ENABLED=true
-GITHUB_CLIENT_ID=your-github-client-id
-GITHUB_CLIENT_SECRET=your-github-client-secret
-```
+In **Settings → Sign-in → GitHub**, paste the Client ID and Client Secret, turn it on and save. The callback URL to register is shown there with a copy button. The **Sign in with GitHub** button appears on the login page right away.
 
-The button only appears when all three are set. `GITHUB_TOKEN` is a different setting, used for **Sync CS2 Maps**. It has nothing to do with sign-in.
-
-</Step>
-
-<Step>
-
-### Restart the app
-
-```bash
-docker compose up -d --force-recreate matchzy-tournament
-```
+Prefer environment variables? Set `AUTH_GITHUB_ENABLED=true`, `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET` and restart. They are imported once.
 
 </Step>
 
@@ -74,8 +60,7 @@ docker compose up -d --force-recreate matchzy-tournament
 
 1. Open `FRONTEND_BASE_URL/login` in a private browser window.
 2. Click **Sign in with GitHub** and click **Authorize** on GitHub.
-3. The first time, you see **Connect your Steam account**. Click **Connect with Steam** and sign in with Steam.
-4. Sign out, then click **Sign in with GitHub** again. You are now signed in as your Steam account without the Steam step.
+3. You are signed in. Someone new gets an account of their own when registration is open (**Settings → Players & Access**). Steam can be linked later on **/me/connections**.
 
 If GitHub shows "The redirect_uri is not associated with this application", the callback URL in step 2 does not match `FRONTEND_BASE_URL` exactly.
 

@@ -1,5 +1,14 @@
 {
   "title": "Sign-in",
   "icon": "KeyRound",
-  "pages": ["index", "steam", "discord", "keycloak", "github", "google"]
+  "pages": [
+    "index",
+    "steam",
+    "discord",
+    "keycloak",
+    "github",
+    "google",
+    "twitch",
+    "epic"
+  ]
 }
