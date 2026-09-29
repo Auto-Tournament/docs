@@ -33,6 +33,9 @@ API_TOKENS=discord-bot:paste-the-secret-here
 
 # Read only: GET, HEAD and OPTIONS
 API_TOKENS_READONLY=scoreboard:paste-another-secret-here
+
+# Only the integrations API, e.g. a website that sends its teams
+API_TOKENS_INTEGRATOR=ntlan:paste-a-third-secret-here
 ```
 
 3. Recreate the app container:
@@ -65,7 +68,7 @@ curl -H "Authorization: Bearer $TOKEN" http://localhost:3069/api/auth/admin/me
 | Status | Meaning |
 | --- | --- |
 | `401` | The token is wrong, or no tokens are set. |
-| `403` | The token is read-only and you tried to change something. |
+| `403` | The token is read-only and you tried to change something, or it is an integrator token used outside `/api/integrations`. |
 
 To remove a token, delete it from `.env` and recreate the container. To change a token, add the new one next to the old one, move the program to the new one, then remove the old one.
 
@@ -82,6 +85,10 @@ These need no token:
 | `GET /health` | If the app is running. |
 
 For everything else, see `/api-docs` on your install.
+
+## Webhooks
+
+Auto Tournament can also send match events to another website. See [Webhooks and teams API](/reference/webhooks).
 
 ## Example bot
 

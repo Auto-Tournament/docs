@@ -1,4 +1,4 @@
 {
   "title": "Reference",
-  "pages": ["configuration", "api", "troubleshooting", "servers-health", "licensing", "changelog"]
+  "pages": ["configuration", "api", "webhooks", "troubleshooting", "servers-health", "licensing", "changelog"]
 }
