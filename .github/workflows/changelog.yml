@@ -1,0 +1,44 @@
+# Regenerates content/docs/reference/changelog/ from the GitHub releases of
+# each product and commits the result to main when it changed. The server's
+# auto_update.sh then deploys it like any other commit.
+name: Changelog
+
+on:
+  schedule:
+    - cron: '17 * * * *' # hourly
+  workflow_dispatch:
+  # A product repo can trigger a refresh right after a release:
+  #   gh api repos/Auto-Tournament/docs/dispatches -f event_type=release-published
+  repository_dispatch:
+    types: [release-published]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: changelog
+  cancel-in-progress: false
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Generate
+        run: node scripts/changelog/generate.mjs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Commit if changed
+        run: |
+          if git diff --quiet -- content/docs/reference/changelog; then
+            echo "No changes."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add content/docs/reference/changelog
+          git commit -m "docs(changelog): update from GitHub releases"
+          git push
