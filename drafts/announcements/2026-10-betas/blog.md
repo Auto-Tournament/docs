@@ -2,12 +2,7 @@
 Draft blog / website post for the October 2026 betas. Not published.
 The docs site has no blog or news section, so this lives outside content/ and is not built.
 Before publishing:
-- Every feature here is merged; nothing is released yet. Publish after the three releases exist.
-- TODO(product-pages): the autotournament.gg product page paths (/platform, /ready-up, /csm)
-  are placeholders until the website's product pages are merged. Check them against the
-  website repo.
-- TODO(ready-up-docs): docs.autotournament.gg/cs2/ready-up is in Auto-Tournament/docs#8,
-  which publishes with Ready Up's first release.
+- All three releases are out (2026-09-29).
 - Use the Auto Tournament icon for the post image. No MatchZy branding.
 -->
 
@@ -24,8 +19,8 @@ crashed ones, starts and stops servers to fit the bracket, and adds new machines
 command. These are betas. Try them on test servers and scrims first.
 
 More about each one: [Auto Tournament](https://autotournament.gg/platform),
-[Ready Up](https://autotournament.gg/ready-up) and
-[CS2 Server Manager](https://autotournament.gg/csm).
+[Ready Up](https://autotournament.gg/games/cs2/ready-up) and
+[CS2 Server Manager](https://autotournament.gg/games/cs2/csm).
 
 ## One CS2 install, unlimited servers
 

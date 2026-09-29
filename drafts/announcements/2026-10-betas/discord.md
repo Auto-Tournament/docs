@@ -1,10 +1,6 @@
 <!--
 Draft Discord post for the October 2026 betas. Not published.
 Paste everything between the two lines. Keep it under 1200 characters (Discord's limit is 2000).
-Before posting:
-- The release links only work once the three releases exist.
-- TODO(product-pages): the autotournament.gg paths below are placeholders until the website's
-  product pages are merged. Check them against the website repo.
 -->
 
 ---
@@ -23,9 +19,9 @@ What's new:
 
 These are betas. Try them on test servers, not your main event.
 
-Ready Up: https://autotournament.gg/ready-up
+Ready Up: https://autotournament.gg/games/cs2/ready-up
 Platform: https://autotournament.gg/platform
-csm: https://autotournament.gg/csm
+csm: https://autotournament.gg/games/cs2/csm
 Releases: https://github.com/Auto-Tournament
 Docs: https://docs.autotournament.gg
 
