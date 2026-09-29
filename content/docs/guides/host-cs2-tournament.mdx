@@ -1,0 +1,202 @@
+---
+title: Host a CS2 tournament
+description: From a new install to a running Counter-Strike 2 tournament, with servers managed from the platform.
+icon: Trophy
+---
+
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+
+This guide takes you from nothing to a running CS2 tournament. It uses CS2 Server Manager (csm) to put many servers on one Linux machine, and the platform to create and control them. It is the shortest path. Other ways to get servers are at the [end](#other-ways-to-add-servers).
+
+<Callout title="Game modules are not installed by default">
+  In Auto Tournament 3.0 no game module comes with a new install, not even CS2. Until you install the CS2 module there is no **Servers** page and no map pools. That is step 2. 3.0 is in beta. See [What are modules](/modules).
+</Callout>
+
+You need:
+
+- One machine that runs the platform, with Docker.
+- One Linux machine for the game servers. Debian or Ubuntu, `sudo` access, at least 8 GB RAM and about 70 GB of free disk. For a small event it can be the same machine as the platform, but game servers use a lot of CPU.
+- The ports from [Server requirements](/modules/cs2/server-requirements) open, so players can reach the game servers.
+
+<Steps>
+
+<Step>
+
+### Install the platform and finish setup
+
+Follow [Install](/getting-started/install), then [First login](/getting-started/first-login).
+
+After the admin steps you see **One last thing: the license**. Pick how you use this instance:
+
+- **Non-commercial**: free. Nobody earns money from it.
+- **Commercial**: you need a license. You can paste the key now or later, in **Settings** > **License**.
+
+Type `I AGREE` and click **Accept and continue**. For who needs a license, see [Licensing and commercial use](/reference/licensing). Every game server counts toward it.
+
+</Step>
+
+<Step>
+
+### Install the CS2 module
+
+1. Open **Admin** > **Modules**.
+2. Under **Games**, find **Counter-Strike 2** in the **Available** list and click **Install**.
+3. Confirm the **Install Counter-Strike 2?** dialog. The module is signed by Auto Tournament, and the dialog says where it is installed from.
+4. When the page asks you to reload, click **Reload**. If it asks for a restart, click **Restart now**.
+
+The page comes back with the CS2 pages (**Servers** and **Maps**) and the CS2 settings. Then open **Settings** > **Integrations & Webhooks** and click **Sync CS2 Maps**, as in [First login](/getting-started/first-login).
+
+</Step>
+
+<Step>
+
+### Prepare the game machine
+
+On the Linux machine, install csm with the command in [Install CS2 Server Manager](/cs2/server-manager/install). Quit the menu it opens. Then run:
+
+```bash
+sudo csm setup-host
+sudo -iu cs2servermanager csm instance config backend instances
+```
+
+- `sudo csm setup-host` runs once. It installs the system packages, creates the `cs2servermanager` user and lets csm run as that user, without `sudo`. It never starts, stops or updates a server, and it is safe to run again.
+- **Instance mode** means every server runs one shared, read-only copy of CS2. Ten servers cost about as much disk as one. Without it, each server is a full copy, about 69 GB each.
+
+The CS2 download is about 69 GB, once for all servers. It runs the first time a server is created, or when you run `csm update-game`. It can take a long time, so start it early.
+
+</Step>
+
+<Step>
+
+### Link the machine to the platform
+
+1. Open **Servers**. Under **Machines**, click **Add machine**. Give it a name if you like, then click **Get the command**.
+2. The platform shows a `csm link` command with a one-time code. The code works once and for 15 minutes.
+3. Run the link command as the CS2 user. Use `-` in place of the code, so the code is read from your keyboard and stays out of the shell history:
+
+   ```bash
+   sudo -iu cs2servermanager csm link https://tournament.example.com -
+   ```
+
+   Paste the code and press Enter. If it does not continue, press Ctrl+D.
+4. Install the host agent as a service, so it keeps running and starts again after a reboot:
+
+   ```bash
+   sudo -iu cs2servermanager csm agent install
+   ```
+
+The dialog changes to **Connected. The machine is ready.** The machine now shows as **Online** under **Machines**, with its CPU, memory and disk.
+
+If your platform address starts with `http://`, the command the platform shows has `--insecure` in it. Keep it when you build your own command. The link token then travels unencrypted, so serve the platform over https when you can. See [Reverse proxy](/guides/reverse-proxy).
+
+The link is one outbound connection from the machine to the platform. You open no inbound port for it, and you need no SSH from here on.
+
+</Step>
+
+<Step>
+
+### Create the servers
+
+On the machine's card under **Machines**, click **Create server** for one, or **Create several…** for many. Set **How many** and choose a **Plugin preset**:
+
+| Preset | Plugins |
+| --- | --- |
+| **Tournament** | Match, essentials and whitelist. Use this for an event. |
+| **Practice** | For grenades and positions. |
+| **Fun** | Extras for casual servers. |
+| **Custom** | You pick each plugin. |
+| **Fleet default** | The set you saved with **Default plugins**. |
+
+New servers get Ready Up, connect to the platform on their own and show up in the **Ready Up fleet** list. The first one can take a while, because CS2 must finish downloading.
+
+Two things are on by default:
+
+- **Automatic scaling** starts stopped servers before the bracket needs them and stops idle ones after a cool-down. When all servers are busy and the machine has room, it creates one more. Servers are never deleted. The defaults are 2 minutes of lead time, 10 minutes idle before a stop, and 4 servers per machine. Change them in **Automatic scaling** on the **Servers** page.
+- **Failover** moves a match to another server if its server dies. See [What failover does](#what-failover-does).
+
+<Callout type="warn" title="Spare servers count toward the license">
+  Failover keeps spare servers idle, so one is ready when another goes down. Every server counts toward the license, spares too, and so does every server automatic scaling creates. For an event that makes a profit, count them before you create servers. You set the number of spares in **Failover** on the **Servers** page.
+</Callout>
+
+</Step>
+
+<Step>
+
+### Teams, tournament and maps
+
+This part is the same for every setup:
+
+1. **Teams**: create the teams and their players. See [Teams and players](/guides/teams-and-players).
+2. **Tournament**: click **Create Tournament**. Pick the [format](/guides/tournament-formats) and **Best of 1**, **Best of 3** or **Best of 5**.
+3. **Maps**: choose a map pool. Map veto needs exactly 7 maps. See [Maps](/guides/maps).
+4. Click **Save & Generate Brackets** and check the **Bracket** page.
+
+The full walk-through is [Run a first tournament](/getting-started/first-tournament).
+
+</Step>
+
+<Step>
+
+### Start
+
+Send players the address of the platform and the [guide for players](/guides/players). Then click **Start Tournament**.
+
+For each match, the teams do the map veto on their player pages. The platform picks a free server and loads the match.
+
+</Step>
+
+</Steps>
+
+## What players see
+
+Players sign in with Steam and land on their player page. It shows their next match and, when it is their turn, the map veto. When the server is ready, the page shows the **Connect to Server** button. Players do not type an IP or a password.
+
+In the server, each player is put on the right team. Players type `.ready` in chat, and the match goes live when everyone is ready. See [Running matches](/guides/running-matches).
+
+## Watch and control matches
+
+Open **Matches** to see live scores. Open a match to see **Admin controls**: pause, swap teams, restore a backup, end the match and more. They are listed in [Running matches](/guides/running-matches#admin-controls).
+
+## Demos
+
+If demo recording is on, the server records a demo for each map. It is uploaded to the platform when the match ends, and you download it from the match.
+
+## Round backups
+
+CS2 writes a backup at the start of every round, and Ready Up sends it to the platform. To go back, open the match and choose **Restore backup**. Under **Round backups**, pick a map and a round, then click **Restore**. Rounds played after that round are voided, and the match is paused until an admin unpauses it.
+
+## What failover does
+
+If a server loses its connection, hangs or stops during a match, the platform notices. With **Automatic failover** on (the default), the match resumes from the last round backup. It resumes on the same server if that server comes back in time, and otherwise on a free one. The platform asks csm to restart the server that went down, and waits up to 90 seconds for it. If no server is free, csm creates one on a machine that has room, and the match moves as soon as it is ready.
+
+Players see the new server on the match page. The match has a **Failover** section with the history. With automatic failover off, the match page asks an admin first. An admin can also use **Move match** at any time.
+
+You set failover, and the number of spare servers, in **Failover** on the **Servers** page.
+
+## Other ways to add servers
+
+### One server, no csm
+
+Use this for one server that you set up by hand.
+
+1. On the server, install Ready Up with the installer in [Install Ready Up](/cs2/ready-up/install). Choose the Essentials bundle.
+2. On the platform, open **Servers**. Under **Ready Up fleet**, click **Add server**, then **Create code**. The code works for 15 minutes.
+3. In the server console, run the command the platform shows:
+
+   ```text
+   ru fleet enroll https://tournament.example.com RUE-7F3K-9QX2-LM4D-P8TW
+   ```
+
+4. When the server shows as **Online**, click **Use for matches**.
+
+More in [Fleet mode](/cs2/ready-up/fleet#enroll-a-server). The platform cannot start, stop or create this server, and automatic scaling leaves it alone. Failover can still move a match to it.
+
+### Legacy RCON servers
+
+Servers with the Auto Tournament CS2 plugin (formerly MatchZy Enhanced) are added by host, port and RCON password on the **Servers** page, with **Add Server** or **Batch Add**. See [Connect a CS2 server](/getting-started/connect-server). They have no automatic scaling and no failover.
+
+## Next
+
+- [Running matches](/guides/running-matches)
+- [Server requirements](/modules/cs2/server-requirements)
+- [License key](/guides/license)
