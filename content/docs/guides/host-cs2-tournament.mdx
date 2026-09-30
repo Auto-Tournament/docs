@@ -15,7 +15,7 @@ This guide takes you from nothing to a running CS2 tournament. It uses CS2 Serve
 You need:
 
 - One machine that runs the platform, with Docker.
-- One Linux machine for the game servers. Debian or Ubuntu, `sudo` access, at least 8 GB RAM and about 70 GB of free disk. For a small event it can be the same machine as the platform, but game servers use a lot of CPU.
+- One Linux machine for the game servers. Debian or Ubuntu, an ordinary user account with `sudo` for the one-time setup, at least 8 GB RAM and about 70 GB of free disk. For a small event it can be the same machine as the platform, but game servers use a lot of CPU.
 - The ports from [Server requirements](/modules/cs2/server-requirements) open, so players can reach the game servers.
 
 <Steps>
@@ -44,7 +44,7 @@ Type `I AGREE` and click **Accept and continue**. For who needs a license, see [
 3. Confirm the **Install Counter-Strike 2?** dialog. The module is signed by Auto Tournament, and the dialog says where it is installed from.
 4. When the page asks you to reload, click **Reload**. If it asks for a restart, click **Restart now**.
 
-The page comes back with the CS2 pages (**Servers** and **Maps**) and the CS2 settings. Then open **Settings** > **Integrations & Webhooks** and click **Sync CS2 Maps**, as in [First login](/getting-started/first-login).
+The page comes back with the CS2 pages (**Servers** and **Maps**) and the CS2 settings. Then open **Settings → Counter-Strike 2** and click **Sync CS2 Maps**.
 
 </Step>
 
@@ -52,14 +52,14 @@ The page comes back with the CS2 pages (**Servers** and **Maps**) and the CS2 se
 
 ### Prepare the game machine
 
-On the Linux machine, install csm with the command in [Install CS2 Server Manager](/cs2/server-manager/install). Quit the menu it opens. Then run:
+On the Linux machine, log in as the account that will run the servers (not root) and install csm with the command in [Install CS2 Server Manager](/cs2/server-manager/install). Quit the menu it opens. Then run:
 
 ```bash
 sudo csm setup-host
-sudo -iu cs2servermanager csm instance config backend instances
+csm instance config backend instances
 ```
 
-- `sudo csm setup-host` runs once. It installs the system packages, creates the `cs2servermanager` user and lets csm run as that user, without `sudo`. It never starts, stops or updates a server, and it is safe to run again.
+- `sudo csm setup-host` runs once. It installs the system packages and sets your account up to run csm without `sudo`: servers keep running after you log out, and the files csm uses are yours. It never starts, stops or updates a server, and it is safe to run again. After this, run every `csm` command as yourself, without `sudo`. csm refuses to run as root.
 - **Instance mode** means every server runs one shared, read-only copy of CS2. Ten servers cost about as much disk as one. Without it, each server is a full copy, about 69 GB each.
 
 The CS2 download is about 69 GB, once for all servers. It runs the first time a server is created, or when you run `csm update-game`. It can take a long time, so start it early.
@@ -72,17 +72,17 @@ The CS2 download is about 69 GB, once for all servers. It runs the first time a 
 
 1. Open **Servers**. Under **Machines**, click **Add machine**. Give it a name if you like, then click **Get the command**.
 2. The platform shows a `csm link` command with a one-time code. The code works once and for 15 minutes.
-3. Run the link command as the CS2 user. Use `-` in place of the code, so the code is read from your keyboard and stays out of the shell history:
+3. Run the link command. Use `-` in place of the code, so the code is read from your keyboard and stays out of the shell history:
 
    ```bash
-   sudo -iu cs2servermanager csm link https://tournament.example.com -
+   csm link https://tournament.example.com -
    ```
 
    Paste the code and press Enter. If it does not continue, press Ctrl+D.
 4. Install the host agent as a service, so it keeps running and starts again after a reboot:
 
    ```bash
-   sudo -iu cs2servermanager csm agent install
+   csm agent install
    ```
 
 The dialog changes to **Connected. The machine is ready.** The machine now shows as **Online** under **Machines**, with its CPU, memory and disk.
@@ -126,10 +126,9 @@ Two things are on by default:
 
 This part is the same for every setup:
 
-1. **Teams**: create the teams and their players. See [Teams and players](/guides/teams-and-players).
-2. **Tournament**: click **Create Tournament**. Pick the [format](/guides/tournament-formats) and **Best of 1**, **Best of 3** or **Best of 5**.
-3. **Maps**: choose a map pool. Map veto needs exactly 7 maps. See [Maps](/guides/maps).
-4. Click **Save & Generate Brackets** and check the **Bracket** page.
+1. **Teams**: create the teams and their players. Every CS2 player needs a Steam account. See [Teams and players](/guides/teams-and-players).
+2. **Tournament setup**: go through the steps: game, name, [format](/guides/tournament-formats) and best of 1, 3 or 5, teams, then the map pool (map veto needs exactly 7 maps, see [Maps](/guides/maps)).
+3. On **Review**, click **Create Tournament** and check the **Bracket** page.
 
 The full walk-through is [Run a first tournament](/getting-started/first-tournament).
 
@@ -149,7 +148,7 @@ For each match, the teams do the map veto on their player pages. The platform pi
 
 ## What players see
 
-Players sign in with Steam and land on their player page. It shows their next match and, when it is their turn, the map veto. When the server is ready, the page shows the **Connect to Server** button. Players do not type an IP or a password.
+Players sign in with any sign-in method you turned on and land on their player page. For CS2 their account needs Steam connected, because the server lets players in by Steam ID. It shows their next match and, when it is their turn, the map veto. When the server is ready, the page shows the **Connect to Server** button. Players do not type an IP or a password.
 
 In the server, each player is put on the right team. Players type `.ready` in chat, and the match goes live when everyone is ready. See [Running matches](/guides/running-matches).
 
@@ -187,13 +186,13 @@ Use this for one server that you set up by hand.
    ru fleet enroll https://tournament.example.com RUE-7F3K-9QX2-LM4D-P8TW
    ```
 
-4. When the server shows as **Online**, click **Use for matches**.
+4. When the server shows as **Online**, it is used for tournament matches. To keep one out (for example a practice server), edit the server and turn off **Use for tournament matches**.
 
 More in [Fleet mode](/cs2/ready-up/fleet#enroll-a-server). The platform cannot start, stop or create this server, and automatic scaling leaves it alone. Failover can still move a match to it.
 
 ### Legacy RCON servers
 
-Servers with MatchZy Enhanced (formerly MatchZy Enhanced) are added by host, port and RCON password on the **Servers** page, with **Add Server** or **Batch Add**. See [Connect a CS2 server](/getting-started/connect-server). They have no automatic scaling and no failover.
+Servers with [MatchZy Enhanced](/cs2/matchzy-enhanced), the older plugin, are added by host, port and RCON password on the **Servers** page, with **Add Server** or **Batch Add**. See [Connect a CS2 server](/getting-started/connect-server). They have no automatic scaling and no failover.
 
 ## Next
 

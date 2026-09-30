@@ -52,7 +52,7 @@ docker compose up -d
 ### Watch the log
 
 ```bash
-docker compose logs -f matchzy-tournament
+docker compose logs -f auto-tournament
 ```
 
 Wait until the log shows that the server started, then press `Ctrl+C`.
@@ -79,8 +79,8 @@ If the app does not start, the log usually shows the reason. The most common cau
 
 ```yaml title="docker-compose.yml"
 services:
-  matchzy-tournament:
-    image: sivertio/matchzy-auto-tournament:2.4.15
+  auto-tournament:
+    image: sivertio/auto-tournament:3.0.0
 ```
 
 Versions are listed on the [releases page](https://github.com/Auto-Tournament/auto-tournament/releases). The image tag has no `v` in front.
@@ -93,7 +93,7 @@ Versions are listed on the [releases page](https://github.com/Auto-Tournament/au
 
 ### Set the older version
 
-Set the older version in `image:` in `docker-compose.yml`, for example `sivertio/matchzy-auto-tournament:2.4.13`.
+Set the older version in `image:` in `docker-compose.yml`, for example `sivertio/auto-tournament:2.4.13`.
 
 </Step>
 

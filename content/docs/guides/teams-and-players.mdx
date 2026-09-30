@@ -30,7 +30,7 @@ Enter the team name and a short tag, for example `NAVI`. The team ID is made fro
 
 ### Add the players
 
-For each player, enter a Steam ID and a name. You can enter a Steam64 ID or a Steam profile URL. Custom profile URLs (vanity URLs) need a Steam Web API key, set with `STEAM_API_KEY` in `.env`.
+For each player, enter a name and, for CS2, a Steam ID: a Steam64 ID or a Steam profile URL. CS2 servers let players in by Steam ID. Custom profile URLs (vanity URLs) need the Steam Web API key from **Settings → Sign-in → Steam**.
 
 </Step>
 
@@ -125,7 +125,7 @@ steamId,name,initialELO
 76561198765432109,Player2,
 ```
 
-`steamId` and `name` are required. `initialELO` and `avatarUrl` are optional.
+Only `name` is required. Leave `steamId` out for a player without Steam: they get an account of their own and can connect Steam, or sign in another way, later. `initialELO` and `avatarUrl` are optional. For CS2, players need a Steam ID.
 
 </Step>
 
@@ -141,13 +141,13 @@ Confirm the import. The players show up on the **Players** page.
 
 ## Player registration
 
-By default, anyone who signs in with Steam gets a player record. To only allow players that an admin created or imported, turn off **Player registration** in **Settings**.
+Player registration is off by default: only players that an admin created or imported can take part. To let anyone who signs in, with any sign-in method, get an account of their own, turn on **Allow anyone to register by signing in** in **Settings → Players & Access**.
 
 ## Team pages and player pages
 
-Every team has a page at `/team/<team-id>`. It shows the team's current match, the roster, stats and match history. Viewers must sign in to open it.
+Every team has a page at `/team/<team-id>`. It shows the team's current match, the roster, stats and match history, and anyone with the link can open it.
 
-The map veto and the button to join the server are on each player's own page, `/player/<steam-id>`. Players land there after they sign in with Steam. Only players on the team can use the veto and see the server details.
+The map veto and the button to join the server are on each player's own page, `/player/<id>`. Players land there after they sign in. Only players on the team can use the veto and see the server details.
 
 To share a team page, click the link icon next to the team on **Teams** (**Copy team match link**). Send players the [guide for players](/guides/players).
 
