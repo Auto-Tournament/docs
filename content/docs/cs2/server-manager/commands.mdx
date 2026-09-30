@@ -4,7 +4,7 @@ description: Every csm command, flag and environment variable.
 icon: ListTree
 ---
 
-Run `sudo csm` with no command to open the menu. Run `csm help` for a short list in the terminal.
+Run `csm` with no command to open the menu. Run `csm help` for a short list in the terminal.
 
 `<server>` is a server number: `1` for `server-1`. Where a command says so, `0` means all servers.
 
@@ -52,7 +52,7 @@ Run `sudo csm` with no command to open the menu. Run `csm help` for a short list
 | `csm dedupe-vpk [--dry-run] [--verify] [--undo] [--allow-running] [server]` | Hardlink the `.vpk` files of the servers to `master-install` to save disk space. See [Save disk space](/cs2/server-manager/managing-servers#save-disk-space). |
 | `csm extract-map-data` | Extract map preview images. See [Map thumbnails](/cs2/server-manager/maps). |
 | `csm logdir` | Show the `csm` log folder and the latest command logs. |
-| `csm cleanup-all` | Delete all servers, the CS2 user and the MySQL container. |
+| `csm cleanup-all` | Delete all servers and the MySQL container. |
 
 ## RCON bans
 
@@ -76,7 +76,7 @@ The menu and most commands that change something need `sudo`. `csm help`, `publi
 
 ## Environment variables
 
-Set these in front of the command, for example `sudo CSM_LAUNCH_MODE=alternate csm restart`. For the update monitor, they must also be in the cron job.
+Set these in front of the command, for example `CSM_LAUNCH_MODE=alternate csm restart`. For the update monitor, they must also be in the cron job.
 
 | Variable | What it does |
 | --- | --- |
@@ -85,9 +85,8 @@ Set these in front of the command, for example `sudo CSM_LAUNCH_MODE=alternate c
 | `CSM_METAMOD_VERSION` | Metamod release tag for `update-plugins`, or `latest`. Default `2.0.0.1411`. |
 | `CSM_MATCHZY_SCOPE_PREFIX` | Prefix for the plugin scope name, instead of the hostname. |
 | `CSM_VPK_HARDLINK` | `0` turns off VPK hardlinks. New copies are full copies. |
-| `CSM_ROOT` | Folder for `csm` state and logs. Default `/opt/cs2-server-manager`. |
+| `CSM_ROOT` | Folder for csm's state, logs and servers. Default: the home folder of the account that runs csm. |
 | `CSM_LOG_DIR` | Folder for `csm` logs. Default `<CSM_ROOT>/logs`. |
 | `CSM_COPY_MODE` | The same as `--copy-mode`. |
-| `CS2_USER` | Linux user of the servers. Default `cs2servermanager`. |
 
 `csm bootstrap` reads more variables, such as `NUM_SERVERS` and `RCON_PASSWORD`. See [Install without the menu](/cs2/server-manager/install#install-without-the-menu).

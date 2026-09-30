@@ -43,7 +43,7 @@ go build -o csm ./src/cmd/cs2-tui
 ### Run
 
 ```bash
-sudo ./csm
+./csm
 ```
 
 When you run `csm` from a folder that has an `overrides/` folder next to the binary, `csm` uses that folder as its root instead of `/opt/cs2-server-manager`. Set `CSM_ROOT` to choose the root yourself.
@@ -74,7 +74,7 @@ go test ./...
 ## Contribute
 
 - Open an [issue](https://github.com/Auto-Tournament/cs2-server-manager/issues) first for larger changes.
-- In a bug report, give your Linux version and CPU type (`uname -m`), what you expected and what happened, and the logs: `sudo csm logs <server> 200` and `/opt/cs2-server-manager/logs/csm.log`.
+- In a bug report, give your Linux version and CPU type (`uname -m`), what you expected and what happened, and the logs: `csm logs <server> 200` and `/opt/cs2-server-manager/logs/csm.log`.
 - Keep pull requests small, and say how you tested the change.
 
 Releases are made from the GitHub **Release** workflow with `scripts/release.sh`. It uploads `csm-linux-amd64` and `csm-linux-arm64`.

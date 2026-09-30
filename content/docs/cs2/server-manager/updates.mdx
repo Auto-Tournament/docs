@@ -9,7 +9,7 @@ icon: RefreshCw
 Valve updates CS2 often. An outdated server cannot load matches, and Auto Tournament shows **CS2 update required**.
 
 ```bash
-sudo csm update-game
+csm update-game
 ```
 
 This updates `master-install` with SteamCMD, stops all servers, copies the new files to each server and starts them again. Players on the servers are kicked, so do not run it during a match.
@@ -17,13 +17,13 @@ This updates `master-install` with SteamCMD, stops all servers, copies the new f
 To update only one server:
 
 ```bash
-sudo csm update-server 2
+csm update-server 2
 ```
 
 ## Update the plugins
 
 ```bash
-sudo csm update-plugins
+csm update-plugins
 ```
 
 This downloads the plugins, copies them and your [overrides](/cs2/server-manager/configuration#your-own-config-files) to every server, and restarts the servers. It installs:
@@ -35,7 +35,7 @@ This downloads the plugins, copies them and your [overrides](/cs2/server-manager
 `update-plugins` always installs the whole bundle, so it replaces a newer Metamod with the fixed version. To choose another Metamod build, set `CSM_METAMOD_VERSION` to a [release tag](https://github.com/alliedmodders/metamod-source/releases), or to `latest` for the newest build:
 
 ```bash
-sudo CSM_METAMOD_VERSION=2.0.0.1468 csm update-plugins
+CSM_METAMOD_VERSION=2.0.0.1468 csm update-plugins
 ```
 
 Keep all servers on the same plugin version. Auto Tournament shows **Version mismatch** when they differ.
@@ -45,25 +45,25 @@ Keep all servers on the same plugin version. Auto Tournament shows **Version mis
 The update monitor checks each server's log and updates servers that need it. Install it as a cron job that runs every 5 minutes:
 
 ```bash
-sudo csm install-monitor-cron
+csm install-monitor-cron
 ```
 
 Other intervals use cron syntax for the minute field:
 
 ```bash
-sudo csm install-monitor-cron "*/10"
+csm install-monitor-cron "*/10"
 ```
 
 To remove it:
 
 ```bash
-sudo csm remove-monitor-cron
+csm remove-monitor-cron
 ```
 
 To run one check by hand:
 
 ```bash
-sudo csm monitor
+csm monitor
 ```
 
 ### How the monitor works
@@ -93,13 +93,13 @@ The monitor writes its log to `auto_update_monitor.log` in the `csm` log folder.
 The monitor can't see whether a tournament is running. It only sees whether a server is idle, and servers are often idle between matches. Before an event, turn automatic updates off:
 
 ```bash
-sudo csm updates hold on
+csm updates hold on
 ```
 
 While the hold is on, the monitor never restarts a server. When the event is over:
 
 ```bash
-sudo csm updates hold off
+csm updates hold off
 ```
 
 The hold is saved and survives reboots. `csm update-game` and `csm update-server` still work while it is on, so you can update by hand between rounds.
@@ -107,7 +107,7 @@ The hold is saved and survives reboots. `csm update-game` and `csm update-server
 To see the current settings:
 
 ```bash
-sudo csm updates status
+csm updates status
 ```
 
 ### Change the idle grace period
@@ -115,7 +115,7 @@ sudo csm updates status
 A server must stay idle this many minutes before the monitor updates it:
 
 ```bash
-sudo csm updates grace 20
+csm updates grace 20
 ```
 
 ## Set up automatic updates
@@ -123,7 +123,7 @@ sudo csm updates grace 20
 Install the update monitor:
 
 ```bash
-sudo csm install-monitor-cron
+csm install-monitor-cron
 ```
 
-That's it. When CS2 updates, each server is updated the next time it has been idle for the grace period. Remember to run `sudo csm updates hold on` before an event.
+That's it. When CS2 updates, each server is updated the next time it has been idle for the grace period. Remember to run `csm updates hold on` before an event.

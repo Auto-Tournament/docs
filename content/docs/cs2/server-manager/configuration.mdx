@@ -9,28 +9,29 @@ icon: FolderCog
 `csm` rebuilds server files when it updates the game or the plugins. Files you edit inside `server-N/` can be lost. Put your own files in the overrides folder instead:
 
 ```text
-/home/cs2servermanager/overrides/game/
+~/overrides/game/
 ```
 
 The folder mirrors the server's `game/` folder. `csm` copies it over the servers when it updates the plugins, so your files win. Examples:
 
 | Your file | Goes to |
 | --- | --- |
-| Plugin settings | `/home/cs2servermanager/overrides/game/csgo/cfg/MatchZy/config.cfg` |
-| Plugin database | `/home/cs2servermanager/overrides/game/csgo/cfg/MatchZy/database.json` |
-| CS2 configs | `/home/cs2servermanager/overrides/game/csgo/cfg/` |
+| Ready Up settings | `~/overrides/game/csgo/cfg/ReadyUp/` (`readyup.cfg` and one file per plugin) |
+| MatchZy Enhanced settings | `~/overrides/game/csgo/cfg/MatchZy/config.cfg` |
+| MatchZy Enhanced database | `~/overrides/game/csgo/cfg/MatchZy/database.json` |
+| CS2 configs | `~/overrides/game/csgo/cfg/` |
 
-Change `cs2servermanager` if you chose another user in the installer.
+`~` is the home folder of the account that runs csm.
 
 After a change, copy it to the servers. This also restarts them:
 
 ```bash
-sudo csm update-plugins
+csm update-plugins
 ```
 
-A plain `sudo csm restart` does not copy the overrides.
+A plain `csm restart` does not copy the overrides.
 
-The **Config** tab in `sudo csm` has editors for the plugin `config.cfg` and `database.json` and the CounterStrikeSharp `admins.json`. They open the file in `nano` and copy it to all servers when you save.
+The **Config** tab in `csm` has editors for the plugin `config.cfg` and `database.json` and the CounterStrikeSharp `admins.json`. They open the file in `nano` and copy it to all servers when you save.
 
 ## The plugin database
 
@@ -42,10 +43,10 @@ The CS2 plugin keeps match stats and its saved settings in a database. The insta
 For an install without the menu, pick SQLite with:
 
 ```bash
-sudo MATCHZY_DB_ENGINE=sqlite csm bootstrap
+MATCHZY_DB_ENGINE=sqlite csm bootstrap
 ```
 
-To check or repair the MySQL container, run `sudo csm`, open **Tools** and choose **MatchZy DB: verify/repair**.
+To check or repair the MySQL container, run `csm`, open **Tools** and choose **MatchZy DB: verify/repair**.
 
 `csm` writes `database.json` for you. It only changes the file while it still contains the `__CSM_NOTE` line. Remove that line, and `csm` leaves your file alone.
 
@@ -62,28 +63,28 @@ For example `cs2-server-1` on a machine called `cs2`. The name comes from the se
 If you rename the machine, or several machines have the same hostname, set your own prefix wherever `csm` starts servers, also in the update monitor cron:
 
 ```bash
-sudo CSM_MATCHZY_SCOPE_PREFIX=eu-1 csm restart
+CSM_MATCHZY_SCOPE_PREFIX=eu-1 csm restart
 ```
 
-The plugin must be version 1.4.28 or newer. `sudo csm doctor` checks this under **MatchZy per-server config (shared database)**. It fails when two servers report the same server ID, or when servers share MySQL with an old plugin or without the scope name.
+The plugin must be version 1.4.28 or newer. `csm doctor` checks this under **MatchZy per-server config (shared database)**. It fails when two servers report the same server ID, or when servers share MySQL with an old plugin or without the scope name.
 
 ### Move an older install over
 
 1. Update `csm` (run the [install command](/cs2/server-manager/install#install) again).
-2. Run `sudo csm update-plugins`. It installs the latest plugin and restarts every server with the new start argument.
+2. Run `csm update-plugins`. It installs the latest plugin and restarts every server with the new start argument.
 3. In Auto Tournament, click **Retry** on each server on the **Servers** page. Until a server saves its own settings, it still reads the old shared ones.
-4. Run `sudo csm doctor` to check.
+4. Run `csm doctor` to check.
 
 Match stats already in the database stay where they are.
 
-If you cannot update the plugin, switch to SQLite: set `"DatabaseType": "SQLite"` in `/home/cs2servermanager/overrides/game/csgo/cfg/MatchZy/database.json` and in `/home/cs2servermanager/cs2-config/game/csgo/cfg/MatchZy/database.json`, then run `sudo csm update-plugins`.
+If you cannot update the plugin, switch to SQLite: set `"DatabaseType": "SQLite"` in `~/overrides/game/csgo/cfg/MatchZy/database.json` and in `~/cs2-config/game/csgo/cfg/MatchZy/database.json`, then run `csm update-plugins`.
 
 ## Where csm keeps its own files
 
-`csm` keeps its state and logs in `/opt/cs2-server-manager`. To use another folder, set `CSM_ROOT` every time you run `csm`:
+`csm` keeps its state, logs and servers in the home folder of the account that runs it. To use another folder, set `CSM_ROOT` every time you run `csm`:
 
 ```bash
-sudo CSM_ROOT=/srv/csm csm
+CSM_ROOT=/srv/csm csm
 ```
 
 Most people do not need this.
