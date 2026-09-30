@@ -4,6 +4,10 @@ description: What the plugin sends to Auto Tournament, and how it is set up.
 icon: Radio
 ---
 
+<Callout title="Older plugin, still supported">
+  MatchZy Enhanced still works with Auto Tournament: 1.4.x with Auto Tournament 2.x, and 2.0 or newer with 3.0 ([which version](/modules/cs2/matchzy-enhanced#which-version-for-which-platform)). For new setups on Auto Tournament 3.0, use [Ready Up](/cs2/ready-up): the platform links to it over the fleet link, and [CS2 Server Manager](/cs2/server-manager) installs it.
+</Callout>
+
 The plugin talks to Auto Tournament over HTTP. It sends match events, match reports and demos, and it downloads its setup and the match configs. Auto Tournament sets all of this up when you add a server. This page explains what happens, for debugging or for your own integration.
 
 All requests from the plugin carry the server token. Auto Tournament checks it against `SERVER_TOKEN`.
@@ -134,7 +138,7 @@ Auto Tournament reads these over RCON to see what the server is doing:
 
 ## Settings stored per server
 
-The plugin saves the settings it gets from Auto Tournament in its database, so they survive a restart. With a shared MySQL database, each server keeps its own copy. The plugin tells servers apart by the scope name (`+matchzy_config_scope`), or else by the bind address and game port. See [Several servers on one database](/cs2/plugin/install#several-servers-on-one-database).
+The plugin saves the settings it gets from Auto Tournament in its database, so they survive a restart. With a shared MySQL database, each server keeps its own copy. The plugin tells servers apart by the scope name (`+matchzy_config_scope`), or else by the bind address and game port. See [Several servers on one database](/cs2/matchzy-enhanced/install#several-servers-on-one-database).
 
 These settings are stored per server: `matchzy_server_id`, the bootstrap URL and token, the event URL and header, the report URL and token, the demo upload URL, the chat prefixes and the `matchzy_warmup_*` settings.
 

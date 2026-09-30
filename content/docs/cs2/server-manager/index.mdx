@@ -7,11 +7,11 @@ icon: Terminal
 CS2 Server Manager (`csm`) is a command-line tool with a menu in the terminal. On one Linux machine it:
 
 - installs CS2 with SteamCMD,
-- sets up Metamod:Source, CounterStrikeSharp and [Auto Tournament CS2](/cs2/plugin) (formerly MatchZy Enhanced) on every server,
-- runs each server in its own tmux session,
-- keeps the game and the plugins updated.
+- installs a match plugin on every server: [Ready Up](/cs2/ready-up) (the default), or the older [MatchZy Enhanced](/cs2/matchzy-enhanced) stack with Metamod:Source and CounterStrikeSharp for Auto Tournament 2.x,
+- runs each server (in instance mode it starts a crashed server again),
+- keeps the game and the plugins updated, never in the middle of a match.
 
-It is made for Auto Tournament, but works for any setup that needs several CS2 match servers. Auto Tournament then controls the servers over RCON.
+Linked to Auto Tournament 3.0 (`csm link`), the platform creates, starts, stops and updates the machine's servers itself, and uses them for failover and auto-scaling. csm also works on its own, for any setup that needs several CS2 servers.
 
 - Source and releases: [github.com/Auto-Tournament/cs2-server-manager](https://github.com/Auto-Tournament/cs2-server-manager)
 - Bugs and questions: [GitHub issues](https://github.com/Auto-Tournament/cs2-server-manager/issues)
@@ -19,18 +19,18 @@ It is made for Auto Tournament, but works for any setup that needs several CS2 m
 
 ## How it is set up
 
-`csm` creates a Linux user for the game servers, `cs2servermanager` by default. Everything lives in that user's home folder:
+csm runs as the ordinary Linux account you run it from. It refuses to run as root: only `sudo csm setup-host`, `sudo csm install-deps` and `sudo csm self-update` use `sudo`. Everything lives in that account's home folder:
 
 | Path | What it is |
 | --- | --- |
-| `/home/cs2servermanager/master-install/` | One full CS2 install. SteamCMD only updates this one. |
-| `/home/cs2servermanager/server-1/`, `server-2/`, ... | One folder per server. The large game files are shared with `master-install`, so each extra server uses about 2 GB. |
-| `/home/cs2servermanager/overrides/game/` | Your own config files. They survive updates. |
-| `/home/cs2servermanager/logs/server-1.log` | The console log of each server. |
+| `~/master-install/` | One full CS2 install. SteamCMD only updates this one. |
+| `~/server-1/`, `~/server-2/`, ... | One folder per server (classic mode). The large game files are shared with `master-install`, so each extra server uses about 2 GB. |
+| `~/overrides/game/` | Your own config files. They survive updates. |
+| `~/logs/` | csm's log and the console log of each server. |
 
-`csm` keeps its own state and logs in `/opt/cs2-server-manager`.
+In **instance mode** (`csm instance config backend instances`), every server runs the one CS2 install read-only and only keeps the files it writes itself. Ten servers use about as much disk as one, and a CS2 update is made once, as a new version next to the old one. The platform uses this mode when it creates servers.
 
-Server `N` runs in the tmux session `cs2-N`.
+Set `CSM_ROOT` to keep csm's files somewhere other than your home folder.
 
 ## Next
 

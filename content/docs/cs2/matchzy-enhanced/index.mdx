@@ -1,19 +1,23 @@
 ---
-title: Auto Tournament CS2
+title: MatchZy Enhanced
 description: The CS2 server plugin that connects your servers to Auto Tournament.
 icon: Plug
 ---
 
-<Callout title="Ready Up replaces this plugin" type="warn">
-  [Ready Up](/cs2/ready-up) is the new native CS2 server plugin. It needs no Metamod or CounterStrikeSharp, and it will replace the Auto Tournament CS2 plugin described in this section. Ready Up is in beta now (see the [Ready Up changelog](/reference/changelog/ready-up)). These pages stay for servers that still run the old plugin.
+<Callout title="Older plugin, still supported">
+  MatchZy Enhanced still works with Auto Tournament: 1.4.x with Auto Tournament 2.x, and 2.0 or newer with 3.0 ([which version](/modules/cs2/matchzy-enhanced#which-version-for-which-platform)). For new setups on Auto Tournament 3.0, use [Ready Up](/cs2/ready-up): the platform links to it over the fleet link, and [CS2 Server Manager](/cs2/server-manager) installs it.
 </Callout>
 
-Auto Tournament CS2 is a CounterStrikeSharp plugin. It runs inside each CS2 server. It loads matches from Auto Tournament, runs warmup, ready-up, the knife round and pauses, and sends events, results and demos back.
+<Callout title="Ready Up replaces this plugin" type="warn">
+  [Ready Up](/cs2/ready-up) is the new native CS2 server plugin. It needs no Metamod or CounterStrikeSharp, and it will replace MatchZy Enhanced described in this section. Ready Up is in beta now (see the [Ready Up changelog](/reference/changelog/ready-up)). These pages stay for servers that still run the old plugin.
+</Callout>
+
+MatchZy Enhanced is a CounterStrikeSharp plugin. It runs inside each CS2 server. It loads matches from Auto Tournament, runs warmup, ready-up, the knife round and pauses, and sends events, results and demos back.
 
 The plugin was called **MatchZy Enhanced** before. It is the same plugin with a new name.
 
-- Source and releases: [github.com/Auto-Tournament/cs2-plugin](https://github.com/Auto-Tournament/cs2-plugin). The old addresses, such as `github.com/sivert-io/MatchZy-Enhanced`, redirect there.
-- Bugs and questions: [GitHub issues](https://github.com/Auto-Tournament/cs2-plugin/issues).
+- Source and releases: [github.com/Auto-Tournament/matchzy-enhanced](https://github.com/Auto-Tournament/matchzy-enhanced). The old addresses, such as `github.com/sivert-io/MatchZy-Enhanced`, redirect there.
+- Bugs and questions: [GitHub issues](https://github.com/Auto-Tournament/matchzy-enhanced/issues).
 - License: MIT, free for any use, including paid work. See [Licensing and commercial use](/reference/licensing).
 
 ## What is still called MatchZy
@@ -48,10 +52,10 @@ Auto Tournament does not support the original MatchZy plugin. The [upstream Matc
 5. During the match, the plugin sends events and match reports to Auto Tournament.
 6. After each map, it uploads the demo if recording is on.
 
-You do not need to configure the plugin by hand for this. See [Events and report API](/cs2/plugin/events) for the details.
+You do not need to configure the plugin by hand for this. See [Events and report API](/cs2/matchzy-enhanced/events) for the details.
 
 ## Next
 
-- [Install the plugin](/cs2/plugin/install)
-- [Chat and console commands](/cs2/plugin/commands)
+- [Install the plugin](/cs2/matchzy-enhanced/install)
+- [Chat and console commands](/cs2/matchzy-enhanced/commands)
 - Several servers on one Linux machine: use [CS2 Server Manager](/cs2/server-manager). It installs and updates the plugin for you.

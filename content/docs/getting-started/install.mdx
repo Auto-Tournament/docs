@@ -8,11 +8,9 @@ import { Step, Steps } from 'fumadocs-ui/components/steps';
 
 Auto Tournament runs as two containers: the app and a PostgreSQL database. You need a Linux, macOS or Windows machine with [Docker](https://docs.docker.com/engine/install/) and Docker Compose.
 
-<Callout title="Old names">
-  The Docker image is still `sivertio/matchzy-auto-tournament` and the container is still called `matchzy-tournament-api`. They keep these names until 3.0. The commands on this page use the current names.
+<Callout title="Coming from 2.x?">
+  3.0 has a new image, new container names and a renamed database. Follow [Upgrading to 3.0](/guides/upgrading-to-3) instead of this page.
 </Callout>
-
-{/* TODO 3.0: Before 3.0 ships, switch this page to the sivertio/auto-tournament image and remove the Old names callout, or keep it if the old image is still the default. See /guides/upgrading-to-3. */}
 
 <Steps>
 
@@ -36,12 +34,12 @@ Save this file as `docker-compose.yml` in the folder:
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: matchzy-postgres
+    container_name: auto-tournament-postgres
     restart: unless-stopped
     environment:
       - POSTGRES_USER=${DB_USER:-postgres}
       - POSTGRES_PASSWORD=${DB_PASSWORD:-postgres}
-      - POSTGRES_DB=${DB_NAME:-matchzy_tournament}
+      - POSTGRES_DB=${DB_NAME:-auto_tournament}
     volumes:
       - postgres-data:/var/lib/postgresql/data
     healthcheck:
@@ -50,11 +48,11 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - matchzy-network
+      - auto-tournament-network
 
-  matchzy-tournament:
-    image: sivertio/matchzy-auto-tournament:latest
-    container_name: matchzy-tournament-api
+  auto-tournament:
+    image: sivertio/auto-tournament:next
+    container_name: auto-tournament
     restart: unless-stopped
     depends_on:
       postgres:
@@ -67,7 +65,7 @@ services:
       - NODE_ENV=production
       - PORT=3000
       - DB_HOST=postgres
-      - DATABASE_URL=postgresql://${DB_USER:-postgres}:${DB_PASSWORD:-postgres}@postgres:5432/${DB_NAME:-matchzy_tournament}
+      - DATABASE_URL=postgresql://${DB_USER:-postgres}:${DB_PASSWORD:-postgres}@postgres:5432/${DB_NAME:-auto_tournament}
       - SESSION_SECRET=${SESSION_SECRET:-}
     volumes:
       - ./data:/app/data
@@ -78,16 +76,18 @@ services:
       retries: 3
       start_period: 10s
     networks:
-      - matchzy-network
+      - auto-tournament-network
 
 networks:
-  matchzy-network:
+  auto-tournament-network:
     driver: bridge
 
 volumes:
   postgres-data:
     driver: local
 ```
+
+`:next` is the 3.0 beta. When 3.0.0 is out, use `:latest`. The same image is on GitHub as `ghcr.io/auto-tournament/auto-tournament`.
 
 `PORT=3000` is the internal port of the API. Do not change it. The web app and API are both served on port `3069`. Set `HOST_PORT` in `.env` to use another port on your machine.
 
@@ -104,18 +104,13 @@ cat > .env <<EOF
 SESSION_SECRET=$(openssl rand -base64 32)
 SERVER_TOKEN=$(openssl rand -base64 24 | tr -d '=+/')
 FRONTEND_BASE_URL=http://localhost:3069
-STEAM_API_KEY=
-AUTH_STEAM_ENABLED=true
 LOG_LEVEL=info
 EOF
 ```
 
-Then open `.env` and fill in two values:
+Then set `FRONTEND_BASE_URL` to the address you open in the browser. Game servers also use it to reach the platform, so `localhost` only works when they run on the same machine. Otherwise use the LAN IP or domain, for example `http://192.168.1.50:3069` or `https://tournament.example.com`.
 
-- `STEAM_API_KEY`: get a key from the [Steam Web API key page](https://steamcommunity.com/dev/apikey). Steam login does not work without it.
-- `FRONTEND_BASE_URL`: the address you open in the browser. Your game servers also use this address to send results back, so `localhost` only works when the game servers run on the same machine. If they run somewhere else, use the LAN IP or domain, for example `http://192.168.1.50:3069` or `https://tournament.example.com`.
-
-All other settings are in [Configuration](/reference/configuration).
+Sign-in providers, such as the Steam Web API key, are set up later in the app (**Settings → Sign-in**), not here. All other settings are in [Configuration](/reference/configuration).
 
 </Step>
 
@@ -148,7 +143,7 @@ Open the value of `FRONTEND_BASE_URL` in your browser, for example [http://local
 ## Where the data is
 
 - The database is in the Docker volume `postgres-data`. `docker compose down` keeps it. `docker compose down -v` deletes it.
-- Uploaded files, such as demos, are in the `data/` folder next to `docker-compose.yml`.
+- Uploaded files, such as demos and installed game modules, are in the `data/` folder next to `docker-compose.yml`.
 
 Before you update, read [Updating](/guides/updating).
 

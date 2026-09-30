@@ -48,7 +48,7 @@ yarn install
 yarn db
 ```
 
-This starts PostgreSQL 16 in a Docker container called `matchzy-postgres` on port `5432`.
+This starts PostgreSQL 16 in a Docker container called `auto-tournament-postgres` on port `5432`.
 
 </Step>
 
@@ -60,12 +60,13 @@ This starts PostgreSQL 16 in a Docker container called `matchzy-postgres` on por
 cp example.env .env
 ```
 
-The `DB_*` values in `example.env` match `yarn db`. Set `STEAM_API_KEY` so you can sign in with Steam, and set the address of the dev server:
+The `DB_*` values in `example.env` match `yarn db`. Set the address of the dev server:
 
 ```bash title=".env"
 FRONTEND_BASE_URL=http://localhost:5173
-STEAM_API_KEY=your-steam-web-api-key
 ```
+
+Sign-in providers are set up later in the app (**Settings → Sign-in**). You do not need any to get started.
 
 </Step>
 
@@ -85,7 +86,7 @@ This starts the API on port `3000` and the web app on port `5173`. The API log i
 
 ### Open the app
 
-Open [http://localhost:5173](http://localhost:5173) and sign in with Steam. On an empty database, the first user becomes admin. The dev build also shows **Dev Tools** in the menu and the **Developer / Simulation** tab in **Settings**.
+Open [http://localhost:5173](http://localhost:5173). On an empty database, the API log prints a one-time setup code: open **Set up the first admin** (`/setup`), enter it, and create the local admin. The dev build also shows **Dev tools** in the menu and the **Developer** tab in **Settings**.
 
 </Step>
 
@@ -101,7 +102,7 @@ To test the Docker image the way users run it, build it from your checkout:
 
 ### Set the secrets
 
-Set `SESSION_SECRET`, `SERVER_TOKEN` and `STEAM_API_KEY` in `.env`. Set `FRONTEND_BASE_URL=http://localhost:3069`.
+Set `SESSION_SECRET` and `SERVER_TOKEN` in `.env`. Set `FRONTEND_BASE_URL=http://localhost:3069`.
 
 </Step>
 

@@ -19,22 +19,17 @@ If you run 2.4.x for Counter-Strike 2, the short version is: back up, change one
 - **The name.** MatchZy Auto Tournament (MAT) is now Auto Tournament. Menus and pages were rebuilt, so the app looks different. The tasks are the same ones.
 - **CS2 is a module, not the whole app.** Counter-Strike 2 now sits in a module next to a second one, [manual reporting](/guides/manual-reporting), which runs tournaments for games the platform cannot watch. A CS2 tournament still does everything it did: servers, veto, live scores, demos and stats.
 - **The licence changed.** 3.0 and everything after it are under the PolyForm Noncommercial License 1.0.0. [What that means for you](#the-licence-change) is below.
-- **The CS2 plugin has a new name.** MatchZy Enhanced is now **Auto Tournament CS2**, at [github.com/Auto-Tournament/cs2-plugin](https://github.com/Auto-Tournament/cs2-plugin). It is the same plugin: it still reports itself as MatchZy in `css_plugins list`, and its settings still start with `matchzy_`. See [Auto Tournament CS2](/cs2/plugin).
-- **There is a new image name.** `sivertio/auto-tournament` on Docker Hub, and `ghcr.io/auto-tournament/auto-tournament` on GitHub's registry.
+- **New names for the image, the service, the containers and the database.** The image is `sivertio/auto-tournament` (or `ghcr.io/auto-tournament/auto-tournament`). In `docker-compose.yml` the service is `auto-tournament`, the containers are `auto-tournament` and `auto-tournament-postgres`, and the database is `auto_tournament`. The platform renames your database on its first start, and keeps all data.
+- **Sign-in and admins are set up in the app.** Sign-in providers (Steam, Discord, Google, …) and the admin lists move to **Settings → Sign-in**. The values in your `.env` are imported once on the first start. Steam is no longer required: players can sign in with any provider you turn on, and CS2 asks for Steam where it needs it.
+- **Your CS2 servers need a new plugin version.** 3.0 needs MatchZy Enhanced 2.0 or newer (1.4.x does not work with it), or the new [Ready Up](/cs2/ready-up) plugin, which links to the platform without RCON and brings failover and auto-scaling. See [Your CS2 servers](#your-cs2-servers).
 - **The docs moved** from `docs.sivert.io/docs/mat` to [docs.autotournament.gg](https://docs.autotournament.gg). Old links redirect to the matching new page.
 
 ### What does not change
 
-Nothing in your `docker-compose.yml` has to change except the image name, and even that is optional:
-
-- The Compose service is still `matchzy-tournament`, and the containers are still `matchzy-tournament-api` and `matchzy-postgres`.
-- The database is still `matchzy_tournament`, on the same volume.
-- Every environment variable in your `.env` keeps its name and its meaning, and 3.0 adds no required ones. The new things you can turn on, such as game search, are configured in the app's own settings.
-- The app still listens on port 3069.
-
-### You do not have to change the image name
-
-Every release is built once and published under all three names, so `sivertio/matchzy-auto-tournament:latest` gets 3.0 too. An install you never touch will update itself the next time you pull. Changing the name is tidier, and it is the name that will be documented from now on, but nothing breaks if you leave it.
+- Your data: teams, players, ratings, past matches, demos and settings. Nothing is dropped.
+- Every environment variable in your `.env` keeps working, and 3.0 adds no required ones. `DB_NAME` is the one exception: if you set it to `matchzy_tournament`, remove it (see below).
+- The app still listens on port 3069, and the `postgres-data` volume keeps its name.
+- CS2 tournaments: the CS2 game module is installed on the first start, because your database has CS2 data.
 
 ## The licence change
 
@@ -66,9 +61,9 @@ Uploaded map images were written one folder above the one `/map-images` is serve
 
 `GET /api/matches/:slug.json` is the match config your CS2 servers download, and it used to answer anyone who asked. Match slugs are easy to guess (`r1m1`, `r2m1`, …), so anyone who could reach your API could read both rosters, Steam IDs, team names, the map list and the match setup.
 
-In 3.0 the endpoint needs either the `X-MatchZy-Token` header with your `SERVER_TOKEN`, or an admin sign-in. **Your servers need no change**: the app now puts the header on the load command it sends them, and every version of the plugin understands it. Only two things are affected:
+In 3.0 the endpoint needs either the `X-Auto-Tournament-Token` header with your `SERVER_TOKEN`, or an admin sign-in. **Your servers need no change**: the app now puts the header on the load command it sends them, and every version of the plugin understands it. Only two things are affected:
 
-- Loading a config URL by hand in a server console now needs `matchzy_loadmatch_url "<url>" "X-MatchZy-Token" "<SERVER_TOKEN>"`.
+- Loading a config URL by hand in a server console now needs `matchzy_loadmatch_url "<url>" "X-Auto-Tournament-Token" "<SERVER_TOKEN>"`.
 - Scripts or tools of your own that fetched a config anonymously now need the header or an admin token.
 
 ## Before you start
@@ -76,7 +71,7 @@ In 3.0 the endpoint needs either the `X-MatchZy-Token` header with your `SERVER_
 - Your install runs 2.4.x with Docker Compose, as in [Install](/getting-started/install). The upgrade is tested from **2.4.15**; if you are on an older 2.4.x, update to 2.4.15 first.
 - No match is running. The app restarts.
 - You have the folder with your `docker-compose.yml` and `.env`. Run every command below in that folder.
-- Your CS2 servers can stay on the plugin version they have; 3.0 sets no minimum. Updating them to the latest is still a good idea, and it is a step below.
+- Plan the CS2 server update: 3.0 needs MatchZy Enhanced 2.0 or newer, or Ready Up. It is a step below.
 
 ## Update
 
@@ -123,27 +118,31 @@ Again, "No such file or directory" just means you never uploaded any. `./data/ma
 
 <Step>
 
-### Change the image name
+### Stop the old stack
 
-Open `docker-compose.yml`, find the `image:` line of the `matchzy-tournament` service, and set the new name:
-
-```yaml title="docker-compose.yml"
-services:
-  matchzy-tournament:
-    image: sivertio/auto-tournament:3.0.0
-```
-
-Or make the same change from the shell, keeping a copy of the old file as `docker-compose.yml.bak`:
+The platform renames the database on its first start, and it only does that when nothing else is connected to it. Stop the 2.x containers with your **old** compose file:
 
 ```bash
-sed -i.bak 's#sivertio/matchzy-auto-tournament#sivertio/auto-tournament#' docker-compose.yml
+docker compose down
 ```
 
-A fixed version like `3.0.0` is worth using here, because it is what makes going back a one-line change. `sivertio/auto-tournament:latest` also works, as does `ghcr.io/auto-tournament/auto-tournament:3.0.0` if you would rather pull from GitHub.
+`down` keeps the database volume. Do not use `down -v`.
 
-Change **only** the image. Keep the service name, the container names, the volumes and `DB_NAME` as they are — a different database name starts an empty database.
+</Step>
 
-You can also skip this step entirely and stay on `sivertio/matchzy-auto-tournament`, which gets the same 3.0 build.
+<Step>
+
+### Switch to the 3.0 compose file
+
+Keep a copy of the old file, then replace `docker-compose.yml` with the one in [Install](/getting-started/install#save-docker-composeyml):
+
+```bash
+cp docker-compose.yml docker-compose.yml.2x
+```
+
+The new file uses the same `postgres-data` volume, so your data is there. If your old file had changes of your own (another port, extra volumes, a reverse proxy network), carry them over.
+
+In `.env`, remove `DB_NAME=matchzy_tournament` if you have it. 3.0 refuses to start on the old name and says so in its log.
 
 </Step>
 
@@ -156,8 +155,6 @@ docker compose pull
 docker compose up -d
 ```
 
-`up -d` replaces the app container and keeps the database volume.
-
 </Step>
 
 <Step>
@@ -165,18 +162,19 @@ docker compose up -d
 ### Watch the first start
 
 ```bash
-docker compose logs -f matchzy-tournament
+docker compose logs -f auto-tournament
 ```
 
-The first start on your existing database does three things, in this order, and each one logs a line:
+The first start on your existing database does these things, and each one logs a line:
 
-1. **Moves the stray demos and logs** into `/app/data`: `[data-dir] Migrated N item(s) out of the legacy data directory`.
-2. **Adds the new tables and columns** — accounts, linked accounts, team memberships, match reports, custom stat fields and the game catalogue. Nothing existing is dropped, renamed or rewritten.
-3. **Runs two backfills**, which announce themselves as `Applied migration 2026-09-22-linked-accounts-backfill` and `… team-members-backfill`. The first records the Steam and Discord accounts your database already knows in the new accounts table; the second turns every team roster into team memberships. Both only add rows.
+1. **Renames the database**: `[PostgreSQL] Renamed the 2.x database "matchzy_tournament" to "auto_tournament"`. No rows are moved.
+2. **Moves the stray demos and logs** into `/app/data`: `[data-dir] Migrated N item(s) out of the legacy data directory`.
+3. **Adds the new tables and columns** (accounts, linked accounts, team memberships, match reports, custom stat fields and the game catalogue). Nothing existing is dropped or rewritten.
+4. **Runs two backfills**: `Applied migration 2026-09-22-linked-accounts-backfill` and `… team-members-backfill`. They record the Steam and Discord accounts your database knows in the new accounts table, and turn every team roster into team memberships. Both only add rows, run once, and are retried on the next start if one fails.
+5. **Installs the CS2 module** from the image, because the database has CS2 data.
+6. **Imports your sign-in settings** from `.env` into **Settings → Sign-in**, once.
 
-Each backfill is recorded in a `schema_migrations` table, runs once, and is written in the same transaction that records it — so a restart in the middle cannot leave one half-applied, and later starts skip them. If one fails it is logged and retried on the next start.
-
-Press `Ctrl+C` when the log says the server has started.
+Press `Ctrl+C` when the log says the server has started. If it stops instead, the log says why: another connection to the old database (a 2.x container still running), or a `DB_NAME` that still says `matchzy_tournament`.
 
 </Step>
 
@@ -195,15 +193,11 @@ The version must be 3.0 or newer. Then open the app, sign in, and check that you
 
 <Step>
 
-### Update the CS2 plugin on your servers
+### Your CS2 servers
 
-Put the same, latest version of Auto Tournament CS2 on every server. With CS2 Server Manager:
+3.0 sets servers up with MatchZy Enhanced 2.0's settings, so servers on 1.4.x stop working until they are updated. Either update MatchZy Enhanced to 2.0 or newer on every server (see [Update MatchZy Enhanced](/cs2/matchzy-enhanced/install#update)), then open the **Servers** page, click **Refresh Status**, and **Retry** any server that is not set up. Or move the servers to [Ready Up](/cs2/ready-up).
 
-```bash
-sudo csm update-plugins
-```
-
-Without it, see [Update the CS2 plugin](/cs2/plugin/install#update). Then open the **Servers** page, click **Refresh Status**, and **Retry** any server that is not set up.
+If CS2 Server Manager manages your servers, move that machine to [Ready Up](/cs2/ready-up): csm installs MatchZy Enhanced only for 2.x platforms. Run `csm plugins stack readyup` and `csm update-plugins`, then [link the machine](/getting-started/connect-server#a-machine-with-cs2-server-manager). From then on the platform creates, starts and updates its servers.
 
 </Step>
 
@@ -227,38 +221,35 @@ The docs are at [docs.autotournament.gg](https://docs.autotournament.gg) and the
 
 ## Go back to 2.4.15
 
-3.0 only adds to the database — no table or column is dropped, renamed or rewritten — so 2.4.15 starts again on a database 3.0 has migrated, shows the same data, and can still be written to. That was tested by upgrading a 2.4.15 install to 3.0 and then booting 2.4.15 back onto the same database.
-
-Anything created only in 3.0, such as a match report or a team captain, is invisible to 2.4.15. It stays in the database, and comes back if you move to 3.0 again.
+3.0 adds to the database and renames it, but drops nothing, so 2.4.15 can run on it again once the database has its old name back. Anything created only in 3.0, such as a match report or a team captain, is invisible to 2.4.15; it stays in the database and comes back if you move to 3.0 again.
 
 <Steps>
 
 <Step>
 
-### Set the old image back
+### Stop 3.0 and rename the database back
 
-```yaml title="docker-compose.yml"
-services:
-  matchzy-tournament:
-    image: sivertio/matchzy-auto-tournament:2.4.15
+```bash
+docker compose stop auto-tournament
+docker compose exec -T postgres sh -c 'psql -U "$POSTGRES_USER" -d postgres -c "ALTER DATABASE auto_tournament RENAME TO matchzy_tournament;"'
+docker compose down
 ```
-
-If you used the `sed` command above, `mv docker-compose.yml.bak docker-compose.yml` puts the old file back; then pin `2.4.15` in it, so a later `pull` does not fetch 3.0 again through `latest`.
 
 </Step>
 
 <Step>
 
-### Pull and restart
+### Put the old compose file back
+
+```bash
+cp docker-compose.yml.2x docker-compose.yml
+```
+
+Pin `sivertio/matchzy-auto-tournament:2.4.15` as its image, so a later `pull` does not fetch 3.0 through `latest`. Then start it:
 
 ```bash
 docker compose pull
 docker compose up -d
-```
-
-Check the version:
-
-```bash
 curl -fsS http://localhost:3069/api/settings/version
 ```
 
@@ -285,7 +276,7 @@ Use your own backup's file name. `dropdb` deletes everything, including whatever
 
 ## If something goes wrong
 
-- **The app will not start.** `docker compose logs matchzy-tournament` usually names the cause. A missing value in `.env` and a database it cannot reach are the two common ones.
-- **Your data looks empty.** Almost always a changed `DB_NAME`, or a volume that was recreated. Check that `docker-compose.yml` still points at the same database and the same volume as before.
-- **A server shows a plugin version mismatch.** Update the plugin on every server to the same version. See [Server health warnings](/reference/servers-health).
+- **The app will not start.** `docker compose logs auto-tournament` usually names the cause: a 2.x container still connected to the old database, `DB_NAME=matchzy_tournament` in `.env`, a missing value in `.env`, or a database it cannot reach.
+- **Your data looks empty.** Almost always a different volume: the 3.0 compose file must use the same `postgres-data` volume as before. Check `docker volume ls`.
+- **A server shows a plugin version mismatch.** Update MatchZy Enhanced on every server to the same version. See [Server health warnings](/reference/servers-health).
 - **Anything else.** [Troubleshooting](/reference/troubleshooting), or ask on [Discord](https://discord.gg/n7gHYau7aW).

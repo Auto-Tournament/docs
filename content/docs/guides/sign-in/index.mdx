@@ -48,9 +48,22 @@ You get admin rights in one of these ways:
 
 - You are a local admin (see above).
 - An existing admin edits your player on the **Players** page and turns on **Is admin**.
-- Your Steam64 ID is in `ADMIN_STEAM_IDS` in `.env`. See [If you are not admin](/getting-started/first-login#if-you-are-not-admin).
+- Your email address is in **Admin emails** (**Settings → Sign-in → Admin access**), and you sign in with a provider that has verified it, such as Google.
+- Your Steam64 ID is in **Admin Steam IDs** in the same place.
 
-Admin rights belong to the account, whatever button you used to sign in.
+Admin rights belong to the account, whatever button you used to sign in. Someone who only uses Google, for example for a chess tournament, can be an admin without ever touching Steam.
+
+## Games that need an account
+
+A game can need a certain account, because that is how its matches know who is who. The game's module or game pack says which one:
+
+| Game | Account | Why |
+| --- | --- | --- |
+| Counter-Strike 2, Dota 2, Deadlock, Team Fortress 2 | Steam | CS2 servers let players in by Steam ID. |
+| Rocket League, Fortnite | Epic Games | The in-game account people know each other by. |
+| Most others (chess, fighting games, …) | None | Any sign-in method works. |
+
+Turn on the sign-in method your games need in **Settings → Sign-in**. Players see the games under **Game accounts** on their connections page, with a **Connect** button for an account they have not linked yet. When that sign-in method is not turned on, the page tells them to ask an admin.
 
 ## Callback address
 

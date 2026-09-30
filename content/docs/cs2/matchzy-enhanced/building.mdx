@@ -6,7 +6,11 @@ icon: Hammer
 
 import { Step, Steps } from 'fumadocs-ui/components/steps';
 
-Most people use the [release zip](/cs2/plugin/install). Build from source if you want to change the plugin.
+<Callout title="Older plugin, still supported">
+  MatchZy Enhanced still works with Auto Tournament: 1.4.x with Auto Tournament 2.x, and 2.0 or newer with 3.0 ([which version](/modules/cs2/matchzy-enhanced#which-version-for-which-platform)). For new setups on Auto Tournament 3.0, use [Ready Up](/cs2/ready-up): the platform links to it over the fleet link, and [CS2 Server Manager](/cs2/server-manager) installs it.
+</Callout>
+
+Most people use the [release zip](/cs2/matchzy-enhanced/install). Build from source if you want to change the plugin.
 
 ## What you need
 
@@ -22,7 +26,7 @@ Most people use the [release zip](/cs2/plugin/install). Build from source if you
 ### Clone the repository
 
 ```bash
-git clone https://github.com/Auto-Tournament/cs2-plugin.git
+git clone https://github.com/Auto-Tournament/matchzy-enhanced.git
 cd cs2-plugin
 ```
 
@@ -81,7 +85,7 @@ The GitHub build workflow runs the same commands on each push.
 
 ## Contribute
 
-- Open an [issue](https://github.com/Auto-Tournament/cs2-plugin/issues) first for larger changes.
+- Open an [issue](https://github.com/Auto-Tournament/matchzy-enhanced/issues) first for larger changes.
 - In a bug report, give the plugin version (`matchzy_version`), the CounterStrikeSharp version, the steps to reproduce, and the server log.
 - Keep pull requests small, and say how you tested the change.
 

@@ -4,11 +4,15 @@ description: Fixes for common problems with the CS2 plugin.
 icon: LifeBuoy
 ---
 
+<Callout title="Older plugin, still supported">
+  MatchZy Enhanced still works with Auto Tournament: 1.4.x with Auto Tournament 2.x, and 2.0 or newer with 3.0 ([which version](/modules/cs2/matchzy-enhanced#which-version-for-which-platform)). For new setups on Auto Tournament 3.0, use [Ready Up](/cs2/ready-up): the platform links to it over the fleet link, and [CS2 Server Manager](/cs2/server-manager) installs it.
+</Callout>
+
 For problems on the Auto Tournament side, see the main [Troubleshooting](/reference/troubleshooting) page.
 
 ## Where to look
 
-- The server console, and the server log. With CS2 Server Manager: `sudo csm logs 1 200`.
+- The server console, and the server log. With CS2 Server Manager: `csm logs 1 200`.
 - The plugin's own log of match phase changes: `addons/counterstrikesharp/plugins/MatchZy/logs/matchzy_breadcrumbs.log`.
 - In Auto Tournament, **Admin Tools** > **Server Events Monitor** shows the events that arrive from each server.
 
@@ -19,7 +23,7 @@ Since version 1.4.28, logs do not contain tokens or passwords. You can share the
 Run `css_plugins list` in the server console. MatchZy must be in the list.
 
 - If CounterStrikeSharp itself is missing, fix Metamod and CounterStrikeSharp first.
-- If the log shows `Plugin uses old SourceHook Metamod build`, Metamod is too new. Install Metamod `2.0.0.1411`. With CS2 Server Manager, run `sudo csm update-plugins`.
+- If the log shows `Plugin uses old SourceHook Metamod build`, Metamod is too new. Install Metamod `2.0.0.1411`. With CS2 Server Manager, run `csm update-plugins`.
 - Check that `MatchZy.dll` is at `game/csgo/addons/counterstrikesharp/plugins/MatchZy/MatchZy.dll`, not one folder deeper. The zip has a top folder that you must not copy.
 
 ## No events arrive in Auto Tournament
@@ -37,7 +41,7 @@ Run `css_plugins list` in the server console. MatchZy must be in the list.
 
 ## The same server shows up several times
 
-Several servers share one MySQL database, and the plugin cannot tell them apart. Update every server to version 1.4.28 or newer, and give each server its own `+matchzy_config_scope <name>` start argument. Then click **Retry** on each server. See [Several servers on one database](/cs2/plugin/install#several-servers-on-one-database).
+Several servers share one MySQL database, and the plugin cannot tell them apart. Update every server to version 1.4.28 or newer, and give each server its own `+matchzy_config_scope <name>` start argument. Then click **Retry** on each server. See [Several servers on one database](/cs2/matchzy-enhanced/install#several-servers-on-one-database).
 
 Look for this line at startup. Each server must show a different name:
 
@@ -60,7 +64,7 @@ Restart the server after a fix.
 ## The server loads the wrong match, or no match
 
 - A match loaded during postgame waits until the series resets. The reply ends with `queued_match=<id>`. `matchzy_tournament_next_match` shows it. Run `matchzy_clear_queued_match` to drop it.
-- The match config must have `maplist`, `num_maps`, `team1` and `team2`. The server log names the missing field. See [Match config and maps](/cs2/plugin/match-config).
+- The match config must have `maplist`, `num_maps`, `team1` and `team2`. The server log names the missing field. See [Match config and maps](/cs2/matchzy-enhanced/match-config).
 
 ## No demo
 
