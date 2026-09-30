@@ -4,28 +4,21 @@ description: All environment variables for Auto Tournament.
 icon: Settings
 ---
 
-You configure Auto Tournament with environment variables in the `.env` file next to `docker-compose.yml`. After a change, recreate the app container:
+You configure the few things that cannot live in the app with environment variables in the `.env` file next to `docker-compose.yml`. After a change, recreate the app container:
 
 ```bash
-docker compose up -d --force-recreate matchzy-tournament
+docker compose up -d --force-recreate auto-tournament
 ```
 
-Most other settings, such as match rules, the webhook URL and the hostname format, are in the app under **Settings**.
-
-<Callout>
-  The variable names still use `MATCHZY_` in some places. They keep these names until 3.0.
-</Callout>
-
-{/* TODO 3.0: Before 3.0 ships, say whether the MATCHZY_ variables are renamed in 3.0, and list old and new names if they are. */}
+Everything else, such as sign-in providers, admins, match rules, the webhook URL and the hostname format, is in the app under **Settings**. Some variables below are only **imported once** into Settings on the first start (marked "imported once"): after that the value saved in Settings wins, and the variable can be removed.
 
 ## Required
 
 | Variable | What it does |
 | --- | --- |
-| `SESSION_SECRET` | Secret for login sessions. Without it, everyone is logged out on each restart. Create one with `openssl rand -base64 32`. |
-| `SERVER_TOKEN` | Shared secret between Auto Tournament and your CS2 servers. Servers send it with events, demo uploads and match config downloads. Create one with `openssl rand -base64 24 \| tr -d '=+/'`. |
-| `FRONTEND_BASE_URL` | The address people open in the browser, for example `https://tournament.example.com`. Used for login redirects and cookies. With `https://` cookies are only sent over HTTPS. The webhook URL starts with this value. |
-| `STEAM_API_KEY` | Steam Web API key. Needed for Steam login and to look up Steam profile URLs. Get one at [steamcommunity.com/dev/apikey](https://steamcommunity.com/dev/apikey). |
+| `SESSION_SECRET` | Secret for login sessions. Without it, everyone is logged out on each restart. Also the key for secrets saved in Settings when `SECRETS_KEY` is not set. Create one with `openssl rand -base64 32`. |
+| `SERVER_TOKEN` | Shared secret between Auto Tournament and MatchZy Enhanced servers. They send it as `X-Auto-Tournament-Token` with events, demo uploads and match config downloads. Ready Up servers use their own token from enrollment. Create one with `openssl rand -base64 24 \| tr -d '=+/'`. |
+| `FRONTEND_BASE_URL` | The address people open in the browser, for example `https://tournament.example.com`. Used for login redirects, cookies (`https://` makes them HTTPS-only), callback URLs and the fleet link address. |
 
 ## Docker and database
 
@@ -34,38 +27,46 @@ Most other settings, such as match rules, the webhook URL and the hostname forma
 | `HOST_PORT` | `3069` | The port on your machine. Only used by `docker-compose.yml`. |
 | `DB_USER` | `postgres` | Database user. |
 | `DB_PASSWORD` | `postgres` | Database password. |
-| `DB_NAME` | `matchzy_tournament` | Database name. |
+| `DB_NAME` | `auto_tournament` | Database name. 3.0 refuses the 2.x name `matchzy_tournament`; see [Upgrading to 3.0](/guides/upgrading-to-3). |
 | `DATABASE_URL` | Built from `DB_*` | Full PostgreSQL address. `docker-compose.yml` sets it for you. |
 | `DB_HOST`, `DB_PORT` | `postgres` in Docker, port `5432` | Only used when `DATABASE_URL` is not set. |
+| `DATA_DIR` | `/app/data` | Where demos, logs, map images, installed modules and round backups are kept. Mount a volume here. |
 | `PORT` | `3000` | Internal API port. `docker-compose.yml` sets it. Do not change it. |
 | `NODE_ENV` | `production` in Docker | `docker-compose.yml` sets it. |
 
 Set `DB_USER`, `DB_PASSWORD` and `DB_NAME` before the first start. The database is created with these values, and changing them later does not change the existing database.
 
-## Admins and sign-in
+## Secrets saved in Settings
 
 | Variable | Default | What it does |
 | --- | --- | --- |
-| `ADMIN_STEAM_IDS` | empty | Steam64 IDs that are always admin, separated by commas. Applied on every start. It only adds admins. |
-| `AUTH_STEAM_ENABLED` | `true` | Steam login. It also needs `STEAM_API_KEY`. |
-| `BACKEND_BASE_URL` | `FRONTEND_BASE_URL` | Base address for login callbacks, if the API has another public address than the web app. |
+| `SECRETS_KEY` | `SESSION_SECRET` | Key for the secrets saved in Settings (sign-in client secrets, the Steam key), stored encrypted with AES-256-GCM. Changing it, or `SESSION_SECRET` when this is unset, makes the saved secrets unreadable: enter them again in Settings. |
 
-### Sign-in providers
+## Sign-in and admins
 
-Set these up on **Settings → Sign-in**. The variables below are imported once, at the first start, into fields that have no saved value; after that the saved settings win and the variables can be removed. Each provider's guide is under [Sign-in providers](/guides/sign-in).
+These are set up in **Settings → Sign-in**. The variables are imported once. See [Sign-in providers](/guides/sign-in) for each provider's guide.
 
 | Variable | What it does |
 | --- | --- |
-| `AUTH_STEAM_ENABLED`, `STEAM_API_KEY` | Steam. On unless `AUTH_STEAM_ENABLED=false`. |
+| `AUTH_STEAM_ENABLED`, `STEAM_API_KEY` | Steam. On unless `AUTH_STEAM_ENABLED=false`; needs the key. The key also looks up Steam profile URLs. |
 | `AUTH_DISCORD_ENABLED`, `DISCORD_CLIENT_ID`, `DISCORD_CLIENT_SECRET` | Discord. |
 | `AUTH_GITHUB_ENABLED`, `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET` | GitHub. |
 | `AUTH_GOOGLE_ENABLED`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Google. |
 | `AUTH_TWITCH_ENABLED`, `TWITCH_CLIENT_ID`, `TWITCH_CLIENT_SECRET` | Twitch. |
 | `AUTH_EPIC_ENABLED`, `EPIC_CLIENT_ID`, `EPIC_CLIENT_SECRET` | Epic Games. |
-| `AUTH_OIDC_ENABLED`, `OIDC_ISSUER_URL`, `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET` | Any OpenID Connect server (Keycloak, Authentik, Entra ID, ...). |
-| `OIDC_LABEL` | The OpenID Connect button's name: *Sign in with …*. |
+| `AUTH_OIDC_ENABLED`, `OIDC_ISSUER_URL`, `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET`, `OIDC_LABEL` | Any OpenID Connect server (Keycloak, Authentik, Entra ID, …); `OIDC_LABEL` names the button. |
+| `ADMIN_STEAM_IDS` | Steam64 IDs that are admin (**Admin Steam IDs**). Made admin at every start. Ready Up servers also read this variable directly for in-game admin commands. |
+| `ADMIN_EMAILS` | Addresses that become admin when they sign in with a provider that verified them (**Admin emails**). |
+| `BACKEND_BASE_URL` | Base address for login callbacks, if the API has another public address than the web app. Default: `FRONTEND_BASE_URL`. |
 
-Callback URLs are `FRONTEND_BASE_URL` + `/api/auth/<provider>/callback`; Settings shows each with a copy button.
+Callback URLs are `FRONTEND_BASE_URL` + `/api/auth/<provider>/callback`. Settings shows each with a copy button.
+
+## License
+
+| Variable | What it does |
+| --- | --- |
+| `AT_ACCEPT_LICENSE` | Accept the license terms without the browser, for scripted installs: `noncommercial` or `commercial`. Setting it means you have read and accept them, including later versions. |
+| `LICENSE_KEY` | Your license key (starts with `ATL1.`). Saved on start when it differs from the saved one, so it wins over a key pasted in **Settings → License**. A missing or invalid key never blocks anything. See [License key](/guides/license). |
 
 ## API tokens
 
@@ -73,18 +74,31 @@ Callback URLs are `FRONTEND_BASE_URL` + `/api/auth/<provider>/callback`; Setting
 | --- | --- |
 | `API_TOKENS` | Tokens with full admin rights, for bots and scripts. |
 | `API_TOKENS_READONLY` | Tokens that can only read (`GET`, `HEAD`, `OPTIONS`). |
-| `API_TOKENS_INTEGRATOR` | Tokens that only reach the integrations API (`/api/integrations`), e.g. a website sending its teams. See [Webhooks and teams API](/reference/webhooks). |
+| `API_TOKENS_INTEGRATOR` | Tokens that only reach the integrations API (`/api/integrations`), for example a website sending its teams. See [Webhooks and teams API](/reference/webhooks). |
 
 See [API](/reference/api) for the format.
 
-## Game servers
+## Games and modules
 
 | Variable | Default | What it does |
 | --- | --- | --- |
-| `API_BASE_URL` | `FRONTEND_BASE_URL` | Starting value for the webhook URL, if the game servers must use another address than the browser. After the first start, change it in **Settings** instead. Also used as the server address in `/api-docs`. |
-| `ALLOW_UNAUTHENTICATED_EVENTS` | `false` | Accept game events without a token. Only for servers set up by hand or by a very old version. While it is on, anyone who can reach the API can send fake results. Turn it off again after you click **Retry** on your servers. |
-| `MATCHZY_ENABLE_SIMULATION_IN_PROD` | `false` | Allow [simulation mode](/guides/simulation-mode). Only for test installs. |
-| `GITHUB_TOKEN` | empty | GitHub token for **Sync CS2 Maps**. Only needed if you hit the GitHub rate limit. |
+| `PREINSTALL_PACKS` | none | Install the image's game packs on the first start: `all`, or a comma-separated list of slugs such as `rocket-league,chess`. |
+| `CATALOG_URL` | The catalog in [Auto-Tournament/packs](https://github.com/Auto-Tournament/packs) | Where the game catalog comes from. |
+| `CATALOG_OFFLINE` | `false` | Never fetch the catalog; offer only what the image carries. For air-gapped LANs. CS2 then also uses its bundled map list. |
+| `MODULE_AUTO_UPDATE` | `true` | On start, update modules installed from the catalog to the newer release the image carries, within their major version. |
+| `MODULE_TRUSTED_KEYS` | none | Extra Ed25519 public keys (base64, comma-separated) that may sign code modules, for your own module builds. |
+| `AT_RESTART_SUPERVISED` | `true` in the Docker image | Whether something restarts the app when it exits, so the Modules page can offer **Restart now**. |
+| `GAMES_ENRICH` | on | `off` stops the background lookups of game pictures on [Wikidata](/guides/game-search). |
+
+## Game servers (CS2)
+
+| Variable | Default | What it does |
+| --- | --- | --- |
+| `API_BASE_URL` | `FRONTEND_BASE_URL` | Starting value for the webhook URL MatchZy Enhanced servers use, if they must use another address than the browser. After the first start, change it in **Settings → Counter-Strike 2**. Also used as the server address in `/api-docs`. |
+| `ALLOW_UNAUTHENTICATED_EVENTS` | `false` | Accept MatchZy Enhanced events without a token. Only for servers set up by hand or by a very old version. While it is on, anyone who can reach the API can send fake results. Turn it off again after you click **Retry** on your servers. |
+| `FLEET_BACKUP_RETENTION_DAYS` | `14` | Days to keep the round backups Ready Up servers send, after a match ends. `0` keeps them forever. |
+| `FLEET_AUTOSCALE_INTERVAL_MS` | `15000` | How often automatic scaling checks the servers on csm machines. `0` turns its timer off. Turn scaling itself on or off on the **Servers** page. |
+| `AT_ENABLE_SIMULATION_IN_PROD` | `false` | Allow [simulation mode](/guides/simulation-mode). Only for test installs. |
 
 ## Logging
 
@@ -101,3 +115,4 @@ See [API](/reference/api) for the format.
 | Variable | Default | What it does |
 | --- | --- | --- |
 | `CORS_ORIGIN` | `*` | Allowed origins for live updates (WebSocket). |
+| `LICENSE_CHECKIN_URL` | autotournament.gg | Where the daily license check-in goes; `off` turns it off. Only used with a license key. |

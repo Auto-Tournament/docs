@@ -12,7 +12,7 @@ each connected game server. This page explains what each one means.
 Auto Tournament cannot reach the server over RCON, or the server can reach
 Auto Tournament over RCON but its webhook calls back never arrive.
 
-- Check that the server is running (`sudo csm status` with CS2 Server Manager).
+- Check that the server is running (`csm status` with CS2 Server Manager).
 - Check the host, port and RCON password on the **Servers** page.
 - Check that the firewall allows TCP on the game port from the Auto Tournament
   machine.
@@ -20,7 +20,7 @@ Auto Tournament over RCON but its webhook calls back never arrive.
   LAN IP, not `localhost`.
 - If RCON works but no events arrive, on the CS2 machine run
   `curl <webhook-url>/api/events/test`. It must answer `"success":true`. If it
-  fails, fix the **Webhook URL** in **Settings** > **Integrations & Webhooks**,
+  fails, fix the **Webhook URL** in **Settings → Counter-Strike 2**,
   DNS or the firewall.
 - Click **Retry** on the server once fixed.
 
@@ -35,11 +35,11 @@ passwords.
 
 ```bash
 csm list-bans 1
-sudo csm unban-all 1
+csm unban-all 1
 ```
 
 Use `0` instead of the server number for all servers. To remove one IP:
-`sudo csm unban 1 <ip>`.
+`csm unban 1 <ip>`.
 
 ## CS2 update required
 
@@ -47,8 +47,8 @@ Valve released a CS2 update and the server is behind. Auto Tournament blocks
 outdated servers from new allocations and tournament start.
 
 ```bash
-sudo csm update-game
-sudo csm restart
+csm update-game
+csm restart
 ```
 
 Without CS2 Server Manager, update the server with SteamCMD and restart it.
@@ -61,11 +61,11 @@ CS2 Server Manager can do this for you, see
 MatchZy Enhanced cannot reach **its own**
 database on the game server. This is not the Auto Tournament database.
 
-- With CS2 Server Manager and its MySQL container: run `sudo csm`, open
+- With CS2 Server Manager and its MySQL container: run `csm`, open
   **Tools** and choose **MatchZy DB: verify/repair**.
 - With your own MySQL: check `game/csgo/cfg/MatchZy/database.json` (with CS2
   Server Manager:
-  `/home/cs2servermanager/overrides/game/csgo/cfg/MatchZy/database.json`),
+  `~/overrides/game/csgo/cfg/MatchZy/database.json` in the account that runs csm),
   that the database host is reachable, and the user and password.
 
 Restart the server and click **Refresh Status**.
@@ -77,7 +77,7 @@ the rest of the fleet. Update all of them to the same version. With CS2
 Server Manager:
 
 ```bash
-sudo csm update-plugins
+csm update-plugins
 ```
 
 Then restart the affected servers.
