@@ -13,7 +13,6 @@ import { Step, Steps } from 'fumadocs-ui/components/steps';
 - At least 8 GB RAM. Add more for many servers.
 - About 71 GB of disk for the first install, plus about 2 GB for each server.
 - Docker, if you use the shared MySQL database for the plugin (the default). See the [Docker install guide](https://docs.docker.com/engine/install/). `csm` does not install Docker for you.
-- A Game Server Login Token (GSLT) per server, if players join over the internet. Create one at [steamcommunity.com/dev/managegameservers](https://steamcommunity.com/dev/managegameservers) with app ID 730. For a LAN event you do not need one.
 
 `csm` installs the other packages it needs (SteamCMD, tmux, rsync, the 32-bit libraries and more) with `apt`. See [Server requirements](/modules/cs2/server-requirements) for the network ports.
 
@@ -64,7 +63,7 @@ The installer asks:
 - **Game port and GOTV port** of server 1. The defaults are `27015` and `27020`.
 - **CS2 user.** The default is `cs2servermanager`.
 - **Hostname prefix, RCON password and max players.** Change the default RCON password. You enter this password in Auto Tournament.
-- **GSLT.**
+- **GSLT.** Leave it empty. A GSLT only lists the server in the in-game server browser, and Valve can ban it on a server with the skins plugin. See [Game Server Login Token](/modules/cs2/server-requirements#game-server-login-token).
 - Update options: validate the game files with SteamCMD, update the plugins, and install the [update monitor](/cs2/server-manager/updates#the-update-monitor).
 
 </Step>

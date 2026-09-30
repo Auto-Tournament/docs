@@ -21,7 +21,7 @@ If you run 2.4.x for Counter-Strike 2, the short version is: back up, change one
 - **The licence changed.** 3.0 and everything after it are under the PolyForm Noncommercial License 1.0.0. [What that means for you](#the-licence-change) is below.
 - **New names for the image, the service, the containers and the database.** The image is `sivertio/auto-tournament` (or `ghcr.io/auto-tournament/auto-tournament`). In `docker-compose.yml` the service is `auto-tournament`, the containers are `auto-tournament` and `auto-tournament-postgres`, and the database is `auto_tournament`. The platform renames your database on its first start, and keeps all data.
 - **Sign-in and admins are set up in the app.** Sign-in providers (Steam, Discord, Google, …) and the admin lists move to **Settings → Sign-in**. The values in your `.env` are imported once on the first start. Steam is no longer required: players can sign in with any provider you turn on, and CS2 asks for Steam where it needs it.
-- **A new CS2 plugin, Ready Up.** Your servers with MatchZy Enhanced keep working with 3.0. [Ready Up](/cs2/ready-up) is the new plugin for new setups: it links to the platform without RCON and brings failover and auto-scaling. You can move servers over at your own pace.
+- **Your CS2 servers need a new plugin version.** 3.0 needs MatchZy Enhanced 2.0 or newer (1.4.x does not work with it), or the new [Ready Up](/cs2/ready-up) plugin, which links to the platform without RCON and brings failover and auto-scaling. See [Your CS2 servers](#your-cs2-servers).
 - **The docs moved** from `docs.sivert.io/docs/mat` to [docs.autotournament.gg](https://docs.autotournament.gg). Old links redirect to the matching new page.
 
 ### What does not change
@@ -71,7 +71,7 @@ In 3.0 the endpoint needs either the `X-Auto-Tournament-Token` header with your 
 - Your install runs 2.4.x with Docker Compose, as in [Install](/getting-started/install). The upgrade is tested from **2.4.15**; if you are on an older 2.4.x, update to 2.4.15 first.
 - No match is running. The app restarts.
 - You have the folder with your `docker-compose.yml` and `.env`. Run every command below in that folder.
-- Your CS2 servers can stay on the plugin version they have; 3.0 sets no minimum. Updating them to the latest is still a good idea, and it is a step below.
+- Plan the CS2 server update: 3.0 needs MatchZy Enhanced 2.0 or newer, or Ready Up. It is a step below.
 
 ## Update
 
@@ -195,7 +195,7 @@ The version must be 3.0 or newer. Then open the app, sign in, and check that you
 
 ### Your CS2 servers
 
-Servers with MatchZy Enhanced keep working. Put the same, latest version of it on every server, see [Update MatchZy Enhanced](/cs2/matchzy-enhanced/install#update). Then open the **Servers** page, click **Refresh Status**, and **Retry** any server that is not set up.
+3.0 sets servers up with MatchZy Enhanced 2.0's settings, so servers on 1.4.x stop working until they are updated. Either update MatchZy Enhanced to 2.0 or newer on every server (see [Update MatchZy Enhanced](/cs2/matchzy-enhanced/install#update)), then open the **Servers** page, click **Refresh Status**, and **Retry** any server that is not set up. Or move the servers to [Ready Up](/cs2/ready-up).
 
 If CS2 Server Manager manages your servers, move that machine to [Ready Up](/cs2/ready-up): csm installs MatchZy Enhanced only for 2.x platforms. Run `csm plugins stack readyup` and `csm update-plugins`, then [link the machine](/getting-started/connect-server#a-machine-with-cs2-server-manager). From then on the platform creates, starts and updates its servers.
 

@@ -47,7 +47,11 @@ On Debian, add `contrib` and `non-free` to your apt sources, then run `sudo apt-
 
 ## Game Server Login Token
 
-A CS2 server that players join over the internet needs a Game Server Login Token (GSLT). Create one per server at [steamcommunity.com/dev/managegameservers](https://steamcommunity.com/dev/managegameservers) with app ID 730. The CS2 Server Manager installer asks for it. For a LAN event you do not need one.
+**Do not set a Game Server Login Token (GSLT).** A GSLT only lists the server in the in-game server browser. Tournament and scrim servers do not need that: players join from the match page, or with `connect <address>`. Leave the token empty in the CS2 Server Manager installer, and do not put `sv_setsteamaccount` in a server config.
+
+<Callout type="warn" title="Never with the skins plugin">
+  Valve can ban a GSLT, and the account that owns it, for servers that change skins. If you use Ready Up's [skins plugin](/cs2/ready-up/skins), never set a GSLT on that server.
+</Callout>
 
 ## Network
 

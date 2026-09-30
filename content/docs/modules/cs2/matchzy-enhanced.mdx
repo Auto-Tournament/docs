@@ -6,9 +6,16 @@ icon: Plug
 
 MatchZy Enhanced (ME) is the older CS2 server plugin for Auto Tournament, built on MatchZy with Metamod:Source and CounterStrikeSharp. It loads matches, runs warmup, ready-up, the knife round and pauses, and sends events, results and demos back over HTTP. Auto Tournament talks to it over RCON.
 
-**For new setups on Auto Tournament 3.0, use [Ready Up](/cs2/ready-up).** Ready Up is a native plugin with no Metamod or CounterStrikeSharp. It connects to the platform over one outbound link (no RCON, no inbound port), streams demos while they record, and powers failover and auto-scaling. MatchZy Enhanced keeps working with the platform, so servers that already run it are fine.
+**For new setups on Auto Tournament 3.0, use [Ready Up](/cs2/ready-up).** Ready Up is a native plugin with no Metamod or CounterStrikeSharp. It connects to the platform over one outbound link (no RCON, no inbound port), streams demos while they record, and powers failover and auto-scaling.
 
-Its settings still start with `matchzy_`, and its config folder and files keep their old names, so existing configs keep working.
+## Which version for which platform
+
+| Auto Tournament | MatchZy Enhanced | Settings start with |
+| --- | --- | --- |
+| 2.x | 1.4.x (1.4.35 is the last) | `matchzy_` |
+| 3.0 | 2.0 or newer | `at_` |
+
+Auto Tournament 3.0 sets up servers with the `at_` settings, so a server on 1.4.x does not work with it: update it to 2.0, or move it to Ready Up. 2.0 is a pre-release for now. Its config folder keeps its name, `cfg/AutoTournamentCS2/`.
 
 The full plugin docs have their own section:
 

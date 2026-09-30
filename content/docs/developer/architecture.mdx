@@ -28,15 +28,18 @@ If either process stops, the container stops, so Docker's restart policy can sta
 
 | Folder | What is in it |
 | --- | --- |
-| `api/src/routes/` | One Express router per area. `routeTable.ts` lists every router and its path prefix, for example `/api/matches` and `/api/events`. |
-| `api/src/services/` | The logic: tournaments, brackets, matches, server allocation, RCON, veto, ratings, recovery. |
+| `api/src/routes/` | One Express router per area. `routeTable.ts` lists every core router and its path prefix, for example `/api/matches`. |
+| `api/src/core/` | The game-neutral match flow: the scheduler, the allocation queue, match lifecycle and results. |
+| `api/src/services/` | The logic: tournaments, brackets, players, ratings, sign-in settings, game packs. |
+| `api/src/integrations/` | The game modules. `registry.ts` lists them; `cs2/` is the CS2 module (servers, maps, veto, events, the fleet link), `manual-report/` is manual reporting. |
+| `api/src/modules/` | Code modules installed at runtime: the catalog, signature checks, the loader. |
 | `api/src/middleware/` | `auth.ts` checks admin sessions and API tokens. `serverAuth.ts` checks the token that game servers send. |
 | `api/src/config/` | Database connection and schema, Passport sign-in providers, and the OpenAPI setup. |
 | `api/src/types/`, `api/src/utils/` | Shared types and helpers. |
 
 ### Database
 
-The schema is in `api/src/config/database.schema.ts`. On start, the API creates missing tables and adds missing columns with `ALTER TABLE ... ADD COLUMN`. Changes that are more than a new column, such as a backfill or a new constraint, are written by hand in `api/src/config/database.ts`. There are no numbered migration files.
+The schema is in `api/src/config/database.schema.ts`. On start, the API creates missing tables and adds missing columns with `ALTER TABLE ... ADD COLUMN`, derived from the schema itself. Changes that are more than a new column, such as a backfill, are hand-written steps in `api/src/config/schemaMigrations.ts`, each run once and recorded in `schema_migrations`. Game modules bring their own migrations (CS2: `api/src/integrations/cs2/migrations.ts`).
 
 ### Brackets
 
@@ -50,12 +53,12 @@ To add a tournament type, write a generator and add it to the registry.
 
 ### Game servers
 
-The API talks to CS2 servers in two directions:
+The CS2 module has two drivers (`api/src/integrations/cs2/driver.ts`), one per plugin:
 
-- **To the server:** RCON, in `rconService`. When you add a server, `serverInitializationService` sets `matchzy_server_id`, `matchzy_bootstrap_token` and `matchzy_bootstrap_url` over RCON, in that order. The plugin then downloads its settings from `GET /api/servers/:id/bootstrap`.
-- **From the server:** the plugin posts events to `/api/events` and match reports to `/api/events/report`, and downloads match configs from `/api/matches/<slug>.json`. Each request carries `SERVER_TOKEN` in the `X-MatchZy-Token` header. `matchEventHandler` applies the events.
+- **`fleet`, Ready Up.** The server keeps one outbound WebSocket to `/api/fleet/ws` (`fleet/gateway.ts`). Matches, settings and admins go out over it; state, events and round backups come back. The protocol is versioned JSON, described in `fleet/protocol/`. csm machines use a second link (`fleet/hosts/`) for server lifecycle, failover and auto-scaling.
+- **`rcon`, MatchZy Enhanced.** To the server: RCON, in `rconService`. When you add a server, `serverInitializationService` sets `at_server_id`, `at_bootstrap_token` and `at_bootstrap_url` over RCON, and the plugin downloads its settings from `GET /api/servers/:id/bootstrap`. From the server: events to `/api/events`, match reports to `/api/events/report`, and match configs from `/api/matches/<slug>.json`, each with `SERVER_TOKEN` in the `X-Auto-Tournament-Token` header. `events/matchEvents.ts` applies the events.
 
-`matchAllocationService` picks a free server for each ready match. `matchConfigBuilder` builds the match config that the plugin downloads. The plugin side is described in [Events and report API](/cs2/matchzy-enhanced/events).
+`allocation.ts` picks a free server for each ready match, and `matchConfig.ts` builds the match config both drivers send. The plugin side is described in [Fleet mode](/cs2/ready-up/fleet) and [Events and report API](/cs2/matchzy-enhanced/events).
 
 ## The web app
 
