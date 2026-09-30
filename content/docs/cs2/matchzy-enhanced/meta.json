@@ -1,6 +1,6 @@
 {
-  "title": "Auto Tournament CS2",
-  "description": "The CS2 server plugin (formerly MatchZy Enhanced)",
+  "title": "MatchZy Enhanced",
+  "description": "The older CS2 plugin (MatchZy-based). Still supported; Ready Up is for new setups.",
   "icon": "Plug",
   "root": true,
   "pages": [
@@ -11,7 +11,7 @@
     "match-config",
     "events",
     "troubleshooting",
-    "[ScrollText][Changelog](/reference/changelog/cs2-plugin)",
+    "[ScrollText][Changelog](/reference/changelog/matchzy-enhanced)",
     "---Developers---",
     "building"
   ]

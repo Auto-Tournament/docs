@@ -19,7 +19,7 @@ If you run 2.4.x for Counter-Strike 2, the short version is: back up, change one
 - **The name.** MatchZy Auto Tournament (MAT) is now Auto Tournament. Menus and pages were rebuilt, so the app looks different. The tasks are the same ones.
 - **CS2 is a module, not the whole app.** Counter-Strike 2 now sits in a module next to a second one, [manual reporting](/guides/manual-reporting), which runs tournaments for games the platform cannot watch. A CS2 tournament still does everything it did: servers, veto, live scores, demos and stats.
 - **The licence changed.** 3.0 and everything after it are under the PolyForm Noncommercial License 1.0.0. [What that means for you](#the-licence-change) is below.
-- **The CS2 plugin has a new name.** MatchZy Enhanced is now **Auto Tournament CS2**, at [github.com/Auto-Tournament/cs2-plugin](https://github.com/Auto-Tournament/cs2-plugin). It is the same plugin: it still reports itself as MatchZy in `css_plugins list`, and its settings still start with `matchzy_`. See [Auto Tournament CS2](/cs2/plugin).
+- **The CS2 plugin has a new name.** MatchZy Enhanced is now **MatchZy Enhanced**, at [github.com/Auto-Tournament/matchzy-enhanced](https://github.com/Auto-Tournament/matchzy-enhanced). It is the same plugin: it still reports itself as MatchZy in `css_plugins list`, and its settings still start with `matchzy_`. See [MatchZy Enhanced](/cs2/matchzy-enhanced).
 - **There is a new image name.** `sivertio/auto-tournament` on Docker Hub, and `ghcr.io/auto-tournament/auto-tournament` on GitHub's registry.
 - **The docs moved** from `docs.sivert.io/docs/mat` to [docs.autotournament.gg](https://docs.autotournament.gg). Old links redirect to the matching new page.
 
@@ -197,13 +197,13 @@ The version must be 3.0 or newer. Then open the app, sign in, and check that you
 
 ### Update the CS2 plugin on your servers
 
-Put the same, latest version of Auto Tournament CS2 on every server. With CS2 Server Manager:
+Put the same, latest version of MatchZy Enhanced on every server. With CS2 Server Manager:
 
 ```bash
 sudo csm update-plugins
 ```
 
-Without it, see [Update the CS2 plugin](/cs2/plugin/install#update). Then open the **Servers** page, click **Refresh Status**, and **Retry** any server that is not set up.
+Without it, see [Update the CS2 plugin](/cs2/matchzy-enhanced/install#update). Then open the **Servers** page, click **Refresh Status**, and **Retry** any server that is not set up.
 
 </Step>
 

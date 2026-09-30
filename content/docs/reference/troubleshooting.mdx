@@ -55,7 +55,7 @@ RCON works, but the server cannot send events back.
 
 1. On the CS2 machine, run `curl <webhook-url>/api/events/test`. It must answer `"success":true`.
 2. If it fails, fix the **Webhook URL** in **Settings** > **Integrations & Webhooks**, DNS or the firewall.
-3. Check that Auto Tournament CS2 (formerly MatchZy Enhanced) is loaded: run `css_plugins list` in the server console. The plugin still shows up as MatchZy.
+3. Check that MatchZy Enhanced is loaded: run `css_plugins list` in the server console. The plugin still shows up as MatchZy.
 4. Click **Retry** on the server.
 
 ### IP banned
@@ -102,7 +102,7 @@ sudo csm update-plugins
 
 ### The same server shows up several times
 
-Several servers share one MySQL database with an old version of the CS2 plugin, or without a scope name. See [Several servers on one database](/cs2/plugin/install#several-servers-on-one-database).
+Several servers share one MySQL database with an old version of the CS2 plugin, or without a scope name. See [Several servers on one database](/cs2/matchzy-enhanced/install#several-servers-on-one-database).
 
 ## Tournaments and matches
 

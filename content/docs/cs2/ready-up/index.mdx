@@ -5,10 +5,10 @@ icon: BadgeCheck
 ---
 
 <Callout title="In beta" type="warn">
-  Ready Up is in beta. The latest pre-release is v0.1.0-beta.2, and you install it with `install.sh --channel beta`. See the [Ready Up changelog](/reference/changelog/ready-up). [Auto Tournament CS2](/cs2/plugin) is still the supported plugin for production, and Ready Up will replace it in a later release. These pages describe how Ready Up works today. Expect breaking changes.
+  Ready Up is in beta. The latest pre-release is v0.1.0-beta.2, and you install it with `install.sh --channel beta`. See the [Ready Up changelog](/reference/changelog/ready-up). [MatchZy Enhanced](/cs2/matchzy-enhanced) is still the supported plugin for production, and Ready Up will replace it in a later release. These pages describe how Ready Up works today. Expect breaking changes.
 </Callout>
 
-Ready Up runs the match flow on a CS2 server. Players ready up, the match goes live, and results go back to Auto Tournament. It does the same job as [Auto Tournament CS2](/cs2/plugin), MatchZy and Get5. It is not a fork of any of them. It reuses their chat commands and event names where that makes sense, so moving over is easy.
+Ready Up runs the match flow on a CS2 server. Players ready up, the match goes live, and results go back to Auto Tournament. It does the same job as [MatchZy Enhanced](/cs2/matchzy-enhanced), MatchZy and Get5. It is not a fork of any of them. It reuses their chat commands and event names where that makes sense, so moving over is easy.
 
 - Source: [github.com/Auto-Tournament/ready-up](https://github.com/Auto-Tournament/ready-up)
 - Bugs and questions: [GitHub issues](https://github.com/Auto-Tournament/ready-up/issues) or [Discord](https://discord.gg/n7gHYau7aW)
@@ -35,7 +35,7 @@ Skins (weapon paints, knives, gloves, agents) are a separate, optional plugin. S
 
 ## No Metamod or CounterStrikeSharp
 
-Auto Tournament CS2 needs Metamod:Source and CounterStrikeSharp. Ready Up needs neither.
+MatchZy Enhanced needs Metamod:Source and CounterStrikeSharp. Ready Up needs neither.
 
 CS2 finds its server module, `libserver.so`, through the search paths in `gameinfo.gi`. Ready Up adds one line there, `Game csgo/readyup`, above `Game csgo`. CS2 then loads Ready Up's `libserver.so` first. Ready Up loads Valve's real `libserver.so` and passes everything through to it. This is the same trick Metamod uses.
 
