@@ -4,34 +4,43 @@ description: How the CS2 game module works and what you need for it.
 icon: Crosshair
 ---
 
-The CS2 module lets Auto Tournament run Counter-Strike 2 matches. It is built into the app today.
+The CS2 module lets Auto Tournament run Counter-Strike 2 matches. It is a signed code module: install it from **Modules** (or when you create your first tournament). The Docker image carries a copy, so it installs without internet.
 
 ## The parts
 
 | Part | Where it runs | Required |
 | --- | --- | --- |
-| Auto Tournament | Your app server, in Docker | Yes |
+| Auto Tournament with the CS2 module | Your app server, in Docker | Yes |
 | CS2 dedicated server | A machine you control, usually Linux | Yes, one or more |
-| Metamod:Source and CounterStrikeSharp | On each CS2 server | Yes, the plugin needs them |
-| [MatchZy Enhanced](/cs2/matchzy-enhanced) (formerly MatchZy Enhanced) | On each CS2 server | Yes |
+| A match plugin: [Ready Up](/cs2/ready-up), or the older [MatchZy Enhanced](/cs2/matchzy-enhanced) | On each CS2 server | Yes, one of them |
 | [CS2 Server Manager](/cs2/server-manager) | On the Linux machine with the CS2 servers | No, but recommended |
 
-The CS2 plugin is made for Auto Tournament and based on the MatchZy plugin. It still shows up as MatchZy in the server's plugin list. It adds more events, a match report, simulation mode and a retry queue for events. Auto Tournament does not support the original MatchZy plugin.
+Ready Up is a native plugin with no Metamod or CounterStrikeSharp. MatchZy Enhanced is based on MatchZy and needs Metamod:Source and CounterStrikeSharp. Auto Tournament does not support the original MatchZy plugin.
 
 ## How a match gets to a server
 
-1. You add a server on the **Servers** page with its host, port and RCON password.
-2. Auto Tournament sends a few settings over RCON: a server ID, a token and a setup URL.
-3. The CS2 plugin downloads its full setup from Auto Tournament: where to send events, where to upload demos, and the default match settings. It saves this setup, so it survives a restart.
-4. When a match is ready, Auto Tournament tells the server to load it. The server downloads the match config (teams, players, maps, rules) from Auto Tournament.
-5. During the match, the plugin sends events to Auto Tournament: players connecting, round ends, map results, the series result.
-6. After the match, the plugin uploads the demo if recording is on.
+**Ready Up (fleet link).** The server enrolls once with a code or a fleet key, then keeps one outbound WebSocket to the platform.
 
-The server authenticates to Auto Tournament with `SERVER_TOKEN`, for events, demo uploads and the match config download. If you change `SERVER_TOKEN`, click **Retry** on each server on the **Servers** page so it gets the new token.
+1. When a match is ready, the platform sends the match (teams, players, maps, rules) over the link.
+2. During the match, the server streams its state and events back: players connecting, round ends, map results, the series result, and a round backup after every round.
+3. The demo streams to the platform while it records.
+
+No RCON, no inbound port and no webhook URL. Round backups power **Restore backup** and failover. See [Fleet mode](/cs2/ready-up/fleet).
+
+**MatchZy Enhanced (RCON and webhooks).**
+
+1. You add the server on the **Servers** page with its host, port and RCON password.
+2. Auto Tournament sends a few settings over RCON: a server ID, a token and a setup URL.
+3. The plugin downloads its setup from Auto Tournament: where to send events, where to upload demos, and the default match settings.
+4. When a match is ready, Auto Tournament tells the server to load it, and the server downloads the match config.
+5. During the match, the plugin sends events to the **Webhook URL**, and uploads the demo after the match if recording is on.
+
+The server authenticates with `SERVER_TOKEN` (header `X-Auto-Tournament-Token`). If you change `SERVER_TOKEN`, click **Retry** on each server on the **Servers** page so it gets the new token.
 
 ## Which setup to choose
 
-- **You have a Linux machine for game servers:** use [CS2 Server Manager](/cs2/server-manager). It installs CS2, Metamod, CounterStrikeSharp and the CS2 plugin on several servers and keeps them updated.
-- **You already run CS2 servers, or use a game host:** install [the CS2 plugin](/cs2/matchzy-enhanced/install) yourself.
+- **You have a Linux machine for game servers:** use [CS2 Server Manager](/cs2/server-manager) and link it to the platform. It installs CS2 and Ready Up, and the platform creates, starts and updates the servers, with failover and auto-scaling.
+- **You already run CS2 servers, or use a game host:** install [Ready Up](/cs2/ready-up/install) yourself and enroll each server.
+- **Your servers already run MatchZy Enhanced:** keep them. Add them by RCON, see [Connect a CS2 server](/getting-started/connect-server#a-matchzy-enhanced-server-rcon).
 
 Before you start, read [Server requirements](/modules/cs2/server-requirements).

@@ -9,25 +9,33 @@ icon: ListChecks
 For CS2 Server Manager:
 
 - Linux on `x86_64` or `arm64`. Debian and Ubuntu are the tested systems.
-- `sudo` access.
-- At least 8 GB RAM. Add more for many servers.
-- About 71 GB of disk for the first install, plus about 2 GB for each server.
-- Docker, if you use the shared MySQL database for MatchZy (the default).
+- An ordinary user account to run csm, with `sudo` for the one-time `sudo csm setup-host`. csm refuses to run as root.
+- At least 8 GB RAM, and 1 to 2 GB more for each server.
+- About 70 GB of disk for CS2. In instance mode every server shares that one install, so ten servers need about as much disk as one; without it, each server is a full copy. See [How much disk? in the csm README](https://github.com/Auto-Tournament/cs2-server-manager/blob/master/README.md#how-much-disk).
+- Docker only for the older MatchZy Enhanced stack's shared MySQL database.
 
 ## Software on each server
 
+With **Ready Up**:
+
 - CS2 dedicated server (Steam app 730), kept up to date.
-- Metamod:Source. Use `2.0.0.1411` for now, see the note in [Install the CS2 plugin](/cs2/matchzy-enhanced/install#install-metamodsource-and-counterstrikesharp).
+- [Ready Up](/cs2/ready-up). No Metamod:Source or CounterStrikeSharp.
+- GOTV on (`tv_enable 1`) if you want demos.
+
+With **MatchZy Enhanced**:
+
+- CS2 dedicated server (Steam app 730), kept up to date.
+- Metamod:Source. Use `2.0.0.1411` for now, see the note in [Install MatchZy Enhanced](/cs2/matchzy-enhanced/install#install-metamodsource-and-counterstrikesharp).
 - CounterStrikeSharp.
-- [MatchZy Enhanced](/cs2/matchzy-enhanced) (formerly MatchZy Enhanced), the same version on all servers.
+- [MatchZy Enhanced](/cs2/matchzy-enhanced), the same version on all servers.
 - An RCON password.
 - GOTV on (`tv_enable 1`) if you want demos.
 
-CS2 Server Manager installs all of this.
+CS2 Server Manager installs either stack.
 
 ### SteamCMD on Debian and Ubuntu
 
-If `apt` says `Unable to locate package steamcmd`, the package source is not on. `sudo csm install-deps` tries to fix it. To do it by hand on Ubuntu:
+If `apt` says `Unable to locate package steamcmd`, the package source is not on. `sudo csm install-deps` tries to fix it (one of the few csm commands that needs root). To do it by hand on Ubuntu:
 
 ```bash
 sudo add-apt-repository multiverse
