@@ -26,6 +26,18 @@ Click **Send test event** to send an example of any event. It looks like a real 
   At a LAN event the website often runs on the LAN (`192.168.x.x`, `10.x.x.x`). Turn on **Allow webhooks to private and local addresses** first. Without it, Auto Tournament only sends to public addresses.
 </Callout>
 
+## Send admin calls to Discord
+
+An endpoint can post straight into a Discord channel, such as your admins' channel:
+
+1. In Discord, open the channel's settings, then **Integrations → Webhooks → New Webhook**, and copy its URL.
+2. In **Settings → Webhooks**, click **Add endpoint** and set **Format** to **Discord message**.
+3. Paste the Discord URL. The admin call events are already picked; add others if you want them in the channel too.
+
+Each admin call becomes a message like "Admin called: Team A vs Team B" with what the player wrote, who wrote it, the server, the score and a link to the match page. When an admin answers the call, the channel gets "Admin call answered" with who answered.
+
+Discord messages never include the server password or the connect line, since everyone in the channel can read them. Admins find those on the match page. The messages don't ping anyone.
+
 ## Events
 
 | Event | Sent when |
@@ -38,6 +50,8 @@ Click **Send test event** to send an example of any event. It looks like a real 
 | `match.finished` | The match is over. |
 | `match.cancelled` | The match was cancelled or deleted. |
 | `match.reset` | The match was restarted or taken off its server. |
+| `admin.called` | A player typed `.admin [message]` in a match. `admin_call` says who, what they wrote, the server and a link to the match page. |
+| `admin.call_resolved` | An admin answered a call. Also has `resolved_by` and `resolution_note`. |
 
 `match.ready`, `match.live`, the map events and `match.score_updated` include `connect`:
 
