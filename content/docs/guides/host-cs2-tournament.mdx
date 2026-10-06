@@ -52,14 +52,14 @@ The page comes back with the CS2 pages (**Servers** and **Maps**) and the CS2 se
 
 ### Prepare the game machine
 
-On the Linux machine, install csm with the command in [Install CS2 Server Manager](/cs2/server-manager/install). Quit the menu it opens. Then run:
+On the Linux machine, log in as the account the servers will run as and download csm with the command in [Install CS2 Server Manager](/cs2/server-manager/install). Then run:
 
 ```bash
 sudo csm setup-host
-sudo -iu cs2servermanager csm instance config backend instances
+csm instance config backend instances
 ```
 
-- `sudo csm setup-host` runs once. It installs the system packages, creates the `cs2servermanager` user and lets csm run as that user, without `sudo`. It never starts, stops or updates a server, and it is safe to run again.
+- `sudo csm setup-host` runs once. It installs the system packages and sets up your account to run csm without `sudo`. It never starts, stops or updates a server, and it is safe to run again.
 - **Instance mode** means every server runs one shared, read-only copy of CS2. Ten servers cost about as much disk as one. Without it, each server is a full copy, about 69 GB each.
 
 The CS2 download is about 69 GB, once for all servers. It runs the first time a server is created, or when you run `csm update-game`. It can take a long time, so start it early.
@@ -72,17 +72,17 @@ The CS2 download is about 69 GB, once for all servers. It runs the first time a 
 
 1. Open **Servers**. Under **Machines**, click **Add machine**. Give it a name if you like, then click **Get the command**.
 2. The platform shows a `csm link` command with a one-time code. The code works once and for 15 minutes.
-3. Run the link command as the CS2 user. Use `-` in place of the code, so the code is read from your keyboard and stays out of the shell history:
+3. Run the link command as the account that runs csm. Use `-` in place of the code, so the code is read from your keyboard and stays out of the shell history:
 
    ```bash
-   sudo -iu cs2servermanager csm link https://tournament.example.com -
+   csm link https://tournament.example.com -
    ```
 
    Paste the code and press Enter. If it does not continue, press Ctrl+D.
 4. Install the host agent as a service, so it keeps running and starts again after a reboot:
 
    ```bash
-   sudo -iu cs2servermanager csm agent install
+   csm agent install
    ```
 
 The dialog changes to **Connected. The machine is ready.** The machine now shows as **Online** under **Machines**, with its CPU, memory and disk.

@@ -9,10 +9,10 @@ import { Step, Steps } from 'fumadocs-ui/components/steps';
 ## What you need
 
 - Linux on `x86_64` or `arm64`. Debian and Ubuntu are the tested systems.
-- `sudo` access.
+- A Linux account with `sudo` access. The servers run as that account: `csm` itself runs without `sudo`, and only the one-time host setup needs it. Use a separate account for the servers if you don't want them under your own login.
 - At least 8 GB RAM. Add more for many servers.
 - About 71 GB of disk for the first install, plus about 2 GB for each server.
-- Docker, if you use the shared MySQL database for the plugin (the default). See the [Docker install guide](https://docs.docker.com/engine/install/). `csm` does not install Docker for you.
+- Docker only for the legacy MatchZy Enhanced plugin with its shared MySQL database (Auto Tournament 2.x). Ready Up needs no database. See the [Docker install guide](https://docs.docker.com/engine/install/); `csm` does not install Docker for you.
 - A Game Server Login Token (GSLT) per server, if players join over the internet. Create one at [steamcommunity.com/dev/managegameservers](https://steamcommunity.com/dev/managegameservers) with app ID 730. For a LAN event you do not need one.
 
 `csm` installs the other packages it needs (SteamCMD, tmux, rsync, the 32-bit libraries and more) with `apt`. See [Server requirements](/modules/cs2/server-requirements) for the network ports.
@@ -23,9 +23,9 @@ import { Step, Steps } from 'fumadocs-ui/components/steps';
 
 <Step>
 
-### Download `csm` and start it
+### Download `csm`
 
-Run this on the Linux machine. It downloads the latest `csm` for your CPU to `/usr/local/bin/csm` and opens the menu:
+Log in as the account the servers will run as, then run this. It downloads the latest `csm` for your CPU to `/usr/local/bin/csm`:
 
 ```bash
 arch=$(uname -m); \
@@ -37,11 +37,40 @@ esac; \
 tmp=$(mktemp); \
 curl -L "https://github.com/Auto-Tournament/cs2-server-manager/releases/latest/download/$asset" -o "$tmp" && \
 sudo install -m 0755 "$tmp" /usr/local/bin/csm && \
-rm "$tmp" && \
-sudo csm
+rm "$tmp"
 ```
 
-Run the same command again later to update `csm` itself. The menu also has **Tools** > **Force update CSM now**.
+To update `csm` later, run `sudo csm self-update`, or choose **Tools** > **Force update CSM now** in the menu.
+
+</Step>
+
+<Step>
+
+### Set up the host
+
+Run this once, with `sudo`, from the same account:
+
+```bash
+sudo csm setup-host
+```
+
+It installs the packages `csm` needs (and accepts the Steam license the `steamcmd` package asks for), lets your account's services keep running after you log out (systemd lingering), and gives your account `csm`'s files. Leave out a step with `--skip-deps` or `--skip-linger`.
+
+Only for the legacy MatchZy Enhanced plugin with the shared MySQL database: add `--docker`. It starts Docker and adds your account to the `docker` group; log out and back in afterwards. Members of that group can control every container on the machine.
+
+</Step>
+
+<Step>
+
+### Start `csm`
+
+From now on, run `csm` without `sudo`:
+
+```bash
+csm
+```
+
+`csm` refuses to run as root. Only `setup-host`, `install-deps`, `self-update` and `cleanup-all` take `sudo`.
 
 </Step>
 
@@ -59,10 +88,11 @@ In the menu, choose **Install** > **Install or redeploy servers**.
 
 The installer asks:
 
-- **MatchZy storage:** shared MySQL (the default) or one SQLite file per server. Shared MySQL keeps all match stats in one place and runs in a Docker container. You can also point it at your own MySQL server.
+- **Plugins:** Ready Up (the default, for Auto Tournament 3.x) or the legacy MatchZy Enhanced stack (for 2.x).
+- **Ready Up license:** noncommercial (free: your own servers, a club, a school, a free event) or commercial (needs a paid license key).
+- Legacy stack only: **MatchZy storage**, shared MySQL in a Docker container or one SQLite file per server, or your own MySQL server.
 - **Number of servers.** The default is 3.
 - **Game port and GOTV port** of server 1. The defaults are `27015` and `27020`.
-- **CS2 user.** The default is `cs2servermanager`.
 - **Hostname prefix, RCON password and max players.** Change the default RCON password. You enter this password in Auto Tournament.
 - **GSLT.**
 - Update options: validate the game files with SteamCMD, update the plugins, and install the [update monitor](/cs2/server-manager/updates#the-update-monitor).
@@ -113,22 +143,23 @@ Server 1 uses game port `27015` and GOTV port `27020`. Each next server adds 10:
 
 ## Install without the menu
 
-`csm bootstrap` installs or redeploys the servers with no questions. Set the options as environment variables:
+`csm bootstrap` installs or redeploys the servers with no questions, for the account that runs it. Set the options as environment variables:
 
 ```bash
-sudo NUM_SERVERS=5 RCON_PASSWORD='a-long-random-password' csm bootstrap
+NUM_SERVERS=5 RCON_PASSWORD='a-long-random-password' csm bootstrap
+csm plugins license noncommercial   # or commercial, with a paid license key
+csm update-plugins                  # installs Ready Up on every server
 ```
 
 | Variable | Default | What it sets |
 | --- | --- | --- |
 | `NUM_SERVERS` | `3` | Number of servers. |
 | `BASE_GAME_PORT`, `BASE_TV_PORT` | `27015`, `27020` | Ports of server 1. |
-| `CS2_USER` | `cs2servermanager` | Linux user for the servers. |
 | `HOSTNAME_PREFIX` | `CS2 Server` | Start of each server name. |
 | `RCON_PASSWORD` | a fixed default | RCON password. Always set it. |
-| `MATCHZY_DB_ENGINE` | `mysql` | `sqlite` for one SQLite file per server. |
-| `MATCHZY_SKIP_DOCKER` | `0` | `1` to skip the MySQL container. |
-| `ENABLE_METAMOD` | `1` | `0` to install without Metamod. |
+| `MATCHZY_DB_ENGINE` | `mysql` | Legacy stack only: `sqlite` for one SQLite file per server. |
+| `MATCHZY_SKIP_DOCKER` | `0` | Legacy stack only: `1` to skip the MySQL container. |
+| `ENABLE_METAMOD` | `1` | Legacy stack only: `0` to install without Metamod. |
 | `UPDATE_MASTER` | `1` | `0` to skip the game update. |
 | `FRESH_INSTALL` | `0` | `1` to start over from a clean install. |
 
@@ -148,8 +179,14 @@ On Debian, add `contrib` and `non-free` to your apt sources, then run `sudo apt-
 
 ## Remove everything
 
-This deletes all servers, the CS2 user and the MySQL container:
+This stops and deletes your servers, the master install, the shared config, the plugin files and the MySQL container with its data. Your account and the rest of your home directory stay:
 
 ```bash
 sudo csm cleanup-all
+```
+
+Run it from the account that runs `csm`. To remove a dedicated service account from an older install, such as `cs2servermanager`, with its home directory:
+
+```bash
+sudo csm cleanup-all --user cs2servermanager --delete-user
 ```
