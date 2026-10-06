@@ -9,7 +9,7 @@ import { Step, Steps } from 'fumadocs-ui/components/steps';
 ## What you need
 
 - Linux on `x86_64` or `arm64`. Debian and Ubuntu are the tested systems.
-- `sudo` access.
+- A Linux account with `sudo` access. The servers run as that account: `csm` itself runs without `sudo`, and only the one-time host setup needs it. Use a separate account for the servers if you don't want them under your own login.
 - At least 8 GB RAM. Add more for many servers.
 - About 71 GB of disk for the first install, plus about 2 GB for each server.
 - Docker, if you use the shared MySQL database for the plugin (the default). See the [Docker install guide](https://docs.docker.com/engine/install/). `csm` does not install Docker for you.
@@ -23,9 +23,9 @@ import { Step, Steps } from 'fumadocs-ui/components/steps';
 
 <Step>
 
-### Download `csm` and start it
+### Download `csm`
 
-Run this on the Linux machine. It downloads the latest `csm` for your CPU to `/usr/local/bin/csm` and opens the menu:
+Log in as the account the servers will run as, then run this. It downloads the latest `csm` for your CPU to `/usr/local/bin/csm`:
 
 ```bash
 arch=$(uname -m); \
@@ -37,11 +37,40 @@ esac; \
 tmp=$(mktemp); \
 curl -L "https://github.com/Auto-Tournament/cs2-server-manager/releases/latest/download/$asset" -o "$tmp" && \
 sudo install -m 0755 "$tmp" /usr/local/bin/csm && \
-rm "$tmp" && \
-sudo csm
+rm "$tmp"
 ```
 
-Run the same command again later to update `csm` itself. The menu also has **Tools** > **Force update CSM now**.
+To update `csm` later, run `sudo csm self-update`, or choose **Tools** > **Force update CSM now** in the menu.
+
+</Step>
+
+<Step>
+
+### Set up the host
+
+Run this once, with `sudo`, from the same account:
+
+```bash
+sudo csm setup-host
+```
+
+It installs the packages `csm` needs, lets your account's services keep running after you log out (systemd lingering), gives your account `csm`'s files, and adds your account to the `docker` group for the MySQL container. Log out and back in afterwards, so the group takes effect.
+
+Leave out a step with `--skip-deps`, `--skip-linger` or `--skip-docker`. Members of the `docker` group can control every container on the machine; use `--skip-docker` and SQLite if that matters on your host.
+
+</Step>
+
+<Step>
+
+### Start `csm`
+
+From now on, run `csm` without `sudo`:
+
+```bash
+csm
+```
+
+`csm` refuses to run as root. Only `setup-host`, `install-deps`, `self-update` and `cleanup-all` take `sudo`.
 
 </Step>
 
@@ -62,7 +91,6 @@ The installer asks:
 - **MatchZy storage:** shared MySQL (the default) or one SQLite file per server. Shared MySQL keeps all match stats in one place and runs in a Docker container. You can also point it at your own MySQL server.
 - **Number of servers.** The default is 3.
 - **Game port and GOTV port** of server 1. The defaults are `27015` and `27020`.
-- **CS2 user.** The default is `cs2servermanager`.
 - **Hostname prefix, RCON password and max players.** Change the default RCON password. You enter this password in Auto Tournament.
 - **GSLT.**
 - Update options: validate the game files with SteamCMD, update the plugins, and install the [update monitor](/cs2/server-manager/updates#the-update-monitor).
@@ -113,17 +141,16 @@ Server 1 uses game port `27015` and GOTV port `27020`. Each next server adds 10:
 
 ## Install without the menu
 
-`csm bootstrap` installs or redeploys the servers with no questions. Set the options as environment variables:
+`csm bootstrap` installs or redeploys the servers with no questions, for the account that runs it. Set the options as environment variables:
 
 ```bash
-sudo NUM_SERVERS=5 RCON_PASSWORD='a-long-random-password' csm bootstrap
+NUM_SERVERS=5 RCON_PASSWORD='a-long-random-password' csm bootstrap
 ```
 
 | Variable | Default | What it sets |
 | --- | --- | --- |
 | `NUM_SERVERS` | `3` | Number of servers. |
 | `BASE_GAME_PORT`, `BASE_TV_PORT` | `27015`, `27020` | Ports of server 1. |
-| `CS2_USER` | `cs2servermanager` | Linux user for the servers. |
 | `HOSTNAME_PREFIX` | `CS2 Server` | Start of each server name. |
 | `RCON_PASSWORD` | a fixed default | RCON password. Always set it. |
 | `MATCHZY_DB_ENGINE` | `mysql` | `sqlite` for one SQLite file per server. |
@@ -148,8 +175,14 @@ On Debian, add `contrib` and `non-free` to your apt sources, then run `sudo apt-
 
 ## Remove everything
 
-This deletes all servers, the CS2 user and the MySQL container:
+This stops and deletes your servers, the master install, the shared config, the plugin files and the MySQL container with its data. Your account and the rest of your home directory stay:
 
 ```bash
 sudo csm cleanup-all
+```
+
+Run it from the account that runs `csm`. To remove a dedicated service account from an older install, such as `cs2servermanager`, with its home directory:
+
+```bash
+sudo csm cleanup-all --user cs2servermanager --delete-user
 ```

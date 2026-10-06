@@ -8,7 +8,7 @@ For problems on the Auto Tournament side, see the main [Troubleshooting](/refere
 
 ## Where to look
 
-- The server console, and the server log. With CS2 Server Manager: `sudo csm logs 1 200`.
+- The server console, and the server log. With CS2 Server Manager: `csm logs 1 200`.
 - The plugin's own log of match phase changes: `addons/counterstrikesharp/plugins/MatchZy/logs/matchzy_breadcrumbs.log`.
 - In Auto Tournament, **Admin Tools** > **Server Events Monitor** shows the events that arrive from each server.
 
@@ -19,7 +19,7 @@ Since version 1.4.28, logs do not contain tokens or passwords. You can share the
 Run `css_plugins list` in the server console. MatchZy must be in the list.
 
 - If CounterStrikeSharp itself is missing, fix Metamod and CounterStrikeSharp first.
-- If the log shows `Plugin uses old SourceHook Metamod build`, Metamod is too new. Install Metamod `2.0.0.1411`. With CS2 Server Manager, run `sudo csm update-plugins`.
+- If the log shows `Plugin uses old SourceHook Metamod build`, Metamod is too new. Install Metamod `2.0.0.1411`. With CS2 Server Manager, run `csm update-plugins`.
 - Check that `MatchZy.dll` is at `game/csgo/addons/counterstrikesharp/plugins/MatchZy/MatchZy.dll`, not one folder deeper. The zip has a top folder that you must not copy.
 
 ## No events arrive in Auto Tournament
@@ -53,7 +53,7 @@ The plugin cannot reach its own database. This is not the Auto Tournament databa
 
 - Check `game/csgo/cfg/MatchZy/database.json`: the host, port, database name, user and password.
 - Check that the MySQL server is reachable from the CS2 machine.
-- With CS2 Server Manager: run `sudo csm`, open **Tools** and choose **MatchZy DB: verify/repair**.
+- With CS2 Server Manager: run `csm`, open **Tools** and choose **MatchZy DB: verify/repair**.
 
 Restart the server after a fix.
 
