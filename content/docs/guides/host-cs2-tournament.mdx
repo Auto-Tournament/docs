@@ -59,7 +59,7 @@ sudo csm setup-host
 csm instance config backend instances
 ```
 
-- `sudo csm setup-host` runs once. It installs the system packages and sets up your account to run csm without `sudo`. Log out and back in after it. It never starts, stops or updates a server, and it is safe to run again.
+- `sudo csm setup-host` runs once. It installs the system packages and sets up your account to run csm without `sudo`. It never starts, stops or updates a server, and it is safe to run again.
 - **Instance mode** means every server runs one shared, read-only copy of CS2. Ten servers cost about as much disk as one. Without it, each server is a full copy, about 69 GB each.
 
 The CS2 download is about 69 GB, once for all servers. It runs the first time a server is created, or when you run `csm update-game`. It can take a long time, so start it early.

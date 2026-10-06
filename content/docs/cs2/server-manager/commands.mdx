@@ -45,7 +45,7 @@ Run `csm` with no command to open the menu. Run `csm help` for a short list in t
 
 | Command | What it does |
 | --- | --- |
-| `sudo csm setup-host [--skip-deps] [--skip-linger] [--skip-docker]` | One-time host setup for the account you run it from: packages, lingering, `csm`'s files and the `docker` group. Never touches servers. |
+| `sudo csm setup-host [--skip-deps] [--skip-linger] [--docker]` | One-time host setup for the account you run it from: packages, lingering and `csm`'s files. `--docker` also adds the `docker` group, for the legacy stack's MySQL container. Never touches servers. |
 | `sudo csm install-deps` | Install the system packages `csm` needs with `apt`. |
 | `sudo csm self-update` | Update `csm` itself to the latest release. |
 | `csm bootstrap` | Install or redeploy the servers without the menu. Options come from environment variables, see [Install without the menu](/cs2/server-manager/install#install-without-the-menu). |
