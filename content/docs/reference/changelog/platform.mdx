@@ -7,6 +7,54 @@ description: Release notes for each version of the Auto Tournament platform.
 
 Versions before 3.0 were released as **MatchZy Auto Tournament** (MAT). Their notes are under [Earlier versions](#earlier-versions). **3.0 is in beta**: the `3.0.0-beta.N` releases below are the 3.0 notes until 3.0.0 ships. See [Upgrading to 3.0](/guides/upgrading-to-3). Newest first. Each entry is the [GitHub release](https://github.com/Auto-Tournament/auto-tournament/releases) for that version. [Docs](/).
 
+## v3.0.0-beta.52
+
+<p className="text-sm text-fd-muted-foreground">2026-10-06 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.52)</p>
+
+- feat(cs2): 2D replay with radars from the game files, utility, bomb, bullets, damage numbers, kill feed ([#586](https://github.com/Auto-Tournament/auto-tournament/pull/586))
+- feat(cs2): replay timeline with rounds, kills and the bomb; hover shows who killed whom ([#587](https://github.com/Auto-Tournament/auto-tournament/pull/587))
+
+## v3.0.0-beta.51
+
+<p className="text-sm text-fd-muted-foreground">2026-10-06 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.51)</p>
+
+- feat(cs2): demo analysis page per map; worker v2 adds KAST, time to damage and team buys; our own rating ([#584](https://github.com/Auto-Tournament/auto-tournament/pull/584))
+- fix(worker): use the secret of an API_TOKENS entry, not its label ([#585](https://github.com/Auto-Tournament/auto-tournament/pull/585))
+
+## v3.0.0-beta.50
+
+<p className="text-sm text-fd-muted-foreground">2026-10-06 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.50)</p>
+
+- feat(cs2): demo worker in Go reads every stored demo after the match; trades, aim, money and the 2D replay data ([#583](https://github.com/Auto-Tournament/auto-tournament/pull/583))
+
+## v3.0.0-beta.49
+
+<p className="text-sm text-fd-muted-foreground">2026-10-06 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.49)</p>
+
+- feat(cs2): keep Ready Up's map stats; rating, sides, openings, clutches and team flashes on the profile; rating column and Best player, Most clutches, Most team flashes in results ([#580](https://github.com/Auto-Tournament/auto-tournament/pull/580))
+- feat(matchmaking): online count, the usual wait per mode, and each mode's rules (MR and map pool) on Play ([#581](https://github.com/Auto-Tournament/auto-tournament/pull/581))
+- feat(profile): Loadout as its own tab (module profile tab slot, client API 0.2.11) ([#582](https://github.com/Auto-Tournament/auto-tournament/pull/582))
+
+## v3.0.0-beta.48
+
+<p className="text-sm text-fd-muted-foreground">2026-10-06 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.48)</p>
+
+- fix(fleet): a machine linked again gets its commands; they no longer wait forever (csm [#108](https://github.com/Auto-Tournament/auto-tournament/pull/108)) ([#565](https://github.com/Auto-Tournament/auto-tournament/pull/565))
+- fix(skins): your own profile shows the loadout section with nothing in it, linking to the inventory ([#566](https://github.com/Auto-Tournament/auto-tournament/pull/566))
+- feat(skins): a new skin shows the moment it's given, pushed over the socket ([#567](https://github.com/Auto-Tournament/auto-tournament/pull/567))
+- feat(settings): one level; CS2 gets Skins and Match rules in the rail ([#568](https://github.com/Auto-Tournament/auto-tournament/pull/568))
+- feat(home): one layout whatever is on: placeholders for empty slots, map art for tournaments without a banner ([#570](https://github.com/Auto-Tournament/auto-tournament/pull/570))
+- feat(fleet): installs carry the license use accepted on the platform ([#569](https://github.com/Auto-Tournament/auto-tournament/pull/569))
+- feat(chat): match events in the match chat; party bar; wide layout ([#572](https://github.com/Auto-Tournament/auto-tournament/pull/572))
+- test(fleet): restore the license acceptance instead of storing a bare record ([#574](https://github.com/Auto-Tournament/auto-tournament/pull/574))
+- feat(veto): turn timer; a team out of time has its step taken for it ([#571](https://github.com/Auto-Tournament/auto-tournament/pull/571))
+- feat(matchmaking): lobby shows who is in the server, sides and the warmup rule; result leads with Victory/Defeat and your game; Equip on the drop; faces in the seats ([#573](https://github.com/Auto-Tournament/auto-tournament/pull/573))
+- feat(browse, tournaments): Mine, You're in, stage and entries in Browse; stage, plain dates, Results and a template choice for admins ([#575](https://github.com/Auto-Tournament/auto-tournament/pull/575))
+- feat(tournament): tabs per stage, card bracket, sign-up checks and Remind, sides and results in Your match ([#576](https://github.com/Auto-Tournament/auto-tournament/pull/576))
+- feat(profile, skins): level and last ten in the header, month rating change, CS2 tiles before the first match; inventory slots, What this means, drop's game on the reveal ([#577](https://github.com/Auto-Tournament/auto-tournament/pull/577))
+- feat(teams): positions, starters and subs, a main game, invites by name; trophies, this month's change and playing now on the profile; rating, record and best map on the team list ([#578](https://github.com/Auto-Tournament/auto-tournament/pull/578))
+- feat(profile, chat): Overview and per-game tabs on the profile; Back on the phone chat ([#579](https://github.com/Auto-Tournament/auto-tournament/pull/579))
+
 ## v3.0.0-beta.47
 
 <p className="text-sm text-fd-muted-foreground">2026-10-06 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.47)</p>
