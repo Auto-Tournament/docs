@@ -7,6 +7,27 @@ description: Release notes for each version of the Auto Tournament platform.
 
 Versions before 3.0 were released as **MatchZy Auto Tournament** (MAT). Their notes are under [Earlier versions](#earlier-versions). **3.0 is in beta**: the `3.0.0-beta.N` releases below are the 3.0 notes until 3.0.0 ships. See [Upgrading to 3.0](/guides/upgrading-to-3). Newest first. Each entry is the [GitHub release](https://github.com/Auto-Tournament/auto-tournament/releases) for that version. [Docs](/).
 
+## v3.0.0-beta.58
+
+<p className="text-sm text-fd-muted-foreground">2026-10-08 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.58)</p>
+
+- feat(ratings): the tournament rating is per game ([#605](https://github.com/Auto-Tournament/auto-tournament/pull/605))
+- feat(profile): one tab per game, no overview; each game shows its own rating ([#609](https://github.com/Auto-Tournament/auto-tournament/pull/609))
+- refactor(highlights): highlights are core's, any game can have them ([#611](https://github.com/Auto-Tournament/auto-tournament/pull/611))
+- ci(release): skip apt when jq and curl are there; short timeouts when not ([#619](https://github.com/Auto-Tournament/auto-tournament/pull/619))
+- fix(highlights): readable corner text, sound on the kill, Share gives the video file ([#618](https://github.com/Auto-Tournament/auto-tournament/pull/618))
+- ci: point the runners' apt mirror list at the main Ubuntu archive ([#622](https://github.com/Auto-Tournament/auto-tournament/pull/622))
+- feat(matchmaking): on by default with every mode, no longer experimental ([#620](https://github.com/Auto-Tournament/auto-tournament/pull/620))
+- fix(highlights): the "ready in about N min" hint from measured recording times ([#614](https://github.com/Auto-Tournament/auto-tournament/pull/614))
+- feat(leaderboard): a leaderboard for the platform, per game ([#617](https://github.com/Auto-Tournament/auto-tournament/pull/617))
+- feat(servers): the Servers page rebuilt from the draft; servers come only through csm ([#621](https://github.com/Auto-Tournament/auto-tournament/pull/621))
+- fix(matchmaking): the party leader can pick the mode ([#623](https://github.com/Auto-Tournament/auto-tournament/pull/623))
+- feat(highlights): reel intro, orange wipe between players, crossfade between kills ([#625](https://github.com/Auto-Tournament/auto-tournament/pull/625))
+- feat(worker): export the kill feed's icons from the game (export-hud) ([#626](https://github.com/Auto-Tournament/auto-tournament/pull/626))
+- fix(highlights): build the reel intro in its own pass ([#627](https://github.com/Auto-Tournament/auto-tournament/pull/627))
+- feat(social): friends, party invites and the notification bell ([#624](https://github.com/Auto-Tournament/auto-tournament/pull/624))
+- feat(highlights): our own kill feed on every clip ([#628](https://github.com/Auto-Tournament/auto-tournament/pull/628))
+
 ## v3.0.0-beta.57
 
 <p className="text-sm text-fd-muted-foreground">2026-10-07 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.57)</p>
