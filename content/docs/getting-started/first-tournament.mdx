@@ -1,64 +1,50 @@
 ---
-title: Run a first tournament
-description: Create teams, generate a bracket and start the tournament.
+title: Run your first tournament
+description: Create a tournament, let teams sign up and check in, and start it.
 icon: Trophy
 ---
 
 import { Step, Steps } from 'fumadocs-ui/components/steps';
 
-New to CS2 on 3.0? [Host a CS2 tournament](/guides/host-cs2-tournament) covers the whole path, including installing the CS2 module.
-
-Before you start, you need at least one server that shows as online on the **Servers** page. See [Connect a CS2 server](/getting-started/connect-server).
-
-<Callout type="warn">
-  Auto Tournament has one tournament at a time. When you create a new tournament, the old one and its matches are deleted. Player rating history is kept.
-</Callout>
+You need at least one server that shows as **Free** on **Servers** ([Game servers with csm](/getting-started/connect-server)). A tournament runs as many matches at once as there are free servers; the rest wait their turn.
 
 <Steps>
 
 <Step>
 
-### Create teams
-
-1. Open **Teams**.
-2. Click **Create Team**, or **Import JSON** to add many teams at once.
-3. Give each team a name, a tag and its players (Steam ID and name).
-
-You need at least 2 teams. Single and double elimination need 2, 4, 8, 16, 32, 64 or 128 teams. See [Teams and players](/guides/teams-and-players) for the import format.
-
-</Step>
-
-<Step>
-
 ### Create the tournament
 
-1. Open **Tournament** and click **Create Tournament**.
-2. Enter a name.
-3. Choose the tournament type, for example **Single Elimination**. See [Tournament formats](/guides/tournament-formats).
-4. Choose the match format: **Best of 1**, **Best of 3** or **Best of 5**.
-5. Set **Max Rounds per Map** and **Overtime**. The defaults (24 rounds, overtime on) match normal competitive CS2.
+Open **New tournament** in the admin menu and go through the steps:
+
+1. **Game** and **Basics**: CS2, a name and the dates.
+2. **Format**: for example single elimination, best of 1 with a best-of-3 final. See [Tournament formats](/guides/tournament-formats).
+3. **Teams and sign-up**: team size, and switch on **Teams can sign up**, with when sign-up closes, the most teams, and when check-in opens and closes.
+4. **Maps and veto**: the map pool (map veto needs 7 maps; **Active Duty** is a safe pick).
+5. **Event page**: the rules teams accept when they sign up, and the text on the public page.
+6. **Review**, then save.
+
+The tournament gets a public page at `/tournament/<id>` with its teams, bracket, matches and rules. Several tournaments can exist side by side.
 
 </Step>
 
 <Step>
 
-### Choose teams and maps
+### Share the link
 
-1. Select the teams.
-2. Choose a map pool. Map veto needs a pool of exactly 7 maps. The **Active Duty** pool works if you are not sure.
-3. Click **Save & Generate Brackets**.
+Send players the tournament's link. Each team:
 
-Check the result on the **Bracket** page. You can change settings and generate again until you start.
+1. signs in (Steam), and one of them makes the team on **Teams** and invites the others, or joins an existing team;
+2. the owner or a captain opens the tournament's **Sign up** tab, picks the starters and up to two subs, and accepts the rules.
+
+The **Sign up** tab shows every team's lineup and what still has to be fixed before the day: a player with no account here, or who hasn't added CS2. You can also add teams yourself in the tournament's settings.
 
 </Step>
 
 <Step>
 
-### Tell the players where to go
+### Check-in
 
-Players sign in with Steam at your Auto Tournament address. After sign-in they land on their own player page. That page shows their next match, the map veto when it is their turn, and the button to join the server.
-
-Each team also has a page at `/team/<team-id>`, for example `https://tournament.example.com/team/navi`. On **Teams**, click the link icon next to a team (**Copy team match link**) to copy it. Send players the [guide for players](/guides/players).
+When check-in opens, everyone in a lineup gets a notification and checks in on the **Sign up** tab. Lineups lock when check-in closes.
 
 </Step>
 
@@ -66,21 +52,22 @@ Each team also has a page at `/team/<team-id>`, for example `https://tournament.
 
 ### Start
 
-Click **Start Tournament**. For each match that can be played:
+Click **Start Tournament**. The bracket is drawn from the signed-up teams and the first matches go out by themselves:
 
-1. The two teams do the map veto on their player pages.
-2. Auto Tournament picks a free server and loads the match.
-3. Players join the server and type `.ready` in chat.
-4. The match goes live. You see the score on the **Matches** page.
-5. When the match ends, the winner moves on in the bracket and the server is free for the next match.
-
-If there are more matches than servers, the extra matches wait until a server is free.
+1. The two teams do the map veto on the match page in the browser.
+2. The platform gives the match a free server and loads it.
+3. Players see **Connect** on the match page, join, and type `.r` in chat when they're ready.
+4. The match goes live; the score updates on the match page and the bracket.
+5. When it's over, the winner moves on, the server is free for the next match, and the demo is saved.
 
 </Step>
 
 </Steps>
 
-## Next
+## While it runs
 
-- [Running matches](/guides/running-matches): what to do when a match gets stuck.
-- [Simulation mode](/guides/simulation-mode): test a full tournament with bots.
+- **Matches**, or a match's page in the dashboard, shows every match live. From a match you can pause it, hold it (for example "starts in 15 minutes, a player is on their way"), restart its countdown, or move it to another server. **Pause bracket** holds every match that hasn't started.
+- A team that doesn't show up loses by walkover after the forfeit timer (**Settings** > CS2 server defaults > Forfeit, 4 minutes by default). A held match never forfeits.
+- If a player is banned during the tournament, their team gets 15 minutes to pick a sub; then the first sub moves in, or the team plays one short. Nobody is disqualified.
+
+More: [Running matches](/guides/running-matches), [Guide for players](/guides/players), [Simulation mode](/guides/simulation-mode) to test a whole tournament with bots first.
