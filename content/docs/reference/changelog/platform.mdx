@@ -7,6 +7,44 @@ description: Release notes for each version of the Auto Tournament platform.
 
 Versions before 3.0 were released as **MatchZy Auto Tournament** (MAT). Their notes are under [Earlier versions](#earlier-versions). **3.0 is in beta**: the `3.0.0-beta.N` releases below are the 3.0 notes until 3.0.0 ships. See [Upgrading to 3.0](/guides/upgrading-to-3). Newest first. Each entry is the [GitHub release](https://github.com/Auto-Tournament/auto-tournament/releases) for that version. [Docs](/).
 
+## v3.0.0-beta.74
+
+<p className="text-sm text-fd-muted-foreground">2026-10-09 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.74)</p>
+
+- fix(recorder): a desktop recorder shares the host's PIDs, so Steam lets a restarted CS2 in ([#683](https://github.com/Auto-Tournament/auto-tournament/pull/683))
+- feat(fleet): a fleet key can turn skins on for the servers it enrolls ([#663](https://github.com/Auto-Tournament/auto-tournament/pull/663))
+- fix(recorders): a recorder whose CS2 will not start gives its job back instead of failing it ([#684](https://github.com/Auto-Tournament/auto-tournament/pull/684))
+- test(turnover): a waiting match taking the released server counts as the release ([#686](https://github.com/Auto-Tournament/auto-tournament/pull/686))
+- fix(highlights): a series reel waits until every map has recorded clips ([#685](https://github.com/Auto-Tournament/auto-tournament/pull/685))
+
+## v3.0.0-beta.73
+
+<p className="text-sm text-fd-muted-foreground">2026-10-09 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.73)</p>
+
+- feat(compat): accept the code_change trigger ([#674](https://github.com/Auto-Tournament/auto-tournament/pull/674))
+- feat(highlights): add a recorder with one command; recorder keys, names, heartbeat, no sleep mid-job ([#676](https://github.com/Auto-Tournament/auto-tournament/pull/676))
+- feat(fleet): a fleet key can link the servers it enrolls for matches ([#658](https://github.com/Auto-Tournament/auto-tournament/pull/658))
+- feat(system): admins get a toast when a newer Auto Tournament is out ([#677](https://github.com/Auto-Tournament/auto-tournament/pull/677))
+- fix(recorder): wait for the desktop session after a reboot instead of failing every job ([#679](https://github.com/Auto-Tournament/auto-tournament/pull/679))
+- feat(highlights): recorders share each map, newest match first ([#678](https://github.com/Auto-Tournament/auto-tournament/pull/678))
+- chore: format the files a change touches; CI checks it; a CONTRIBUTING guide ([#680](https://github.com/Auto-Tournament/auto-tournament/pull/680))
+- fix(highlights): recorders send files over 64 MB in parts ([#681](https://github.com/Auto-Tournament/auto-tournament/pull/681))
+- test: turnover and end-match use their own match; yarn format covers uncommitted changes ([#682](https://github.com/Auto-Tournament/auto-tournament/pull/682))
+
+## v3.0.0-beta.72
+
+<p className="text-sm text-fd-muted-foreground">2026-10-09 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.72)</p>
+
+- fix(import): drop demos onto the import page; several picked at once go in name order ([#671](https://github.com/Auto-Tournament/auto-tournament/pull/671))
+- feat(highlights): series reels, reel sizes as settings, a Clips list with Redo for outdated clips ([#673](https://github.com/Auto-Tournament/auto-tournament/pull/673))
+
+## v3.0.0-beta.71
+
+<p className="text-sm text-fd-muted-foreground">2026-10-09 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.71)</p>
+
+- feat(highlights): 17 more suggested songs (rock, metal, pop, trance), with Rock and Metal genres ([#669](https://github.com/Auto-Tournament/auto-tournament/pull/669))
+- feat(highlights): the crowd groans when the player dies in a clip ([#670](https://github.com/Auto-Tournament/auto-tournament/pull/670))
+
 ## v3.0.0-beta.70
 
 <p className="text-sm text-fd-muted-foreground">2026-10-09 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.70)</p>
