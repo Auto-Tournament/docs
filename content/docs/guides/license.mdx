@@ -1,24 +1,37 @@
 ---
 title: License key
-description: Paste your license key in Settings, see its status, and show an optional "Licensed" line on public event pages.
+description: Paste your license key in Settings, see its status and server limit, get a free key, and what happens when a license isn't paid.
 icon: KeyRound
 ---
 
-If you use Auto Tournament commercially, you need a license. This page is about the license key in the platform. For who needs a license and what it costs, see [Licensing and commercial use](/reference/licensing).
+You need a license if you make money using Auto Tournament. This page is about the license key in the platform. For who needs a license and what it costs, see [Licensing and commercial use](/reference/licensing).
 
-**A license never blocks anything.** The platform does not lock, disable or limit any feature. If something is off, you see a notice. That is all.
+## Without a key
+
+Non-commercial use needs no key. Nothing is limited and nothing is sent anywhere. The admin home says "No commercial license key. Free for non-commercial use."
+
+## A free key
+
+Running it for free events? You can get an optional **free key** from the [console](https://console.autotournament.gg). Sign in, open **Licenses** and select **Get a free key**. We ask who you are and how you'll use Auto Tournament.
+
+- It never expires and has no server limit.
+- Nothing is enforced with it. It works exactly like running without a key.
+- The install checks in once a day (see [What a licensed install sends](/reference/licensing#what-a-licensed-install-sends)), so it shows up in your console.
+- One free key per organization. Asking again gives you the same key.
+- It stays with the platform. CS2 Server Manager and Ready Up don't get it.
+
+Started making money from your events? Then you need a paid license instead.
 
 ## Add your key
 
-1. Open **Settings** > **License**.
-2. Paste the whole key into **License key**. It looks like `ATL1.<payload>.<signature>`.
-3. Select **Save key**.
+1. Copy the key from **Licenses** in the [console](https://console.autotournament.gg).
+2. In the platform, open **Settings** > **License**.
+3. Paste the whole key into **License key**. It looks like `ATL1.<payload>.<signature>`.
+4. Select **Save key**.
 
-The key is checked on your own server, offline. No internet call is needed.
+The key is checked on your own server, offline. After you save, the key itself isn't shown again, only the license id. To swap it, paste a new key in **Replace the license key**. To remove it, select **Remove key**.
 
-After you save, the key itself is not shown again. You only see the license ID. To swap it, paste a new key in **Replace the license key**. To remove it, select **Remove key**.
-
-If a key fails the checks, it is still saved and shown as "This key could not be verified." A key from a newer signing key can start to work after you update the platform.
+**The key never changes when you renew or add servers.** The current terms (servers, paid until) come with the daily check-in. You only paste a key again after you make a new one in the console.
 
 ## What you see
 
@@ -26,34 +39,45 @@ The **License** tab shows a summary, for example:
 
 > Licensed to NTLAN · Platform S · 6 servers · updates until 2027-09-01
 
-It also shows the license ID and a **Check this license** link to the public check page on autotournament.gg. A founder license shows "updates for life" instead of a date. A license for a single event also shows the event dates.
+A free key shows "Free key for NTLAN, non-commercial use · no server limit". It also shows the license id and a **Check this license** link to the public check page on autotournament.gg. Admins get a **License** card on the admin home with the same summary.
 
-Admins also get a **License** card on the admin home, with the same summary and a link to **Settings**. With no key, the card says "No commercial license key. Free for non-commercial use." and links to Pricing.
+Players never see anything about licensing, unless you turn on the public line below.
 
-Only admins see any of this. Players never see anything about licensing, unless you turn on the public line below.
+## The server limit
+
+A paid license covers a number of game servers at any one time. Every server running our software counts: match servers, spares, practice and test servers.
+
+- Creating a server above the limit is refused, however it's asked for: an admin, CS2 Server Manager, auto-scaling or failover. The message says how many the license covers and how many are set up.
+- **Running servers and matches are never stopped** by the limit.
+- The limit is one pool for the whole license. Servers on CS2 Server Manager hosts using the same key count too.
+- Before it creates servers, the platform asks autotournament.gg whether they fit. If it can't ask (a LAN without internet), the last check-in decides, as long as it's at most 3 days old.
+
+Need more? Change the server count under **Servers** in the console. More servers work right away.
+
+## When a license stops
+
+A paid-up license never stops anything. It stops only in these cases (Commercial License Terms, sections 7 and 8):
+
+- **Not paid.** A monthly or yearly license that isn't paid keeps working for 14 days after the last day you paid for. Admins see a warning, and we email reminders. Still unpaid after that, the platform stops for everyone until it's paid. Paying turns it back on.
+- **The key is used on another install.** One key works on one Auto Tournament install: the first one that checks in with it. Another install using the same key stops at once. To move the key, use **Move to another install** in the console.
+- **You made a new key.** After **Get a new key** in the console, the old key keeps working for one more day, then stops. Paste the new key before then.
+
+Your data is never deleted because of this. Founding supporter licenses, and licenses bought before pricing v4, never stop for late payment.
 
 ## Notices
 
-The platform shows a notice, and only a notice, when:
+Admins also see a notice when:
 
-- The key could not be verified.
+- The key could not be verified. It's then treated as no key.
 - The key is a Servers key. It covers CS2 Server Manager and Ready Up, not the platform.
-- An event license is over, or has not started yet.
+- An event license is over, or hasn't started yet.
 - This version is newer than your updates cover (see below).
-- You run more game servers than the license allows.
 
-Every game server running our software counts, including spare, practice and test servers.
+## Updates
 
-## Products and updates
+A license covers every version whose `x.y.0` release came out on or before its "updates until" date, including the later patches of those versions. For example, if 1.4.0 came out before your date, 1.4.1 and 1.4.2 are covered too. Monthly and yearly licenses move that date on each time you pay. Founding supporter licenses cover every version.
 
-There are two products:
-
-- **Servers**: CS2 Server Manager and Ready Up.
-- **Platform**: the platform, CS2 Server Manager and Ready Up.
-
-A yearly license covers every version whose `x.y.0` release date is on or before the license's "updates until" date. That includes the later patches of those versions. For example, if 1.4.0 came out before your date, 1.4.1 and 1.4.2 are covered too. Founder licenses are lifetime and cover every version.
-
-If you run a newer version than your license covers, you get a notice. It still works. Renew to cover it.
+If you run a newer version than your license covers, you get a notice. It still works.
 
 ## Show "Licensed" on public event pages
 
@@ -65,28 +89,31 @@ Turn on **Show "Licensed" on public event pages** in **Settings** > **License**.
 
 ## CS2 Server Manager and Ready Up
 
-Your game servers use the same key. You don't have to set it on each one.
+Your game servers use the platform's license. You don't set it on each one.
 
 ### The platform hands it over
 
-When you save, replace or remove the key in **Settings** > **License**, every CS2 Server Manager (CSM) host connected to your platform picks it up on its next update-hold poll. CSM applies it to all of its servers, the same as `csm license set` or `csm license clear`. The game servers use it from their next map load or restart.
+When you save, replace or remove the key, every CS2 Server Manager (CSM) host linked to your platform gets it, with the current terms, within a minute. CSM writes it into Ready Up on the servers your platform owns there. The game servers use it from their next map load or restart.
 
-- **Both products work on the game servers.** Ready Up accepts a Servers key and a Platform key.
-- **The platform's key wins.** It replaces a key you set by hand with `csm license set`.
-- **No key in the platform?** CSM only clears a key it got from the platform. A key you set by hand stays.
-- **Platform not reachable?** Nothing changes.
-- **A failed hand-off is only a warning.** You find it in CSM's `auto_update_monitor.log`. Nothing is ever blocked.
+- **CSM keeps to the limit too.** It won't create or start servers above the license's limit, and while the license has stopped it won't create or start any. Running servers are never stopped.
+- **Ready Up stops loading new matches** while the license has stopped. A live match is never cut off.
+- **A free key isn't handed over.** CSM and Ready Up run as without a key.
 - **The key is never written to logs.**
+
+### A host linked to several platforms
+
+A hosting provider can link one CSM host to several platforms (`csm link --name <name> ...`). Each platform sees only the servers it created. The host sets how many servers each platform may create (`csm license cap --link <name> <count>`). Each platform's license goes to its own servers. A key the host sets with `csm license set` covers every server on the host and is never overwritten by a platform.
 
 ### Set it by hand
 
-You can still manage the key on a server machine with CSM:
+On a CSM host without a platform:
 
 | Command | What it does |
 | --- | --- |
-| `csm license set` | Save a license key in the server config. |
-| `csm license status` | Show the status of the saved key. It also tells you when the key came from the platform. |
+| `csm license set <key>` | Save a license key for every server on this host. |
+| `csm license status` | Show the key's status and where it came from. |
 | `csm license clear` | Remove the saved key. |
+| `csm license cap --link <name> <count>` | How many servers a linked platform may create here. |
 
 `csm license set` writes `readyup_license_key` into the server config. Ready Up reads it. In the server console, `ru license` shows the status.
 
