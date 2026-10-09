@@ -1,0 +1,104 @@
+---
+title: Highlights
+description: Highlight clips and reels from every CS2 match, recorded from the demos by recorders you run, and matches imported from their demos.
+icon: Film
+---
+
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+
+<Callout title="Not released yet" type="warn">
+  Highlights arrive in 3.0, which is in development (the 3.0 betas have them).
+</Callout>
+
+After every CS2 map, Auto Tournament reads the demo, picks each player's best moments (multi-kills, clutches, the odd funny one) and has them recorded from the player's own eyes: a clip per moment, a reel per player, a reel per match and team, and one for the tournament. Players find theirs on their profile; everyone can watch them on the match page.
+
+The recording happens on **recorders**: Linux PCs with a GPU, CS2 and Steam that ask the platform for work. Add as many as you like; they share it.
+
+## How it works
+
+1. A map ends and its demo arrives (Ready Up uploads it).
+2. The **demo worker** (the `auto-tournament-worker` container next to the platform) reads it: stats, the 2D replay, and the moments.
+3. A **recorder** takes the moments of a map, plays the demo in CS2 and records each one, then uploads the clips and the player's reel.
+4. When a match is all recorded, the match and team reels are joined from the clips.
+
+## Settings
+
+**CS2 → Highlights → Settings**:
+
+| Setting | What it does |
+| --- | --- |
+| Resolution and frame rate | What the recorders make, up to 4K and 240 fps. Smaller and fewer frames record faster: 720p at 30 fps takes about half as long as 1440p at 120 fps. |
+| Clips per player per map | 1 to 6. Each takes a recorder a few minutes. |
+| Auto Tournament logo | A faint logo in the corner. |
+| Music under reels | Every track, only the ones you pick, or none. You add the tracks (Auto Tournament ships none). |
+| Keep clean copies | Keeps each clip without its overlay too, so overlays can be redrawn and reels made from clean clips. |
+
+## Add a recorder
+
+<Steps>
+
+<Step>
+
+### A Linux PC with Steam and CS2
+
+Install Steam, sign in once and install CS2. Then switch Steam to offline mode: demo playback needs no online session, so every recorder can use the same Steam account.
+
+Windows isn't supported yet: the recorder captures CS2 through gamescope, which is Linux only.
+
+</Step>
+
+<Step>
+
+### Run the recorder container
+
+As the PC's own user (it uses your GPU, display, sound, Steam and CS2):
+
+```bash
+docker run -d --name at-recorder --restart unless-stopped \
+  --user "$(id -u):$(id -g)" --group-add video --group-add render \
+  --device /dev/dri --ipc=host --net=host --shm-size 4g \
+  --security-opt seccomp=unconfined --cap-add SYS_NICE \
+  -v "$HOME:$HOME" -v "/run/user/$(id -u):/run/user/$(id -u)" -v /tmp:/tmp \
+  -e HOME="$HOME" -e XDG_RUNTIME_DIR="/run/user/$(id -u)" \
+  -e WAYLAND_DISPLAY="$WAYLAND_DISPLAY" \
+  -e DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$(id -u)/bus" \
+  -e AT_URL=https://tournament.example.com \
+  -e AT_WORKER_TOKEN=<one of API_TOKENS in the platform's .env> \
+  -e AT_WORKER_NAME="$(hostname)" \
+  -e AT_CS2_GAME="$HOME/.local/share/Steam/steamapps/common/Counter-Strike Global Offensive/game" \
+  -e AT_SNIPER_RUN="$HOME/.local/share/Steam/steamapps/common/SteamLinuxRuntime_sniper/run" \
+  sivertio/auto-tournament-recorder:next
+```
+
+- **NVIDIA**: add `--gpus all` (with the NVIDIA Container Toolkit).
+- **CS2 on another disk**: mount it too (`-v /mnt/games:/mnt/games`) and point `AT_CS2_GAME` at it.
+- `AT_WORKER_NAME` is the name on the Highlights page; the recorder keeps its benchmark and history under it.
+
+</Step>
+
+<Step>
+
+### Check it on the Highlights page
+
+On its first job the recorder runs a short **benchmark**: one moment at 240 and 120 Hz, timed and checked for smoothness. It keeps the fastest smooth setting. Then it shows up under **CS2 → Highlights → Recorders** with its GPU, its benchmark, seconds per clip, and every run with its log.
+
+</Step>
+
+</Steps>
+
+## Playing on a recorder
+
+You can play on a PC while it records, but the GPU is shared. Every clip is checked for repeated frames (a stutter): at 4% or more the platform turns it down and has it recorded again, preferably on another recorder. A recorder with three turned-down clips in a row gets no work for 15 minutes and shows as **Paused**; **Resume** gives it work again sooner.
+
+## Matches played somewhere else
+
+**All matches → Import a match** adds a match played elsewhere (another platform, a LAN without Auto Tournament) from its demos, one per map in the order they were played. The teams, the players and the score are read from the demos; teams and players that are new are created. Then the match gets stats, the 2D replay and highlights like any other.
+
+## Troubleshooting
+
+| What you see | What to check |
+| --- | --- |
+| *Failed to connect to wayland socket* in a run log | The container needs the PC's display: `WAYLAND_DISPLAY` and the `/run/user/<uid>` mount. |
+| A recorder is Paused | Its clips stuttered: something else was using the GPU, or the refresh rate is too high. Close the game or run the benchmark again. |
+| No recorder picks anything up | The recorder's `AT_URL` and token; its last run's log on the Highlights page. |
+| Clips take long | The resolution and frame rate in Settings, and the recorder's GPU (its seconds per clip on the Highlights page). |
