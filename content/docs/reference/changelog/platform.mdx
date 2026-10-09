@@ -7,6 +7,61 @@ description: Release notes for each version of the Auto Tournament platform.
 
 Versions before 3.0 were released as **MatchZy Auto Tournament** (MAT). Their notes are under [Earlier versions](#earlier-versions). **3.0 is in beta**: the `3.0.0-beta.N` releases below are the 3.0 notes until 3.0.0 ships. See [Upgrading to 3.0](/guides/upgrading-to-3). Newest first. Each entry is the [GitHub release](https://github.com/Auto-Tournament/auto-tournament/releases) for that version. [Docs](/).
 
+## v3.0.0-beta.70
+
+<p className="text-sm text-fd-muted-foreground">2026-10-09 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.70)</p>
+
+- feat(highlights): frame check on every clip, recorder pause, first-run benchmark, run logs and a Highlights page ([#659](https://github.com/Auto-Tournament/auto-tournament/pull/659))
+- feat(players): integrators import players with their OpenID Connect login (oidcSubject) ([#660](https://github.com/Auto-Tournament/auto-tournament/pull/660))
+- fix(demos): a deleted match's demo jobs and highlights are dropped, not retried forever ([#662](https://github.com/Auto-Tournament/auto-tournament/pull/662))
+- feat(recorder): a recorder container for Linux gaming PCs ([#664](https://github.com/Auto-Tournament/auto-tournament/pull/664))
+- fix(sign-in): OpenID Connect works when the server refuses profile and email ([#661](https://github.com/Auto-Tournament/auto-tournament/pull/661))
+- feat(search): one search box for players, teams, tournaments, matches and (for admins) settings ([#666](https://github.com/Auto-Tournament/auto-tournament/pull/666))
+- fix(accounts): an account made by a sign-in method has no Steam, and can connect it ([#667](https://github.com/Auto-Tournament/auto-tournament/pull/667))
+- feat(admin): every admin page under /manage; Admin tools becomes System ([#665](https://github.com/Auto-Tournament/auto-tournament/pull/665))
+- feat(highlights): shared highlight settings, music and page in core ([#668](https://github.com/Auto-Tournament/auto-tournament/pull/668))
+
+## v3.0.0-beta.69
+
+<p className="text-sm text-fd-muted-foreground">2026-10-09 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.69)</p>
+
+- feat(matches): import a match from its demos ([#657](https://github.com/Auto-Tournament/auto-tournament/pull/657))
+
+## v3.0.0-beta.68
+
+<p className="text-sm text-fd-muted-foreground">2026-10-09 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.68)</p>
+
+- feat(players): delete leaves a tombstone, ban locks a player out; a banned starter's team gets time to pick a sub ([#655](https://github.com/Auto-Tournament/auto-tournament/pull/655))
+- feat(players): report a player to the admins; a Reports page to dismiss or ban ([#656](https://github.com/Auto-Tournament/auto-tournament/pull/656))
+
+## v3.0.0-beta.67
+
+<p className="text-sm text-fd-muted-foreground">2026-10-09 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.67)</p>
+
+- fix(servers): a Ready Up fleet server needs no RCON password to be edited ([#654](https://github.com/Auto-Tournament/auto-tournament/pull/654))
+
+## v3.0.0-beta.66
+
+<p className="text-sm text-fd-muted-foreground">2026-10-09 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.66)</p>
+
+- fix(accounts): a removed username can be made again; removing a login takes its admin rights ([#652](https://github.com/Auto-Tournament/auto-tournament/pull/652))
+- fix(servers): a Ready Up server's status comes from the fleet link ([#653](https://github.com/Auto-Tournament/auto-tournament/pull/653))
+
+## v3.0.0-beta.65
+
+<p className="text-sm text-fd-muted-foreground">2026-10-09 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.65)</p>
+
+- fix(email): no password reset by email offered when the site sends no email ([#650](https://github.com/Auto-Tournament/auto-tournament/pull/650))
+- fix(webhooks): hide a webhook's URL until asked for ([#651](https://github.com/Auto-Tournament/auto-tournament/pull/651))
+
+## v3.0.0-beta.64
+
+<p className="text-sm text-fd-muted-foreground">2026-10-09 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.64)</p>
+
+- fix(settings): one full-width column; accounts as rows that wrap, the add form in one column ([#647](https://github.com/Auto-Tournament/auto-tournament/pull/647))
+- feat(account): change your own password from your account page ([#648](https://github.com/Auto-Tournament/auto-tournament/pull/648))
+- feat(email): send email from the dashboard; confirm addresses, reset passwords, sign-up news, first sign-in setup ([#649](https://github.com/Auto-Tournament/auto-tournament/pull/649))
+
 ## v3.0.0-beta.63
 
 <p className="text-sm text-fd-muted-foreground">2026-10-09 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.63)</p>
