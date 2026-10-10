@@ -7,6 +7,39 @@ description: Release notes for each version of the Auto Tournament platform.
 
 Versions before 3.0 were released as **MatchZy Auto Tournament** (MAT). Their notes are under [Earlier versions](#earlier-versions). **3.0 is in beta**: the `3.0.0-beta.N` releases below are the 3.0 notes until 3.0.0 ships. See [Upgrading to 3.0](/guides/upgrading-to-3). Newest first. Each entry is the [GitHub release](https://github.com/Auto-Tournament/auto-tournament/releases) for that version. [Docs](/).
 
+## v3.0.0-beta.77
+
+<p className="text-sm text-fd-muted-foreground">2026-10-10 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.77)</p>
+
+- feat(chat): the chat window as in the features draft ([#690](https://github.com/Auto-Tournament/auto-tournament/pull/690))
+- feat(system): admins hear when a module or game pack has an update, or one did not take ([#693](https://github.com/Auto-Tournament/auto-tournament/pull/693))
+- fix(import): imported players go by the name they play under in the demo ([#694](https://github.com/Auto-Tournament/auto-tournament/pull/694))
+- test(cs2): compare the migration ledger with the declared list by id ([#699](https://github.com/Auto-Tournament/auto-tournament/pull/699))
+- feat(highlights): watch and review every clip from the Clips list ([#695](https://github.com/Auto-Tournament/auto-tournament/pull/695))
+- fix(matches): the match dialog opens and closes again ([#698](https://github.com/Auto-Tournament/auto-tournament/pull/698))
+- feat(highlights): recorders split a map by benchmark speed ([#696](https://github.com/Auto-Tournament/auto-tournament/pull/696))
+- fix(recorder): the reel overlay streams; it no longer holds frames until the last card ([#701](https://github.com/Auto-Tournament/auto-tournament/pull/701))
+- feat(recorders): benchmark on a demo shipped with the worker ([#702](https://github.com/Auto-Tournament/auto-tournament/pull/702))
+- feat(recorders): a reel that fails on one recorder goes to another ([#700](https://github.com/Auto-Tournament/auto-tournament/pull/700))
+- fix(recorder): a short capture stall holds a frame instead of failing the clip ([#703](https://github.com/Auto-Tournament/auto-tournament/pull/703))
+- feat(recorders): keep CS2 and the demo loaded; one player a claim, loaded map first ([#704](https://github.com/Auto-Tournament/auto-tournament/pull/704))
+- perf(recorder): the focus blur runs on the GPU (Vulkan), CPU as fallback ([#705](https://github.com/Auto-Tournament/auto-tournament/pull/705))
+
+## v3.0.0-beta.76
+
+<p className="text-sm text-fd-muted-foreground">2026-10-09 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.76)</p>
+
+- ci: base images and buildkit from AWS ECR Public, not Docker Hub ([#691](https://github.com/Auto-Tournament/auto-tournament/pull/691))
+- fix(cs2): the module upgrades from 3.0.0-beta.72 again ([#692](https://github.com/Auto-Tournament/auto-tournament/pull/692))
+
+## v3.0.0-beta.75
+
+<p className="text-sm text-fd-muted-foreground">2026-10-09 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.75)</p>
+
+- fix(highlights): a clip's overlay recipe is stored again, not turned down as empty ([#687](https://github.com/Auto-Tournament/auto-tournament/pull/687))
+- fix(highlights): no stutter check at all; every clip is kept ([#688](https://github.com/Auto-Tournament/auto-tournament/pull/688))
+- ci(release): log in to Docker Hub before the build pulls its base images ([#689](https://github.com/Auto-Tournament/auto-tournament/pull/689))
+
 ## v3.0.0-beta.74
 
 <p className="text-sm text-fd-muted-foreground">2026-10-09 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.74)</p>
