@@ -123,25 +123,38 @@ Again, "No such file or directory" just means you never uploaded any. `./data/ma
 
 <Step>
 
-### Change the image name
+### Change the image name and database name
 
-Open `docker-compose.yml`, find the `image:` line of the `matchzy-tournament` service, and set the new name:
+Open `docker-compose.yml` and make two changes:
+
+1. Update the image name of the `matchzy-tournament` service:
 
 ```yaml title="docker-compose.yml"
 services:
   matchzy-tournament:
-    image: sivertio/auto-tournament:3.0.0
+    image: sivertio/auto-tournament:next
+    environment:
+      - POSTGRES_DB=${DB_NAME:-auto_tournament}
+      - DATABASE_URL=postgresql://${DB_USER:-postgres}:${DB_PASSWORD:-postgres}@postgres:5432/${DB_NAME:-auto_tournament}
 ```
 
-Or make the same change from the shell, keeping a copy of the old file as `docker-compose.yml.bak`:
+2. Update `.env` to set the database name:
+
+```bash
+echo "DB_NAME=auto_tournament" >> .env
+```
+
+Or make the image change from the shell, keeping a copy of the old file as `docker-compose.yml.bak`:
 
 ```bash
 sed -i.bak 's#sivertio/matchzy-auto-tournament#sivertio/auto-tournament#' docker-compose.yml
 ```
 
-A fixed version like `3.0.0` is worth using here, because it is what makes going back a one-line change. `sivertio/auto-tournament:latest` also works, as does `ghcr.io/auto-tournament/auto-tournament:3.0.0` if you would rather pull from GitHub.
+**Why both changes?** 3.0 renames the database from `matchzy_tournament` to `auto_tournament`. The schema is the same, but the database itself is new. On first start, 3.0 handles the migration.
 
-Change **only** the image. Keep the service name, the container names, the volumes and `DB_NAME` as they are — a different database name starts an empty database.
+Use `next` to get the latest development build, or check [available tags on Docker Hub](https://hub.docker.com/r/sivertio/auto-tournament/tags) to pin a specific release. `sivertio/auto-tournament:latest` also works, as does `ghcr.io/auto-tournament/auto-tournament:next` if you would rather pull from GitHub.
+
+Change **only** the image and `DB_NAME`. Keep the service name, the container names, and the volumes as they are.
 
 You can also skip this step entirely and stay on `sivertio/matchzy-auto-tournament`, which gets the same 3.0 build.
 
@@ -242,6 +255,8 @@ services:
   matchzy-tournament:
     image: sivertio/matchzy-auto-tournament:2.4.15
 ```
+
+Also remove `DB_NAME=auto_tournament` from your `.env`, or set it back to `matchzy_tournament`. The 2.4 image expects the old database name.
 
 If you used the `sed` command above, `mv docker-compose.yml.bak docker-compose.yml` puts the old file back; then pin `2.4.15` in it, so a later `pull` does not fetch 3.0 again through `latest`.
 

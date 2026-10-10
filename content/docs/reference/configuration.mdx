@@ -34,7 +34,7 @@ Most other settings, such as match rules, the webhook URL and the hostname forma
 | `HOST_PORT` | `3069` | The port on your machine. Only used by `docker-compose.yml`. |
 | `DB_USER` | `postgres` | Database user. |
 | `DB_PASSWORD` | `postgres` | Database password. |
-| `DB_NAME` | `matchzy_tournament` | Database name. |
+| `DB_NAME` | `matchzy_tournament` | Database name. (3.0+ uses `auto_tournament`.) |
 | `DATABASE_URL` | Built from `DB_*` | Full PostgreSQL address. `docker-compose.yml` sets it for you. |
 | `DB_HOST`, `DB_PORT` | `postgres` in Docker, port `5432` | Only used when `DATABASE_URL` is not set. |
 | `PORT` | `3000` | Internal API port. `docker-compose.yml` sets it. Do not change it. |
