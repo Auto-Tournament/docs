@@ -7,6 +7,58 @@ description: Release notes for each version of the Auto Tournament platform.
 
 Versions before 3.0 were released as **MatchZy Auto Tournament** (MAT). Their notes are under [Earlier versions](#earlier-versions). **3.0 is in beta**: the `3.0.0-beta.N` releases below are the 3.0 notes until 3.0.0 ships. See [Upgrading to 3.0](/guides/upgrading-to-3). Newest first. Each entry is the [GitHub release](https://github.com/Auto-Tournament/auto-tournament/releases) for that version. [Docs](/).
 
+## v3.0.0-beta.85
+
+<p className="text-sm text-fd-muted-foreground">2026-10-12 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.85)</p>
+
+- feat(docker): AT_DATA_DIR and AT_DB_DIR choose where clips and the database live ([#726](https://github.com/Auto-Tournament/auto-tournament/pull/726))
+- feat(highlights): the player remembers mute, like its volume ([#723](https://github.com/Auto-Tournament/auto-tournament/pull/723))
+- feat(recorders): at-recorder update, logs and restart on the host ([#729](https://github.com/Auto-Tournament/auto-tournament/pull/729))
+- fix(player): music and crowd wait while the video buffers ([#731](https://github.com/Auto-Tournament/auto-tournament/pull/731))
+- fix(system): one update toast at a time, clickable notes, per-version dismissal ([#728](https://github.com/Auto-Tournament/auto-tournament/pull/728))
+- feat(highlights): review a clip as "weapon missing" to record it again without TrueView ([#724](https://github.com/Auto-Tournament/auto-tournament/pull/724))
+- feat(match): clips and reels appear on the match page live ([#730](https://github.com/Auto-Tournament/auto-tournament/pull/730))
+- fix(recorders): runs with failed clips are not shown as OK; startup errors keep the log's end ([#725](https://github.com/Auto-Tournament/auto-tournament/pull/725))
+- feat(match): a match opens its own page everywhere ([#735](https://github.com/Auto-Tournament/auto-tournament/pull/735))
+- feat(highlights): reels show elapsed, assembly and summed clip render time apart ([#727](https://github.com/Auto-Tournament/auto-tournament/pull/727))
+- feat(match): clip recording progress bar ([#736](https://github.com/Auto-Tournament/auto-tournament/pull/736))
+- feat(match): each map opens its analysis, 2D replay, clips and reel ([#734](https://github.com/Auto-Tournament/auto-tournament/pull/734))
+- ci: pull images through mirror.gcr.io ([#744](https://github.com/Auto-Tournament/auto-tournament/pull/744))
+- fix(app): a module's page opened from a link waits for the module ([#742](https://github.com/Auto-Tournament/auto-tournament/pull/742))
+- ci: E2E shards start after the image build ([#746](https://github.com/Auto-Tournament/auto-tournament/pull/746))
+- feat(clips): single clips skip the caption card; avatar beside the title ([#733](https://github.com/Auto-Tournament/auto-tournament/pull/733))
+- feat(highlights): highlights library with views and likes; in the main nav ([#737](https://github.com/Auto-Tournament/auto-tournament/pull/737))
+- feat(notifications): a ready highlight opens its clip and shows its still ([#739](https://github.com/Auto-Tournament/auto-tournament/pull/739))
+- feat(highlights): comments with clickable timestamps ([#738](https://github.com/Auto-Tournament/auto-tournament/pull/738))
+- feat(teams): logos everywhere; a team's recent matches ([#743](https://github.com/Auto-Tournament/auto-tournament/pull/743))
+- feat(leaderboards): category rankings; Players becomes a directory ([#740](https://github.com/Auto-Tournament/auto-tournament/pull/740))
+- feat(roles): demo-based role suggestions, with the player's own choice ([#741](https://github.com/Auto-Tournament/auto-tournament/pull/741))
+- feat(nav): one place to find players; the ladder linked from Leaderboards ([#745](https://github.com/Auto-Tournament/auto-tournament/pull/745))
+
+## at-recorder-v0.1.0-beta.4
+
+<p className="text-sm text-fd-muted-foreground">2026-10-12 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/at-recorder-v0.1.0-beta.4)</p>
+
+Native Linux recorder host setup, connection and persistent identity. Managed updates drain active work, verify pinned container and binary releases, and restore the previous build if startup fails. Existing installations need one adoption to install the recovery launcher.
+
+## v3.0.0-beta.84
+
+<p className="text-sm text-fd-muted-foreground">2026-10-12 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.84)</p>
+
+- fix(highlights): use shared music library in public players ([#722](https://github.com/Auto-Tournament/auto-tournament/pull/722))
+
+## v3.0.0-beta.83
+
+<p className="text-sm text-fd-muted-foreground">2026-10-12 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.83)</p>
+
+- fix(recorder): update legacy image overrides and clip music ([#721](https://github.com/Auto-Tournament/auto-tournament/pull/721))
+
+## at-recorder-v0.1.0-beta.3
+
+<p className="text-sm text-fd-muted-foreground">2026-10-12 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/at-recorder-v0.1.0-beta.3)</p>
+
+Native Linux recorder host setup, connection and persistent identity. Managed updates drain active work, verify pinned container and binary releases, and restore the previous build if startup fails. Existing installations need one adoption to install the recovery launcher.
+
 ## v3.0.0-beta.82
 
 <p className="text-sm text-fd-muted-foreground">2026-10-11 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.82)</p>
