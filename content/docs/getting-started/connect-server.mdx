@@ -1,47 +1,88 @@
 ---
-title: Connect a CS2 server
-description: Add CS2 servers to Auto Tournament, with CS2 Server Manager, Ready Up or MatchZy Enhanced.
+title: Game servers with csm
+description: Link a machine running CS2 Server Manager, and let the platform create and run its CS2 servers.
 icon: Server
 ---
 
 import { Step, Steps } from 'fumadocs-ui/components/steps';
 
-Auto Tournament does not run the game. It runs matches on CS2 dedicated servers that you host yourself. Each server needs a match plugin. Install the CS2 game module first (**Modules**, or the catalog when you create your first tournament).
+The platform doesn't run CS2 itself. It runs CS2 dedicated servers on **machines**: Linux computers with [CS2 Server Manager](/cs2/server-manager) (`csm`). You link a machine once with one command; from then on the platform creates, starts, stops and updates its servers, and each server talks to the platform over its own connection (Ready Up's fleet link). No RCON passwords and no addresses to type in.
 
-There are three ways to add servers. Pick one:
+## What a machine needs
 
-| Way | Plugin | What you get |
-| --- | --- | --- |
-| [A machine with CS2 Server Manager](#a-machine-with-cs2-server-manager) (recommended) | Ready Up | The platform creates, starts, stops and updates servers on the machine by itself, and uses it for failover and auto-scaling. |
-| [A Ready Up server you run yourself](#a-ready-up-server-you-run-yourself) | Ready Up | One server that connects to the platform over its fleet link. |
-| [A MatchZy Enhanced server](#a-matchzy-enhanced-server-rcon) | MatchZy Enhanced | The older plugin. The platform controls it over RCON and it sends events back over HTTP. |
+- Linux (Debian or Ubuntu) on `x86_64` or `arm64`, and an account with `sudo`. The servers run as that account.
+- About 71 GB of disk for CS2, plus about 2 GB per server, and 8 GB RAM or more.
+- It reaches the platform at `FRONTEND_BASE_URL`. The platform never connects to the machine, so the machine needs no open inbound port for the platform; players need the game ports (UDP `27015`, `27025`, … one per server).
+- No Game Server Login Token: players join from the match page. See [Game Server Login Token](/modules/cs2/server-requirements#game-server-login-token).
 
-A Ready Up server keeps one outbound connection to the platform: no RCON, no inbound port, and no webhook URL to get right.
-
-## A machine with CS2 Server Manager
+How many servers per machine depends on the CPU: a match server mostly uses one or two cores. One server on a 4-core mini PC is comfortable; a big server takes many.
 
 <Steps>
 
 <Step>
 
-### Install CS2 Server Manager
+### Install `csm` on the machine
 
-On a Linux machine, install `csm`. See [Install CS2 Server Manager](/cs2/server-manager/install).
+Log in as the account the servers will run as:
+
+```bash
+arch=$(uname -m); \
+case "$arch" in \
+  x86_64)  asset="csm-linux-amd64" ;; \
+  aarch64|arm64) asset="csm-linux-arm64" ;; \
+  *) echo "Unsupported architecture: $arch" && exit 1 ;; \
+esac; \
+tmp=$(mktemp); \
+curl -L "https://github.com/Auto-Tournament/cs2-server-manager/releases/latest/download/$asset" -o "$tmp" && \
+sudo install -m 0755 "$tmp" /usr/local/bin/csm && \
+rm "$tmp"
+sudo csm setup-host
+```
+
+`setup-host` installs what `csm` needs (SteamCMD, tmux and more) and lets your account's services keep running after you log out. From here on, run `csm` without `sudo`.
 
 </Step>
 
 <Step>
 
-### Link the machine
+### Accept the Ready Up license
 
-In Auto Tournament, open **Servers** and click **Add machine** in the **Machines** panel. Copy the command it shows and run it on the machine, then install the host agent as a service:
+The servers run [Ready Up](/cs2/ready-up), the plugin that plays the matches. Pick the license that fits:
 
 ```bash
-csm link https://tournament.example.com RUE-7F3K-9QX2-LM4D-P8TW
+csm plugins license noncommercial   # your own servers, a club, a school, a free event
+```
+
+Paid events take `commercial` and a license key; see [License](/guides/license).
+
+</Step>
+
+<Step>
+
+### Add the machine in the dashboard
+
+Open **Servers** > **Add machine**, give the machine a name, and copy the command it shows. It looks like this:
+
+```bash
+csm link http://192.168.1.50:3069 RUE-7F3K-9QX2-LM4D-P8TW --insecure
+```
+
+The code works once and runs out after 15 minutes. `--insecure` is there when the platform is on plain `http://`, which is fine on a LAN; on the internet, put the platform behind HTTPS.
+
+</Step>
+
+<Step>
+
+### Link the machine and start the agent
+
+Run the copied command on the machine, then start csm's agent as a service:
+
+```bash
+csm link http://192.168.1.50:3069 RUE-7F3K-9QX2-LM4D-P8TW --insecure
 csm agent install
 ```
 
-The code works once. The machine then shows up in the Machines panel.
+The dashboard says **Connected** within a few seconds, and the machine shows up on **Servers**.
 
 </Step>
 
@@ -49,101 +90,19 @@ The code works once. The machine then shows up in the Machines panel.
 
 ### Create servers
 
-Click **Create server** (or **Create several…**) on the machine. csm installs CS2 and Ready Up, and each new server enrolls itself. With auto-scaling on, the platform also creates and starts servers when a tournament needs them. See [Host a CS2 tournament](/guides/host-cs2-tournament).
+On the machine's card, click **Create server**. The first one downloads CS2 (about 70 GB), which takes a while; the next ones take a minute. Each server installs Ready Up, enrolls itself on the platform and shows as a tile on the machine: **Free** when it's ready for a match.
+
+Create as many as you want to run matches at the same time. **Fleet settings** on the Servers page has automatic scaling, which creates and stops servers by itself as tournaments need them.
 
 </Step>
 
 </Steps>
 
-## A Ready Up server you run yourself
+Next: [Run your first tournament](/getting-started/first-tournament).
 
-<Steps>
+## Good to know
 
-<Step>
-
-### Install Ready Up
-
-Install Ready Up on the CS2 server. See [Install Ready Up](/cs2/ready-up/install).
-
-</Step>
-
-<Step>
-
-### Get a one-time code
-
-Open **Servers**, and in the **Ready Up fleet** panel click **Add server**. The code works once and runs out after 15 minutes.
-
-</Step>
-
-<Step>
-
-### Enroll the server
-
-Run the command the platform shows in the server console:
-
-```text
-ru fleet enroll https://tournament.example.com RUE-7F3K-9QX2-LM4D-P8TW
-```
-
-The server shows up in the fleet panel as online. To add many servers without a code each, create a **fleet key** in the same panel. See [Fleet mode](/cs2/ready-up/fleet).
-
-</Step>
-
-</Steps>
-
-## A MatchZy Enhanced server (RCON)
-
-[MatchZy Enhanced](/cs2/matchzy-enhanced) is the older plugin. Auto Tournament 3.0 needs version 2.0 or newer. The platform talks to it in both directions:
-
-- **Auto Tournament to server**: RCON on the server's game port (TCP), to set up the plugin and load matches.
-- **Server to Auto Tournament**: HTTP to the **Webhook URL** (**Settings → Counter-Strike 2**). The plugin sends events, results and demos this way.
-
-Both directions must work. Most setup problems are a firewall or a wrong address in one of them.
-
-<Steps>
-
-<Step>
-
-### Install the plugin
-
-Install Metamod:Source, CounterStrikeSharp and MatchZy Enhanced. See [Install MatchZy Enhanced](/cs2/matchzy-enhanced/install). Write down the host (IP or domain), the game port (default `27015`) and the RCON password.
-
-</Step>
-
-<Step>
-
-### Test that the server can reach Auto Tournament
-
-Run this on the machine where the CS2 server runs, with your webhook URL's address:
-
-```bash
-curl http://192.168.1.50:3069/api/events/test
-```
-
-The answer must contain `"success":true`. If it fails, fix the network or the webhook URL first.
-
-</Step>
-
-<Step>
-
-### Add the server
-
-Open **Servers** and click **Add Server**. Fill in **Server Name**, **Host / IP Address**, **Port** and **RCON Password**. Click **Test connectivity** to check both directions, then save. Use **Batch Add** for many servers.
-
-</Step>
-
-<Step>
-
-### Wait for it to come online
-
-Auto Tournament sets up the plugin over RCON, then the server shows as online. If it shows a warning, hover over it to see which direction fails, and see [Troubleshooting](/reference/troubleshooting#server-warnings). After you change a server's config or update the plugin, restart the server, click **Refresh Status**, and **Retry** any server that is not set up.
-
-</Step>
-
-</Steps>
-
-A tournament runs as many matches at the same time as you have free servers.
-
-## Next
-
-[Run a first tournament](/getting-started/first-tournament).
+- `csm status` on the machine lists its servers with map, score and players. `csm` without arguments opens a menu.
+- csm doesn't restart a server for a CS2 update while a match is loaded or live on it.
+- Servers come only from machines. Servers added by address with an RCON password (the 2.x way) are gone; link their machine with csm instead.
+- Problems: [csm troubleshooting](/cs2/server-manager/troubleshooting) and [Ready Up troubleshooting](/cs2/ready-up/troubleshooting).

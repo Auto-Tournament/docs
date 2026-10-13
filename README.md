@@ -1,37 +1,45 @@
-# Auto Tournament docs
-
-Source for [docs.autotournament.gg](https://docs.autotournament.gg), built with [Fumadocs](https://fumadocs.dev).
-
 <div align="center">
-
-### Sponsor Auto Tournament
-
-Running tournaments or LANs with Auto Tournament? Your organisation can keep it growing.
-Auto Tournament is built and maintained by one person — sponsorships pay for development, test servers and infrastructure.
-
-[![Sponsor on GitHub](https://img.shields.io/badge/Sponsor-GitHub-ea4aaa?logo=githubsponsors&logoColor=white)](https://github.com/sponsors/sivert-io)
-[![Support on Ko-fi](https://img.shields.io/badge/Support-Ko--fi-ff5e5b?logo=kofi&logoColor=white)](https://ko-fi.com/sivert)
-[![Become a sponsor](https://img.shields.io/badge/Become%20a%20sponsor-Discord-5865F2?logo=discord&logoColor=white)](https://discord.gg/n7gHYau7aW)
-
-Using it for a business, paid events or hosting? That needs a commercial licence → [Licensing](https://docs.autotournament.gg/reference/licensing)
-
+  <h1>Auto Tournament docs</h1>
+  <p><strong>Source for docs.autotournament.gg</strong></p>
+  <p>
+    <a href="LICENSE"><img src="https://img.shields.io/badge/License-PolyForm%20Noncommercial-blue.svg" alt="License: PolyForm Noncommercial" /></a>
+    <a href="https://docs.autotournament.gg"><img src="https://img.shields.io/badge/docs-docs.autotournament.gg-blue" alt="Docs" /></a>
+    <a href="https://discord.gg/n7gHYau7aW"><img src="https://img.shields.io/badge/Discord-join-5865F2?logo=discord&logoColor=white" alt="Discord" /></a>
+  </p>
 </div>
 
-Pages live in `content/docs` as MDX. The site serves them from the root, so
-`content/docs/getting-started/install.mdx` is `/getting-started/install`.
+<br />
+
+The documentation for [Auto Tournament](https://github.com/Auto-Tournament/auto-tournament), [Ready Up](https://github.com/Auto-Tournament/ready-up), [CS2 Server Manager](https://github.com/Auto-Tournament/cs2-server-manager) and [MatchZy Enhanced](https://github.com/Auto-Tournament/matchzy-enhanced), built with [Fumadocs](https://fumadocs.dev).
+
+## Development
+
+Pages live in `content/docs` as MDX. The site serves them from the root, so `content/docs/getting-started/install.mdx` is `/getting-started/install`.
 
 ```bash
+git clone https://github.com/Auto-Tournament/docs.git
+cd docs
 yarn install
 yarn dev
 ```
 
+The site runs at `http://localhost:3000`.
+
 ## Deploy
 
-The site runs as a Docker container on the docs host. A cron job runs
-`scripts/auto_update.sh` every five minutes; it rebuilds and restarts the
-container when `main` has a new commit. The container listens on
-port 31235, and the astro Cloudflare tunnel routes `docs.autotournament.gg` to `http://dev.lan:31235`.
+The site runs as a Docker container on the docs host. A cron job runs `scripts/auto_update.sh` every five minutes and rebuilds and restarts the container when `main` has a new commit. The container listens on port 31235, and the astro Cloudflare tunnel routes `docs.autotournament.gg` to `http://dev.lan:31235`.
+
+## Contributing
+
+Fixes and new pages are welcome: edit the MDX file and open a pull request.
 
 ## Sponsors
 
-Your logo here — [sponsor Auto Tournament](https://discord.gg/n7gHYau7aW) to be listed.
+Auto Tournament is built by one person. A sponsorship pays for development and test servers: [GitHub Sponsors](https://github.com/sponsors/sivert-io) or [Ko-fi](https://ko-fi.com/sivert).
+
+<!-- sponsors:start -->
+<!-- sponsors:end -->
+
+## License
+
+The docs are licensed under the [PolyForm Noncommercial License 1.0.0](LICENSE). Copyright (c) 2026 Sivert Gullberg Hansen.

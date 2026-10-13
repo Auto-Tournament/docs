@@ -27,7 +27,7 @@ Everything else, such as sign-in providers, admins, match rules, the webhook URL
 | `HOST_PORT` | `3069` | The port on your machine. Only used by `docker-compose.yml`. |
 | `DB_USER` | `postgres` | Database user. |
 | `DB_PASSWORD` | `postgres` | Database password. |
-| `DB_NAME` | `auto_tournament` | Database name. 3.0 refuses the 2.x name `matchzy_tournament`; see [Upgrading to 3.0](/guides/upgrading-to-3). |
+| `DB_NAME` | `auto_tournament` | Database name. 2.x used `matchzy_tournament`; 3.0 renames it on the first start (see [Upgrading to 3.0](/guides/upgrading-to-3)). |
 | `DATABASE_URL` | Built from `DB_*` | Full PostgreSQL address. `docker-compose.yml` sets it for you. |
 | `DB_HOST`, `DB_PORT` | `postgres` in Docker, port `5432` | Only used when `DATABASE_URL` is not set. |
 | `DATA_DIR` | `/app/data` | Where demos, logs, map images, installed modules and round backups are kept. Mount a volume here. |

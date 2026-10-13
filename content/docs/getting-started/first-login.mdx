@@ -1,85 +1,53 @@
 ---
-title: First login
-description: Create the first admin and check the basic settings.
+title: Sign-in and accounts
+description: Let players sign in with Steam, add other admins, and set up email.
 icon: LogIn
 ---
 
 import { Step, Steps } from 'fumadocs-ui/components/steps';
 
-A new install has no admin. The first admin is a local account (username and password) that you create with a one-time setup code from the container log. After that you can sign in with any provider you turn on.
+You are signed in as the admin you made on `/setup`. Now choose how everyone else signs in. All of it is in **Settings** (the gear in the admin menu); changes apply at once, no restart.
 
 <Steps>
 
 <Step>
 
-### Get the setup code
+### Turn on Steam sign-in
 
-On its first start, Auto Tournament writes a setup code to its log:
+CS2 players sign in with Steam. Open **Settings** > **Sign-in providers** > **Steam**, paste a **Steam Web API key** and switch Steam on.
 
-```bash
-docker compose logs auto-tournament | grep SETUP
-```
+Get the key at [steamcommunity.com/dev/apikey](https://steamcommunity.com/dev/apikey). Any domain name works in Steam's form. The key is stored encrypted with `SESSION_SECRET`.
 
-The code works once and expires after 24 hours. Restart the container for a new one.
+Discord, Google, GitHub, Twitch and OpenID Connect are on the same page, if you want them as well. A player can link several of them to one account on their **Connections** page. See [Sign-in providers](/guides/sign-in).
 
 </Step>
 
 <Step>
 
-### Create the admin
+### Make the other admins
 
-Open Auto Tournament in the browser. The login page links to **Set up the first admin** (`/setup`). Enter the code, then pick a username and password. You are signed in as admin.
+Two ways:
 
-From then on, sign in with that account at `/login/admin`. You can turn on two-factor codes for it.
-
-</Step>
-
-<Step>
-
-### Accept the license terms
-
-The first time you open the admin pages, you choose how you use Auto Tournament (for example a free community event, or commercial use with a license). See [Licensing](/reference/licensing).
+- **Username accounts.** **Settings** > **Sign-in providers** > **Accounts**: enter a username and a starting password, and switch **Admin** on. At their first sign-in (on `/login/admin`) they choose their own password, add an email if the site sends email, and can turn on two-step verification.
+- **Steam players.** Let them sign in with Steam once, then open **Players**, edit the player and switch **Admin** on. Or list their Steam IDs (or emails) under **Settings** > **Sign-in providers** > **Admin access**, and they are admins from their next sign-in.
 
 </Step>
 
 <Step>
 
-### Turn on sign-in for players
+### Set up email (optional)
 
-In **Settings → Sign-in**, turn on the providers your players use: Steam, Discord, Google, GitHub, Twitch, Epic Games or your own OpenID Connect server. See [Sign-in providers](/guides/sign-in).
+Without email everything still works: admins set new passwords for username accounts by hand. With it, people can reset a forgotten password themselves, and players can ask for an email when a tournament opens its sign-up.
 
-To sign in with one of them yourself as admin, sign in once, then make that account admin (see below).
-
-</Step>
-
-<Step>
-
-### Set up your game
-
-Settings has a tab for each installed game. For CS2, open **Settings → Counter-Strike 2** and check that **Webhook URL** is an address your game servers can reach (not `localhost` when they run on another machine). Then click **Sync CS2 Maps** to fetch the map list.
-
-Continue with [Connect a CS2 server](/getting-started/connect-server), or [Manual reporting](/guides/manual-reporting) for games without servers.
+Open **Settings** > **Email**, fill in your SMTP server, the sender address and the site address, save, switch **Send email** on and send a test email.
 
 </Step>
 
 </Steps>
 
-## Making more admins
+Next: [Game servers with csm](/getting-started/connect-server).
 
-Admin rights belong to the account, whatever sign-in method it uses. There are three ways to make someone admin:
+## Players, teams and bans
 
-- On the **Players** page, edit the player and turn on **Is admin**.
-- In **Settings → Sign-in → Admin access**, add their email address to **Admin emails**. They become admin when they sign in with a provider that has verified that address (for example Google).
-- In the same place, add their Steam64 ID to **Admin Steam IDs**. Those accounts are made admin at every start and when you save.
-
-The lists only add admins. Removing someone from a list does not take admin away; turn off **Is admin** on the Players page for that.
-
-## Locked out
-
-If nobody can sign in as admin any more, create a new setup code on the host:
-
-```bash
-docker exec auto-tournament reset-admin
-```
-
-Then open `/setup` and enter it. This also turns the local admin login back on if it was switched off.
+- A player's account is created the first time they sign in. They pick their games, make a team or join one in **Teams**, and sign it up for tournaments themselves. You can also make teams and players by hand on **Teams** and **Players**.
+- **Players** > a player's menu > **Ban** locks a player out: they can't sign in, and their public page shows only their name. **Delete** removes everything about them; their old matches stay, shown as "Deleted player".

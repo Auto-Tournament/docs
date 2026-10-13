@@ -1,0 +1,68 @@
+---
+title: Matchmaking (experimental)
+description: Players find a 5v5 match on their own, without an admin.
+icon: Swords
+---
+
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+
+Players click **Find match**, wait in a queue, accept, and play a CS2 match on a free server. Nobody has to set anything up per match. Matchmaking is experimental: it is off by default and only admins can use it until you open it to players.
+
+<Callout type="warn">
+  Matchmaking is new in 3.1 betas. Try it with friends before you open it to everyone.
+</Callout>
+
+## What you need
+
+- The CS2 module, with the **Active Duty** map pool (Maps). Matches are played on a random map from it.
+- At least one [Ready Up](/cs2/ready-up) server the platform can start, for example on a machine linked with [CS2 Server Manager](/cs2/server-manager). Tournament matches always get a free server first.
+- Ten players searching at the same time.
+
+## Turn it on
+
+<Steps>
+
+<Step>
+
+### Switch the feature on
+
+**Settings → Experimental → Matchmaking**. Admins now see **Play** in the top bar.
+
+</Step>
+
+<Step>
+
+### Open it to players
+
+Under the same switch, turn on **Open to players**. Every signed-in player now sees **Play**. Turn on **Leaderboard visible to everyone** if visitors who are not signed in should see the leaderboard.
+
+</Step>
+
+</Steps>
+
+## How a match is found
+
+1. A player picks **Find match**, alone or as a party. A party leader shares the invite link; up to 5 players, always on the same team.
+2. A bar at the bottom of every page shows the search and how long it has run.
+3. When ten players fit together, everyone gets **Match found** with a sound and has 20 seconds to accept.
+4. When all ten accept, the match is created and gets a server. The match room shows both teams, the map and how to join.
+
+Players are matched with others near their rating. The allowed gap starts at ±100 and grows by 50 every 30 seconds, up to 400. After 5 minutes anyone is matched, so a small community still gets games. Teams are split so the total rating is as even as possible.
+
+## Ratings, XP and levels
+
+- **Rating**: each player has a matchmaking rating, separate from tournament ratings. It starts from their tournament rating and settles after a few matches.
+- **XP**: every finished match gives 100 XP, +50 for a win (+25 for a draw), up to +50 for performance, and +100 for the first win of the day. XP never goes down.
+- **Levels** show how experienced a player is on the platform. Each level needs a bit more XP than the last.
+- **Leaderboard** (**Play → Leaderboard**): players with 10 or more matches in the last 30 days.
+
+After a match, the match room shows the score, both scoreboards, the rating change and the XP gained. Players can give each other a thumbs up or a thumbs down (with a reason) for 24 hours. Profiles show the totals, never who voted.
+
+## Leaving and declining
+
+| What happened | Cooldown |
+| --- | --- |
+| Declined or missed a found match (1st, 2nd, 3rd, then more in 24 h) | 2 min, 10 min, 1 h, 24 h |
+| Never joined the server, or left for 5 minutes during a match | 1 h, doubling within 7 days, at most 7 days |
+
+A player who left takes their team's loss in full, gets no XP, and their teammates lose less. Admins can clear a cooldown.

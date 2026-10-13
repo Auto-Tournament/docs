@@ -115,4 +115,4 @@ The servers share one MySQL database and overwrite each other's settings. Run `c
 
 - `Unsupported architecture`: run `uname -m`. `csm` runs on `x86_64` and `arm64` only.
 - Downloads fail: check that the machine can reach GitHub and Steam over HTTPS. Check the proxy and the firewall.
-- `CSM TUI must be run with sudo`: start the menu with `csm`.
+- `Don't run csm as root or with sudo`: run `csm` as the account that owns the servers, without `sudo`. Run `sudo csm setup-host` once first. Only `setup-host`, `install-deps`, `self-update` and `cleanup-all` take `sudo`.
