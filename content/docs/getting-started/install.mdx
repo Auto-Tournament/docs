@@ -1,18 +1,18 @@
 ---
 title: Install
-description: Run Auto Tournament with Docker Compose.
+description: Run the Auto Tournament platform with Docker Compose and create the first admin.
 icon: Download
 ---
 
 import { Step, Steps } from 'fumadocs-ui/components/steps';
 
-Auto Tournament runs as two containers: the app and a PostgreSQL database. You need a Linux, macOS or Windows machine with [Docker](https://docs.docker.com/engine/install/) and Docker Compose.
+This guide takes you from nothing to a first tournament in four parts: install the platform (this page), [set up sign-in](/getting-started/first-login), [add game servers with csm](/getting-started/connect-server) and [run a tournament](/getting-started/first-tournament). It assumes you know your way around Docker and a Linux shell.
 
-<Callout title="Old names">
-  The Docker image is still `sivertio/matchzy-auto-tournament` and the container is still called `matchzy-tournament-api`. They keep these names until 3.0. The commands on this page use the current names.
+The platform is two containers: the app and a PostgreSQL database. Run it on any machine with Docker and Docker Compose: a VPS, a home server, or one PC at a LAN. The game servers run on other machines, with [CS2 Server Manager](/getting-started/connect-server).
+
+<Callout title="3.0 is in beta">
+  3.0 is published as the `next` tag until it is released. Then it moves to `latest`, and you change the tag in `docker-compose.yml`.
 </Callout>
-
-{/* TODO 3.0: Before 3.0 ships, switch this page to the sivertio/auto-tournament image and remove the Old names callout, or keep it if the old image is still the default. See /guides/upgrading-to-3. */}
 
 <Steps>
 
@@ -21,7 +21,7 @@ Auto Tournament runs as two containers: the app and a PostgreSQL database. You n
 ### Create a folder
 
 ```bash
-mkdir -p autotournament && cd autotournament
+mkdir -p auto-tournament && cd auto-tournament
 ```
 
 </Step>
@@ -30,66 +30,53 @@ mkdir -p autotournament && cd autotournament
 
 ### Save `docker-compose.yml`
 
-Save this file as `docker-compose.yml` in the folder:
-
 ```yaml title="docker-compose.yml"
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: matchzy-postgres
     restart: unless-stopped
     environment:
-      - POSTGRES_USER=${DB_USER:-postgres}
-      - POSTGRES_PASSWORD=${DB_PASSWORD:-postgres}
-      - POSTGRES_DB=${DB_NAME:-matchzy_tournament}
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+      POSTGRES_DB: auto_tournament
     volumes:
       - postgres-data:/var/lib/postgresql/data
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U ${DB_USER:-postgres}']
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
       interval: 10s
       timeout: 5s
       retries: 5
-    networks:
-      - matchzy-network
 
-  matchzy-tournament:
-    image: sivertio/matchzy-auto-tournament:latest
-    container_name: matchzy-tournament-api
+  auto-tournament:
+    image: sivertio/auto-tournament:next
+    container_name: auto-tournament
     restart: unless-stopped
     depends_on:
       postgres:
         condition: service_healthy
-    env_file:
-      - .env
+    env_file: .env
     ports:
       - '${HOST_PORT:-3069}:3069'
     environment:
-      - NODE_ENV=production
-      - PORT=3000
-      - DB_HOST=postgres
-      - DATABASE_URL=postgresql://${DB_USER:-postgres}:${DB_PASSWORD:-postgres}@postgres:5432/${DB_NAME:-matchzy_tournament}
-      - SESSION_SECRET=${SESSION_SECRET:-}
+      NODE_ENV: production
+      PORT: 3000
+      DB_HOST: postgres
+      DATABASE_URL: postgresql://postgres:${DB_PASSWORD:-postgres}@postgres:5432/auto_tournament
     volumes:
-      - ./data:/app/data
+      - app-data:/app/data
     healthcheck:
       test: ['CMD', 'wget', '--no-verbose', '--tries=1', '--spider', 'http://localhost:3069/health']
       interval: 30s
       timeout: 3s
       retries: 3
-      start_period: 10s
-    networks:
-      - matchzy-network
-
-networks:
-  matchzy-network:
-    driver: bridge
+      start_period: 20s
 
 volumes:
   postgres-data:
-    driver: local
+  app-data:
 ```
 
-`PORT=3000` is the internal port of the API. Do not change it. The web app and API are both served on port `3069`. Set `HOST_PORT` in `.env` to use another port on your machine.
+The web app and the API share port `3069`. `PORT=3000` is the API's port inside the container; leave it. Set `HOST_PORT` in `.env` to publish another port on the host.
 
 </Step>
 
@@ -97,61 +84,55 @@ volumes:
 
 ### Create `.env`
 
-This command creates `.env` with two new random secrets:
-
 ```bash
 cat > .env <<EOF
+FRONTEND_BASE_URL=http://192.168.1.50:3069
 SESSION_SECRET=$(openssl rand -base64 32)
 SERVER_TOKEN=$(openssl rand -base64 24 | tr -d '=+/')
-FRONTEND_BASE_URL=http://localhost:3069
-STEAM_API_KEY=
-AUTH_STEAM_ENABLED=true
-LOG_LEVEL=info
+DB_PASSWORD=$(openssl rand -base64 18 | tr -d '=+/')
 EOF
 ```
 
-Then open `.env` and fill in two values:
+Set `FRONTEND_BASE_URL` to the address players and game servers use to reach the platform: the LAN IP of this machine, or `https://cs.example.com` behind a [reverse proxy](/guides/reverse-proxy). Not `localhost`, because the game servers connect to it too.
 
-- `STEAM_API_KEY`: get a key from the [Steam Web API key page](https://steamcommunity.com/dev/apikey). Steam login does not work without it.
-- `FRONTEND_BASE_URL`: the address you open in the browser. Your game servers also use this address to send results back, so `localhost` only works when the game servers run on the same machine. If they run somewhere else, use the LAN IP or domain, for example `http://192.168.1.50:3069` or `https://tournament.example.com`.
+`SESSION_SECRET` also encrypts the secrets you enter in the dashboard later (the Steam key, sign-in providers, the email password). Keep a copy: with a different value they can't be read, and you enter them again.
 
-All other settings are in [Configuration](/reference/configuration).
+Everything else, the Steam Web API key and the sign-in providers included, is set in the dashboard. [Configuration](/reference/configuration) lists the other variables.
 
 </Step>
 
 <Step>
 
-### Start
+### Start it
 
 ```bash
 docker compose up -d
-```
-
-Check that it is running:
-
-```bash
-curl -fsS http://localhost:3069/health
+docker compose logs -f auto-tournament
 ```
 
 </Step>
 
 <Step>
 
-### Open the app
+### Create the first admin
 
-Open the value of `FRONTEND_BASE_URL` in your browser, for example [http://localhost:3069](http://localhost:3069). Continue with [First login](/getting-started/first-login).
+On its first start the platform prints a setup code in the log:
+
+```text
+[SETUP] No admin account exists yet.
+[SETUP] Open http://192.168.1.50:3069/setup and enter this code: 4F7K-...
+```
+
+Open that address, enter the code and create the admin account: a username and a password. Then turn on two-step verification with an authenticator app, or skip it for now. The code works once and expires after 24 hours; restart the container for a new one.
 
 </Step>
 
 </Steps>
 
+Next: [Sign-in and accounts](/getting-started/first-login).
+
 ## Where the data is
 
-- The database is in the Docker volume `postgres-data`. `docker compose down` keeps it. `docker compose down -v` deletes it.
-- Uploaded files, such as demos, are in the `data/` folder next to `docker-compose.yml`.
-
-Before you update, read [Updating](/guides/updating).
-
-## Use a domain with HTTPS
-
-Put a reverse proxy in front of port 3069 and set `FRONTEND_BASE_URL` to the `https://` address. See [Reverse proxy](/guides/reverse-proxy).
+- The database is in the `postgres-data` volume; demos, clips and uploads are in `app-data`. `docker compose down` keeps both, `docker compose down -v` deletes them.
+- To update: `docker compose pull && docker compose up -d`. Read [Updating](/guides/updating) first.
+- Locked out: `docker exec auto-tournament reset-admin` prints a one-time code for `/setup` that sets a new admin password.

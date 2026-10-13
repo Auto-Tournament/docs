@@ -114,7 +114,7 @@ A newer version can change the database. If the older version does not start aft
 
 ## After you update
 
-- If you lost admin access, set `ADMIN_STEAM_IDS`. See [First login](/getting-started/first-login#if-you-are-not-admin).
+- If you lost admin access, run `docker exec auto-tournament reset-admin` and open `/setup` with the code it prints. See [Install](/getting-started/install#where-the-data-is).
 - Update Auto Tournament CS2 (formerly MatchZy Enhanced) on your servers too, so all servers run the same version. See [Update the CS2 plugin](/cs2/plugin/install#update), or run `csm update-plugins` with CS2 Server Manager.
 - To free disk space from old images:
 

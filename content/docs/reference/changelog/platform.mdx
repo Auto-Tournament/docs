@@ -7,6 +7,373 @@ description: Release notes for each version of the Auto Tournament platform.
 
 Versions before 3.0 were released as **MatchZy Auto Tournament** (MAT). Their notes are under [Earlier versions](#earlier-versions). **3.0 is in beta**: the `3.0.0-beta.N` releases below are the 3.0 notes until 3.0.0 ships. See [Upgrading to 3.0](/guides/upgrading-to-3). Newest first. Each entry is the [GitHub release](https://github.com/Auto-Tournament/auto-tournament/releases) for that version. [Docs](/).
 
+## v3.0.0-beta.91
+
+<p className="text-sm text-fd-muted-foreground">2026-10-12 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.91)</p>
+
+- feat(tournaments): "End tournament" stops a running tournament without a result ([#757](https://github.com/Auto-Tournament/auto-tournament/pull/757))
+- fix(highlights): a round-ending kill keeps its tail and slow-mo ([#759](https://github.com/Auto-Tournament/auto-tournament/pull/759))
+- fix(replay): bots are on the 2D replay ([#758](https://github.com/Auto-Tournament/auto-tournament/pull/758))
+- fix(veto,skins): countdown stays through the veto; warmup equips show at once ([#760](https://github.com/Auto-Tournament/auto-tournament/pull/760))
+
+## v3.0.0-beta.90
+
+<p className="text-sm text-fd-muted-foreground">2026-10-12 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.90)</p>
+
+- fix(skins): live on/off, equips reach the server once a round, equip errors shown ([#756](https://github.com/Auto-Tournament/auto-tournament/pull/756))
+
+## v3.0.0-beta.89
+
+<p className="text-sm text-fd-muted-foreground">2026-10-12 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.89)</p>
+
+- feat(tournaments): map veto on or off, a wingman preset, and a veto countdown bar ([#755](https://github.com/Auto-Tournament/auto-tournament/pull/755))
+
+## v3.0.0-beta.88
+
+<p className="text-sm text-fd-muted-foreground">2026-10-12 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.88)</p>
+
+- feat(skins): servers follow the platform's skins; esports mode per tournament ([#752](https://github.com/Auto-Tournament/auto-tournament/pull/752))
+- feat(maps): wingman tournaments can use CS2's wingman layouts ([#753](https://github.com/Auto-Tournament/auto-tournament/pull/753))
+- fix(chat): join and leave lines are quiet ([#754](https://github.com/Auto-Tournament/auto-tournament/pull/754))
+- fix(matchmaking): its own rules, and a match now when few are searching ([#751](https://github.com/Auto-Tournament/auto-tournament/pull/751))
+
+## v3.0.0-beta.87
+
+<p className="text-sm text-fd-muted-foreground">2026-10-12 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.87)</p>
+
+- fix(analyzer): humans' kills on bots count, so bot-filled matches get highlights ([#750](https://github.com/Auto-Tournament/auto-tournament/pull/750))
+- fix(bracket): later rounds open their veto; servers free up after a match ([#749](https://github.com/Auto-Tournament/auto-tournament/pull/749))
+
+## at-recorder-v0.1.0-beta.6
+
+<p className="text-sm text-fd-muted-foreground">2026-10-12 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/at-recorder-v0.1.0-beta.6)</p>
+
+Native Linux recorder host setup, connection and persistent identity. Managed updates drain active work, verify pinned container and binary releases, and restore the previous build if startup fails. Existing installations need one adoption to install the recovery launcher.
+
+## v3.0.0-beta.86
+
+<p className="text-sm text-fd-muted-foreground">2026-10-12 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.86)</p>
+
+- feat(recorders): a live link to the platform, with progress everywhere ([#747](https://github.com/Auto-Tournament/auto-tournament/pull/747))
+
+## at-recorder-v0.1.0-beta.5
+
+<p className="text-sm text-fd-muted-foreground">2026-10-12 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/at-recorder-v0.1.0-beta.5)</p>
+
+Native Linux recorder host setup, connection and persistent identity. Managed updates drain active work, verify pinned container and binary releases, and restore the previous build if startup fails. Existing installations need one adoption to install the recovery launcher.
+
+## v3.0.0-beta.85
+
+<p className="text-sm text-fd-muted-foreground">2026-10-12 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.85)</p>
+
+- feat(docker): AT_DATA_DIR and AT_DB_DIR choose where clips and the database live ([#726](https://github.com/Auto-Tournament/auto-tournament/pull/726))
+- feat(highlights): the player remembers mute, like its volume ([#723](https://github.com/Auto-Tournament/auto-tournament/pull/723))
+- feat(recorders): at-recorder update, logs and restart on the host ([#729](https://github.com/Auto-Tournament/auto-tournament/pull/729))
+- fix(player): music and crowd wait while the video buffers ([#731](https://github.com/Auto-Tournament/auto-tournament/pull/731))
+- fix(system): one update toast at a time, clickable notes, per-version dismissal ([#728](https://github.com/Auto-Tournament/auto-tournament/pull/728))
+- feat(highlights): review a clip as "weapon missing" to record it again without TrueView ([#724](https://github.com/Auto-Tournament/auto-tournament/pull/724))
+- feat(match): clips and reels appear on the match page live ([#730](https://github.com/Auto-Tournament/auto-tournament/pull/730))
+- fix(recorders): runs with failed clips are not shown as OK; startup errors keep the log's end ([#725](https://github.com/Auto-Tournament/auto-tournament/pull/725))
+- feat(match): a match opens its own page everywhere ([#735](https://github.com/Auto-Tournament/auto-tournament/pull/735))
+- feat(highlights): reels show elapsed, assembly and summed clip render time apart ([#727](https://github.com/Auto-Tournament/auto-tournament/pull/727))
+- feat(match): clip recording progress bar ([#736](https://github.com/Auto-Tournament/auto-tournament/pull/736))
+- feat(match): each map opens its analysis, 2D replay, clips and reel ([#734](https://github.com/Auto-Tournament/auto-tournament/pull/734))
+- ci: pull images through mirror.gcr.io ([#744](https://github.com/Auto-Tournament/auto-tournament/pull/744))
+- fix(app): a module's page opened from a link waits for the module ([#742](https://github.com/Auto-Tournament/auto-tournament/pull/742))
+- ci: E2E shards start after the image build ([#746](https://github.com/Auto-Tournament/auto-tournament/pull/746))
+- feat(clips): single clips skip the caption card; avatar beside the title ([#733](https://github.com/Auto-Tournament/auto-tournament/pull/733))
+- feat(highlights): highlights library with views and likes; in the main nav ([#737](https://github.com/Auto-Tournament/auto-tournament/pull/737))
+- feat(notifications): a ready highlight opens its clip and shows its still ([#739](https://github.com/Auto-Tournament/auto-tournament/pull/739))
+- feat(highlights): comments with clickable timestamps ([#738](https://github.com/Auto-Tournament/auto-tournament/pull/738))
+- feat(teams): logos everywhere; a team's recent matches ([#743](https://github.com/Auto-Tournament/auto-tournament/pull/743))
+- feat(leaderboards): category rankings; Players becomes a directory ([#740](https://github.com/Auto-Tournament/auto-tournament/pull/740))
+- feat(roles): demo-based role suggestions, with the player's own choice ([#741](https://github.com/Auto-Tournament/auto-tournament/pull/741))
+- feat(nav): one place to find players; the ladder linked from Leaderboards ([#745](https://github.com/Auto-Tournament/auto-tournament/pull/745))
+
+## at-recorder-v0.1.0-beta.4
+
+<p className="text-sm text-fd-muted-foreground">2026-10-12 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/at-recorder-v0.1.0-beta.4)</p>
+
+Native Linux recorder host setup, connection and persistent identity. Managed updates drain active work, verify pinned container and binary releases, and restore the previous build if startup fails. Existing installations need one adoption to install the recovery launcher.
+
+## v3.0.0-beta.84
+
+<p className="text-sm text-fd-muted-foreground">2026-10-12 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.84)</p>
+
+- fix(highlights): use shared music library in public players ([#722](https://github.com/Auto-Tournament/auto-tournament/pull/722))
+
+## v3.0.0-beta.83
+
+<p className="text-sm text-fd-muted-foreground">2026-10-12 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.83)</p>
+
+- fix(recorder): update legacy image overrides and clip music ([#721](https://github.com/Auto-Tournament/auto-tournament/pull/721))
+
+## at-recorder-v0.1.0-beta.3
+
+<p className="text-sm text-fd-muted-foreground">2026-10-12 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/at-recorder-v0.1.0-beta.3)</p>
+
+Native Linux recorder host setup, connection and persistent identity. Managed updates drain active work, verify pinned container and binary releases, and restore the previous build if startup fails. Existing installations need one adoption to install the recovery launcher.
+
+## v3.0.0-beta.82
+
+<p className="text-sm text-fd-muted-foreground">2026-10-11 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.82)</p>
+
+- fix(recorder): request attempt tokens on job claims ([#716](https://github.com/Auto-Tournament/auto-tournament/pull/716))
+- fix(recorder): correct demo seek overshoot before capture ([#717](https://github.com/Auto-Tournament/auto-tournament/pull/717))
+- fix(recorder): verify full frames before dropping repeats ([#718](https://github.com/Auto-Tournament/auto-tournament/pull/718))
+- feat(recorder): add native host setup and persistent identity ([#719](https://github.com/Auto-Tournament/auto-tournament/pull/719))
+- feat(recorder): manage verified updates with recovery ([#720](https://github.com/Auto-Tournament/auto-tournament/pull/720))
+
+## at-recorder-v0.1.0-beta.2
+
+<p className="text-sm text-fd-muted-foreground">2026-10-11 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/at-recorder-v0.1.0-beta.2)</p>
+
+Native Linux recorder host setup, connection and persistent identity. Managed updates drain active work, verify pinned container and binary releases, and restore the previous build if startup fails. Existing installations need one adoption to install the recovery launcher.
+
+## at-recorder-v0.1.0-beta.1
+
+<p className="text-sm text-fd-muted-foreground">2026-10-11 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/at-recorder-v0.1.0-beta.1)</p>
+
+Native Linux recorder host setup, connection, identity reporting and readiness checks.
+
+## v3.0.0-beta.81
+
+<p className="text-sm text-fd-muted-foreground">2026-10-11 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.81)</p>
+
+- Control recorder groups and recover abandoned recording jobs ([#715](https://github.com/Auto-Tournament/auto-tournament/pull/715))
+
+## v3.0.0-beta.80
+
+<p className="text-sm text-fd-muted-foreground">2026-10-10 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.80)</p>
+
+- Add recorder groups and enable controls for highlight rendering ([#713](https://github.com/Auto-Tournament/auto-tournament/pull/713))
+- feat(cs2): fill tournament teams with bots alongside humans ([#714](https://github.com/Auto-Tournament/auto-tournament/pull/714))
+
+## v3.0.0-beta.79
+
+<p className="text-sm text-fd-muted-foreground">2026-10-10 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.79)</p>
+
+- copy(license): the public line says "No license key", not "Unlicensed" ([#710](https://github.com/Auto-Tournament/auto-tournament/pull/710))
+- feat(license): one thing to do on the License page: paste a key ([#711](https://github.com/Auto-Tournament/auto-tournament/pull/711))
+- feat(recorders): add a recorder as a gaming PC or a headless server, no name needed ([#712](https://github.com/Auto-Tournament/auto-tournament/pull/712))
+
+## v3.0.0-beta.78
+
+<p className="text-sm text-fd-muted-foreground">2026-10-10 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.78)</p>
+
+- fix(recorder): CS2's sound buffer is the recorder's, not the Steam profile's ([#707](https://github.com/Auto-Tournament/auto-tournament/pull/707))
+- feat(highlights): a reel is made once the clips it takes are recorded ([#706](https://github.com/Auto-Tournament/auto-tournament/pull/706))
+- fix(recorder): a hole in the full-speed capture takes frames from a slowed one ([#708](https://github.com/Auto-Tournament/auto-tournament/pull/708))
+- test(upgrade): compare CS2's ledger and declared migrations in id order ([#709](https://github.com/Auto-Tournament/auto-tournament/pull/709))
+- feat(license): monthly keys, the paid server limit, and stopping when a subscription goes unpaid ([#672](https://github.com/Auto-Tournament/auto-tournament/pull/672))
+
+## v3.0.0-beta.77
+
+<p className="text-sm text-fd-muted-foreground">2026-10-10 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.77)</p>
+
+- feat(chat): the chat window as in the features draft ([#690](https://github.com/Auto-Tournament/auto-tournament/pull/690))
+- feat(system): admins hear when a module or game pack has an update, or one did not take ([#693](https://github.com/Auto-Tournament/auto-tournament/pull/693))
+- fix(import): imported players go by the name they play under in the demo ([#694](https://github.com/Auto-Tournament/auto-tournament/pull/694))
+- test(cs2): compare the migration ledger with the declared list by id ([#699](https://github.com/Auto-Tournament/auto-tournament/pull/699))
+- feat(highlights): watch and review every clip from the Clips list ([#695](https://github.com/Auto-Tournament/auto-tournament/pull/695))
+- fix(matches): the match dialog opens and closes again ([#698](https://github.com/Auto-Tournament/auto-tournament/pull/698))
+- feat(highlights): recorders split a map by benchmark speed ([#696](https://github.com/Auto-Tournament/auto-tournament/pull/696))
+- fix(recorder): the reel overlay streams; it no longer holds frames until the last card ([#701](https://github.com/Auto-Tournament/auto-tournament/pull/701))
+- feat(recorders): benchmark on a demo shipped with the worker ([#702](https://github.com/Auto-Tournament/auto-tournament/pull/702))
+- feat(recorders): a reel that fails on one recorder goes to another ([#700](https://github.com/Auto-Tournament/auto-tournament/pull/700))
+- fix(recorder): a short capture stall holds a frame instead of failing the clip ([#703](https://github.com/Auto-Tournament/auto-tournament/pull/703))
+- feat(recorders): keep CS2 and the demo loaded; one player a claim, loaded map first ([#704](https://github.com/Auto-Tournament/auto-tournament/pull/704))
+- perf(recorder): the focus blur runs on the GPU (Vulkan), CPU as fallback ([#705](https://github.com/Auto-Tournament/auto-tournament/pull/705))
+
+## v3.0.0-beta.76
+
+<p className="text-sm text-fd-muted-foreground">2026-10-09 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.76)</p>
+
+- ci: base images and buildkit from AWS ECR Public, not Docker Hub ([#691](https://github.com/Auto-Tournament/auto-tournament/pull/691))
+- fix(cs2): the module upgrades from 3.0.0-beta.72 again ([#692](https://github.com/Auto-Tournament/auto-tournament/pull/692))
+
+## v3.0.0-beta.75
+
+<p className="text-sm text-fd-muted-foreground">2026-10-09 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.75)</p>
+
+- fix(highlights): a clip's overlay recipe is stored again, not turned down as empty ([#687](https://github.com/Auto-Tournament/auto-tournament/pull/687))
+- fix(highlights): no stutter check at all; every clip is kept ([#688](https://github.com/Auto-Tournament/auto-tournament/pull/688))
+- ci(release): log in to Docker Hub before the build pulls its base images ([#689](https://github.com/Auto-Tournament/auto-tournament/pull/689))
+
+## v3.0.0-beta.74
+
+<p className="text-sm text-fd-muted-foreground">2026-10-09 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.74)</p>
+
+- fix(recorder): a desktop recorder shares the host's PIDs, so Steam lets a restarted CS2 in ([#683](https://github.com/Auto-Tournament/auto-tournament/pull/683))
+- feat(fleet): a fleet key can turn skins on for the servers it enrolls ([#663](https://github.com/Auto-Tournament/auto-tournament/pull/663))
+- fix(recorders): a recorder whose CS2 will not start gives its job back instead of failing it ([#684](https://github.com/Auto-Tournament/auto-tournament/pull/684))
+- test(turnover): a waiting match taking the released server counts as the release ([#686](https://github.com/Auto-Tournament/auto-tournament/pull/686))
+- fix(highlights): a series reel waits until every map has recorded clips ([#685](https://github.com/Auto-Tournament/auto-tournament/pull/685))
+
+## v3.0.0-beta.73
+
+<p className="text-sm text-fd-muted-foreground">2026-10-09 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.73)</p>
+
+- feat(compat): accept the code_change trigger ([#674](https://github.com/Auto-Tournament/auto-tournament/pull/674))
+- feat(highlights): add a recorder with one command; recorder keys, names, heartbeat, no sleep mid-job ([#676](https://github.com/Auto-Tournament/auto-tournament/pull/676))
+- feat(fleet): a fleet key can link the servers it enrolls for matches ([#658](https://github.com/Auto-Tournament/auto-tournament/pull/658))
+- feat(system): admins get a toast when a newer Auto Tournament is out ([#677](https://github.com/Auto-Tournament/auto-tournament/pull/677))
+- fix(recorder): wait for the desktop session after a reboot instead of failing every job ([#679](https://github.com/Auto-Tournament/auto-tournament/pull/679))
+- feat(highlights): recorders share each map, newest match first ([#678](https://github.com/Auto-Tournament/auto-tournament/pull/678))
+- chore: format the files a change touches; CI checks it; a CONTRIBUTING guide ([#680](https://github.com/Auto-Tournament/auto-tournament/pull/680))
+- fix(highlights): recorders send files over 64 MB in parts ([#681](https://github.com/Auto-Tournament/auto-tournament/pull/681))
+- test: turnover and end-match use their own match; yarn format covers uncommitted changes ([#682](https://github.com/Auto-Tournament/auto-tournament/pull/682))
+
+## v3.0.0-beta.72
+
+<p className="text-sm text-fd-muted-foreground">2026-10-09 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.72)</p>
+
+- fix(import): drop demos onto the import page; several picked at once go in name order ([#671](https://github.com/Auto-Tournament/auto-tournament/pull/671))
+- feat(highlights): series reels, reel sizes as settings, a Clips list with Redo for outdated clips ([#673](https://github.com/Auto-Tournament/auto-tournament/pull/673))
+
+## v3.0.0-beta.71
+
+<p className="text-sm text-fd-muted-foreground">2026-10-09 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.71)</p>
+
+- feat(highlights): 17 more suggested songs (rock, metal, pop, trance), with Rock and Metal genres ([#669](https://github.com/Auto-Tournament/auto-tournament/pull/669))
+- feat(highlights): the crowd groans when the player dies in a clip ([#670](https://github.com/Auto-Tournament/auto-tournament/pull/670))
+
+## v3.0.0-beta.70
+
+<p className="text-sm text-fd-muted-foreground">2026-10-09 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.70)</p>
+
+- feat(highlights): frame check on every clip, recorder pause, first-run benchmark, run logs and a Highlights page ([#659](https://github.com/Auto-Tournament/auto-tournament/pull/659))
+- feat(players): integrators import players with their OpenID Connect login (oidcSubject) ([#660](https://github.com/Auto-Tournament/auto-tournament/pull/660))
+- fix(demos): a deleted match's demo jobs and highlights are dropped, not retried forever ([#662](https://github.com/Auto-Tournament/auto-tournament/pull/662))
+- feat(recorder): a recorder container for Linux gaming PCs ([#664](https://github.com/Auto-Tournament/auto-tournament/pull/664))
+- fix(sign-in): OpenID Connect works when the server refuses profile and email ([#661](https://github.com/Auto-Tournament/auto-tournament/pull/661))
+- feat(search): one search box for players, teams, tournaments, matches and (for admins) settings ([#666](https://github.com/Auto-Tournament/auto-tournament/pull/666))
+- fix(accounts): an account made by a sign-in method has no Steam, and can connect it ([#667](https://github.com/Auto-Tournament/auto-tournament/pull/667))
+- feat(admin): every admin page under /manage; Admin tools becomes System ([#665](https://github.com/Auto-Tournament/auto-tournament/pull/665))
+- feat(highlights): shared highlight settings, music and page in core ([#668](https://github.com/Auto-Tournament/auto-tournament/pull/668))
+
+## v3.0.0-beta.69
+
+<p className="text-sm text-fd-muted-foreground">2026-10-09 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.69)</p>
+
+- feat(matches): import a match from its demos ([#657](https://github.com/Auto-Tournament/auto-tournament/pull/657))
+
+## v3.0.0-beta.68
+
+<p className="text-sm text-fd-muted-foreground">2026-10-09 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.68)</p>
+
+- feat(players): delete leaves a tombstone, ban locks a player out; a banned starter's team gets time to pick a sub ([#655](https://github.com/Auto-Tournament/auto-tournament/pull/655))
+- feat(players): report a player to the admins; a Reports page to dismiss or ban ([#656](https://github.com/Auto-Tournament/auto-tournament/pull/656))
+
+## v3.0.0-beta.67
+
+<p className="text-sm text-fd-muted-foreground">2026-10-09 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.67)</p>
+
+- fix(servers): a Ready Up fleet server needs no RCON password to be edited ([#654](https://github.com/Auto-Tournament/auto-tournament/pull/654))
+
+## v3.0.0-beta.66
+
+<p className="text-sm text-fd-muted-foreground">2026-10-09 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.66)</p>
+
+- fix(accounts): a removed username can be made again; removing a login takes its admin rights ([#652](https://github.com/Auto-Tournament/auto-tournament/pull/652))
+- fix(servers): a Ready Up server's status comes from the fleet link ([#653](https://github.com/Auto-Tournament/auto-tournament/pull/653))
+
+## v3.0.0-beta.65
+
+<p className="text-sm text-fd-muted-foreground">2026-10-09 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.65)</p>
+
+- fix(email): no password reset by email offered when the site sends no email ([#650](https://github.com/Auto-Tournament/auto-tournament/pull/650))
+- fix(webhooks): hide a webhook's URL until asked for ([#651](https://github.com/Auto-Tournament/auto-tournament/pull/651))
+
+## v3.0.0-beta.64
+
+<p className="text-sm text-fd-muted-foreground">2026-10-09 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.64)</p>
+
+- fix(settings): one full-width column; accounts as rows that wrap, the add form in one column ([#647](https://github.com/Auto-Tournament/auto-tournament/pull/647))
+- feat(account): change your own password from your account page ([#648](https://github.com/Auto-Tournament/auto-tournament/pull/648))
+- feat(email): send email from the dashboard; confirm addresses, reset passwords, sign-up news, first sign-in setup ([#649](https://github.com/Auto-Tournament/auto-tournament/pull/649))
+
+## v3.0.0-beta.63
+
+<p className="text-sm text-fd-muted-foreground">2026-10-09 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.63)</p>
+
+- feat(tournament): hold a match or pause the bracket instead of a walkover ([#642](https://github.com/Auto-Tournament/auto-tournament/pull/642))
+- fix(recorder): TrueView on for demos from an older CS2 build ([#643](https://github.com/Auto-Tournament/auto-tournament/pull/643))
+- feat(highlights): a music level slider in the player's music menu ([#644](https://github.com/Auto-Tournament/auto-tournament/pull/644))
+- fix(recorder): smooth 1440p120 capture at max settings, AMD/VAAPI, centered intro card with muffled sound ([#645](https://github.com/Auto-Tournament/auto-tournament/pull/645))
+- feat(matches): a public page for each match, with its team reels, scoreboard and highlights ([#646](https://github.com/Auto-Tournament/auto-tournament/pull/646))
+
+## v3.0.0-beta.62
+
+<p className="text-sm text-fd-muted-foreground">2026-10-08 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.62)</p>
+
+- feat(highlights): clean clips for reuse, reels with their own overlay, redraw without CS2 ([#641](https://github.com/Auto-Tournament/auto-tournament/pull/641))
+
+## v3.0.0-beta.61
+
+<p className="text-sm text-fd-muted-foreground">2026-10-08 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.61)</p>
+
+- feat(highlights): crowd reactions at their own pitch; add reel music from a link ([#640](https://github.com/Auto-Tournament/auto-tournament/pull/640))
+
+## v3.0.0-beta.60
+
+<p className="text-sm text-fd-muted-foreground">2026-10-08 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.60)</p>
+
+- feat(highlights): bring your own reel music; the player plays each reel's own mix ([#639](https://github.com/Auto-Tournament/auto-tournament/pull/639))
+
+## v3.0.0-beta.59
+
+<p className="text-sm text-fd-muted-foreground">2026-10-08 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.59)</p>
+
+- fix: stopped csm servers count, Map type label, worker image and licenses ([#629](https://github.com/Auto-Tournament/auto-tournament/pull/629))
+- chore(legal): third-party notices for the server and the web app ([#630](https://github.com/Auto-Tournament/auto-tournament/pull/630))
+- feat(highlights): see-through settled card and CS2-style kill feed plates ([#631](https://github.com/Auto-Tournament/auto-tournament/pull/631))
+- feat(fleet): machines that reach the platform on a LAN address stay on the LAN ([#633](https://github.com/Auto-Tournament/auto-tournament/pull/633))
+- feat(highlights): idle recorders split a map's players between them ([#634](https://github.com/Auto-Tournament/auto-tournament/pull/634))
+- perf(highlights): faster recording, quality setting, steady sound sync, card at 85 % ([#632](https://github.com/Auto-Tournament/auto-tournament/pull/632))
+- feat(auth): admins manage username + password accounts ([#635](https://github.com/Auto-Tournament/auto-tournament/pull/635))
+- feat(highlights): music beside reels, picked in the player, mixed in only on download ([#636](https://github.com/Auto-Tournament/auto-tournament/pull/636))
+- feat(highlights): a crowd under reels that reacts to how impressive each kill is ([#637](https://github.com/Auto-Tournament/auto-tournament/pull/637))
+
+## v3.0.0-beta.58
+
+<p className="text-sm text-fd-muted-foreground">2026-10-08 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.58)</p>
+
+- feat(ratings): the tournament rating is per game ([#605](https://github.com/Auto-Tournament/auto-tournament/pull/605))
+- feat(profile): one tab per game, no overview; each game shows its own rating ([#609](https://github.com/Auto-Tournament/auto-tournament/pull/609))
+- refactor(highlights): highlights are core's, any game can have them ([#611](https://github.com/Auto-Tournament/auto-tournament/pull/611))
+- ci(release): skip apt when jq and curl are there; short timeouts when not ([#619](https://github.com/Auto-Tournament/auto-tournament/pull/619))
+- fix(highlights): readable corner text, sound on the kill, Share gives the video file ([#618](https://github.com/Auto-Tournament/auto-tournament/pull/618))
+- ci: point the runners' apt mirror list at the main Ubuntu archive ([#622](https://github.com/Auto-Tournament/auto-tournament/pull/622))
+- feat(matchmaking): on by default with every mode, no longer experimental ([#620](https://github.com/Auto-Tournament/auto-tournament/pull/620))
+- fix(highlights): the "ready in about N min" hint from measured recording times ([#614](https://github.com/Auto-Tournament/auto-tournament/pull/614))
+- feat(leaderboard): a leaderboard for the platform, per game ([#617](https://github.com/Auto-Tournament/auto-tournament/pull/617))
+- feat(servers): the Servers page rebuilt from the draft; servers come only through csm ([#621](https://github.com/Auto-Tournament/auto-tournament/pull/621))
+- fix(matchmaking): the party leader can pick the mode ([#623](https://github.com/Auto-Tournament/auto-tournament/pull/623))
+- feat(highlights): reel intro, orange wipe between players, crossfade between kills ([#625](https://github.com/Auto-Tournament/auto-tournament/pull/625))
+- feat(worker): export the kill feed's icons from the game (export-hud) ([#626](https://github.com/Auto-Tournament/auto-tournament/pull/626))
+- fix(highlights): build the reel intro in its own pass ([#627](https://github.com/Auto-Tournament/auto-tournament/pull/627))
+- feat(social): friends, party invites and the notification bell ([#624](https://github.com/Auto-Tournament/auto-tournament/pull/624))
+- feat(highlights): our own kill feed on every clip ([#628](https://github.com/Auto-Tournament/auto-tournament/pull/628))
+
+## v3.0.0-beta.57
+
+<p className="text-sm text-fd-muted-foreground">2026-10-07 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.57)</p>
+
+- feat(skins): a skin a player gets goes on if its slot is empty (Vikunja 1897) ([#597](https://github.com/Auto-Tournament/auto-tournament/pull/597))
+- fix(recorder): wait for long seeks to land; retry a failed clip in a fresh CS2, then skip it; a retry's reel joins the clips earlier jobs recorded ([#598](https://github.com/Auto-Tournament/auto-tournament/pull/598))
+- feat(highlights): placeholders while highlights are being recorded ([#599](https://github.com/Auto-Tournament/auto-tournament/pull/599))
+- feat(chat): a floating window in the lower right instead of a drawer; a pop for a new message ([#601](https://github.com/Auto-Tournament/auto-tournament/pull/601))
+- feat(recorder): H.265 / MP4 (GPU when NVENC opens), and a tighter edit ([#600](https://github.com/Auto-Tournament/auto-tournament/pull/600))
+- fix(manage): the rail fits the window with the tournament picker above it ([#603](https://github.com/Auto-Tournament/auto-tournament/pull/603))
+- feat(skins): a new skin goes first in the profile showcase ([#606](https://github.com/Auto-Tournament/auto-tournament/pull/606))
+- fix(recorder): H.264 1080p60 output, and reels keep the sound on the picture ([#607](https://github.com/Auto-Tournament/auto-tournament/pull/607))
+- perf(recorder): shorter waits between capture passes ([#608](https://github.com/Auto-Tournament/auto-tournament/pull/608))
+- fix(cs2): loadout in the CS2 tab on profiles, not a tab of its own ([#604](https://github.com/Auto-Tournament/auto-tournament/pull/604))
+- feat(manage): the rail is about the platform or one game; a tournament's pages get their own bar ([#610](https://github.com/Auto-Tournament/auto-tournament/pull/610))
+- feat(skins): click an equipped skin to take it off; the eye opens it ([#612](https://github.com/Auto-Tournament/auto-tournament/pull/612))
+- ci: Playwright system deps retry instead of stalling a shard ([#613](https://github.com/Auto-Tournament/auto-tournament/pull/613))
+
 ## v3.0.0-beta.56
 
 <p className="text-sm text-fd-muted-foreground">2026-10-07 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.56)</p>
