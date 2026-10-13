@@ -25,10 +25,10 @@ If you run 2.4.x for Counter-Strike 2, the short version is: back up, change one
 
 ### What does not change
 
-Nothing in your `docker-compose.yml` has to change except the image name, and even that is optional:
+Two things change: the database name in `.env` (required) and the image name (optional):
 
 - The Compose service is still `matchzy-tournament`, and the containers are still `matchzy-tournament-api` and `matchzy-postgres`.
-- The database is still `matchzy_tournament`, on the same volume.
+- The database is renamed from `matchzy_tournament` to `auto_tournament` on the first start, on the same volume. Your data stays; you only set `DB_NAME=auto_tournament` (below).
 - Every environment variable in your `.env` keeps its name and its meaning, and 3.0 adds no required ones. The new things you can turn on, such as game search, are configured in the app's own settings.
 - The app still listens on port 3069.
 
@@ -123,40 +123,33 @@ Again, "No such file or directory" just means you never uploaded any. `./data/ma
 
 <Step>
 
-### Change the image name and database name
+### Set the database name, and change the image name
 
-Open `docker-compose.yml` and make two changes:
+3.0 calls the database `auto_tournament`. On its first start it renames your `matchzy_tournament` database to that, in place: same volume, same data. It needs `DB_NAME` to say the new name, and it refuses to start while it still says `matchzy_tournament`.
 
-1. Update the image name of the `matchzy-tournament` service:
+Set it in `.env` (replace the line if `DB_NAME` is already there):
+
+```bash
+grep -q '^DB_NAME=' .env && sed -i.bak 's/^DB_NAME=.*/DB_NAME=auto_tournament/' .env || echo 'DB_NAME=auto_tournament' >> .env
+```
+
+Then the image. Open `docker-compose.yml`, find the `image:` line of the `matchzy-tournament` service, and set the new name:
 
 ```yaml title="docker-compose.yml"
 services:
   matchzy-tournament:
     image: sivertio/auto-tournament:next
-    environment:
-      - POSTGRES_DB=${DB_NAME:-auto_tournament}
-      - DATABASE_URL=postgresql://${DB_USER:-postgres}:${DB_PASSWORD:-postgres}@postgres:5432/${DB_NAME:-auto_tournament}
 ```
 
-2. Update `.env` to set the database name:
+Or from the shell, keeping a copy of the old file as `docker-compose.yml.bak`:
 
 ```bash
-echo "DB_NAME=auto_tournament" >> .env
+sed -i.bak 's#sivertio/matchzy-auto-tournament:[^ ]*#sivertio/auto-tournament:next#' docker-compose.yml
 ```
 
-Or make the image change from the shell, keeping a copy of the old file as `docker-compose.yml.bak`:
+`next` is the 3.0 beta. Once 3.0 is released, a fixed version like `3.0.0` is worth using, because it makes going back a one-line change; see the [tags on Docker Hub](https://hub.docker.com/r/sivertio/auto-tournament/tags). `ghcr.io/auto-tournament/auto-tournament` works too.
 
-```bash
-sed -i.bak 's#sivertio/matchzy-auto-tournament#sivertio/auto-tournament#' docker-compose.yml
-```
-
-**Why both changes?** 3.0 renames the database from `matchzy_tournament` to `auto_tournament`. The schema is the same, but the database itself is new. On first start, 3.0 handles the migration.
-
-Use `next` to get the latest development build, or check [available tags on Docker Hub](https://hub.docker.com/r/sivertio/auto-tournament/tags) to pin a specific release. `sivertio/auto-tournament:latest` also works, as does `ghcr.io/auto-tournament/auto-tournament:next` if you would rather pull from GitHub.
-
-Change **only** the image and `DB_NAME`. Keep the service name, the container names, and the volumes as they are.
-
-You can also skip this step entirely and stay on `sivertio/matchzy-auto-tournament`, which gets the same 3.0 build.
+Keep the service name, the container names and the volumes as they are. The image name is optional: `sivertio/matchzy-auto-tournament` gets the same 3.0 build. `DB_NAME` is not.
 
 </Step>
 
@@ -256,7 +249,7 @@ services:
     image: sivertio/matchzy-auto-tournament:2.4.15
 ```
 
-Also remove `DB_NAME=auto_tournament` from your `.env`, or set it back to `matchzy_tournament`. The 2.4 image expects the old database name.
+Keep `DB_NAME=auto_tournament` in `.env`: 3.0 renamed the database, and 2.4.15 reads whatever name `DB_NAME` gives it.
 
 If you used the `sed` command above, `mv docker-compose.yml.bak docker-compose.yml` puts the old file back; then pin `2.4.15` in it, so a later `pull` does not fetch 3.0 again through `latest`.
 
@@ -301,6 +294,7 @@ Use your own backup's file name. `dropdb` deletes everything, including whatever
 ## If something goes wrong
 
 - **The app will not start.** `docker compose logs matchzy-tournament` usually names the cause. A missing value in `.env` and a database it cannot reach are the two common ones.
-- **Your data looks empty.** Almost always a changed `DB_NAME`, or a volume that was recreated. Check that `docker-compose.yml` still points at the same database and the same volume as before.
+- **It won't start, and the log talks about the database name.** `DB_NAME` still says `matchzy_tournament` (set it to `auto_tournament`), or the 2.x container is still running and connected to the old database (stop it first). The log line says which, and the exact command when the database user may not rename it.
+- **Your data looks empty.** Almost always a volume that was recreated, or a database called `auto_tournament` that already existed next to the old one (the log says *both exist*). Check that `docker-compose.yml` still points at the same volume as before.
 - **A server shows a plugin version mismatch.** Update the plugin on every server to the same version. See [Server health warnings](/reference/servers-health).
 - **Anything else.** [Troubleshooting](/reference/troubleshooting), or ask on [Discord](https://discord.gg/n7gHYau7aW).
