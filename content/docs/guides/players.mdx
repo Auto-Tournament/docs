@@ -16,7 +16,7 @@ This page is for players in a CS2 tournament. Organisers can send it to their te
 
 ### Sign in
 
-Open the tournament address your organiser gave you, for example `https://tournament.example.com`, and sign in with any of the buttons, such as Steam, Discord or Google. You land on your own player page. You can always get back to it with **My profile** in the top bar.
+Open the tournament address your organiser gave you, for example `https://tournament.example.com`, and sign in with any of the buttons, such as Steam, Discord or Google. You land on Home, which shows your next match. Your own profile is under **My profile** in the account menu.
 
 For CS2, your account needs Steam: the server lets players in by Steam ID. If you signed in another way, open **Account settings** in the account menu and connect Steam.
 
@@ -28,7 +28,9 @@ If the page says you are not registered, ask the organiser to add you to your te
 
 ### Wait for your match
 
-Your player page shows your next match. Before the organiser starts the tournament, it says the match is waiting. Keep the page open. It updates by itself when something happens.
+Home shows your next match, and so do your profile, your team's page and the tournament's Overview. Each has an **Open match room** button: the match room is where you play the match from. The **Your match** button in the top bar always opens it too.
+
+Before the organiser starts the tournament, the match room says the match is waiting. Keep the page open. It updates by itself when something happens.
 
 </Step>
 
@@ -36,7 +38,7 @@ Your player page shows your next match. Before the organiser starts the tourname
 
 ### Do the map veto
 
-In best of 1, 3 and 5 matches, the two teams ban and pick maps on their player pages. When it is your team's turn, the page shows **YOUR TEAM'S TURN TO BAN A MAP** (or to pick a map or a side). Click a map to choose it. Any player on the team can make the choice, so agree in your team who does it.
+In best of 1, 3 and 5 matches, the two teams ban and pick maps in the match room. When it is your team's turn, the room shows **YOUR TEAM'S TURN TO BAN A MAP** (or to pick a map or a side). Click a map to choose it. Any player on the team can make the choice, so agree in your team who does it.
 
 The order of bans and picks is in [Map veto](/guides/running-matches#map-veto). Shuffle tournaments have no veto.
 
@@ -46,13 +48,13 @@ The order of bans and picks is in [Map veto](/guides/running-matches#map-veto). 
 
 ### Join the server
 
-When a server is ready, the player page shows it. Click **Connect to Server** to start CS2 and join. You can also click **Copy Console Command** and paste the command into the CS2 console. It looks like this:
+When a server is ready, the match room shows it. Click **Connect to Server** to start CS2 and join. You can also click **Copy Console Command** and paste the command into the CS2 console. It looks like this:
 
 ```text
 connect 192.168.1.100:27015
 ```
 
-If no server is free yet, the page says it is waiting for a server.
+If no server is free yet, the match room says it is waiting for a server.
 
 </Step>
 
@@ -76,7 +78,7 @@ During the match you can use chat commands such as `.pause`, `.tech` and `.unpau
 
 ### After the match
 
-The result shows on your player page and the team page. In a tournament, your next match appears on your player page when it is ready.
+The result shows in the match room, on your profile and on your team's page. In a tournament, your next match appears on Home when it is ready.
 
 </Step>
 
@@ -84,7 +86,7 @@ The result shows on your player page and the team page. In a tournament, your ne
 
 ## The team page
 
-Every team has a page at `/team/<team-id>`, for example `https://tournament.example.com/team/navi`. It shows the current match, the roster, the team's stats and its match history, and anyone with the link can open it. The veto and the join button are on your player page, not on the team page.
+Every team has a page at `/team/<team-id>`, for example `https://tournament.example.com/team/navi`. It shows the team's next match, the roster, the team's stats and its match history, and anyone with the link can open it. The veto and the join button are in the match room, which the team page links to.
 
 ## Problems
 

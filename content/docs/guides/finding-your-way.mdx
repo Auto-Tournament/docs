@@ -1,0 +1,51 @@
+---
+title: Finding your way
+description: Where things are in Auto Tournament - the top bar, the match room, the team page and Manage.
+icon: Compass
+---
+
+Each thing in Auto Tournament has one page, and the other pages link to it.
+
+## The top bar
+
+| Item | What it opens |
+| --- | --- |
+| The logo | **Home**: your next match, live tournaments and your teams. |
+| **Play** | Matchmaking: the queue, your party and the lobby. Only when matchmaking is on. |
+| **Tournaments** | Every tournament on the site (`/tournaments`). |
+| **Leaderboards** | Ratings per game. With matchmaking on, a **Matchmaking** mode shows its ladder. |
+| **Community** | **Teams** and **Players** (`/community/teams`, `/community/players`), and a game's own pages such as **Highlights**. |
+| **Manage** | Admins only: the admin dashboard. |
+
+When you have a match, a button in the top bar says where it stands (for example "Your turn in veto") and opens its match room.
+
+## The match room
+
+Every match has one page, `/match/<slug>`. Everyone sees the result, the maps and what the game recorded. A player in the match also gets their part while it is on: the map veto, the server with **Connect to Server**, and the live score. For games without servers, it has the form to report the result.
+
+Home, your profile, your team's page and the tournament's Overview show your next match with an **Open match room** button.
+
+## Teams and players
+
+- A team's page is `/team/<team-id>`: the roster, stats, history and its next match. Captains and owners manage the roster at `/team/<team-id>/manage`.
+- A player's page is `/player/<id>`.
+
+## Manage
+
+**Manage** is the admin dashboard, with its own header in place of the top bar. **Back to site** returns to the public pages. The menu on the left is the whole admin menu:
+
+| Group | Pages |
+| --- | --- |
+| **Home** | **Needs you**: what to decide now, and the site at a glance. |
+| **Tournaments** | The tournaments being run or set up, then **All tournaments**. |
+| **History** | Every played match (with **Import**), and highlights. |
+| **People** | Teams, players and reports. |
+| **Setup** | Templates and ratings, modules, settings, license, system. |
+
+A game adds its own pages, for example CS2's **Servers** and **Maps**.
+
+One tournament has its own address in Manage, `/manage/tournaments/<id>/…`, with tabs: **Matches**, **Bracket**, **Disputes** (games with reported results), **Setup** and its public page. A link to one of them always opens that tournament.
+
+## Old addresses
+
+Old links keep working: `/browse`, `/browse/teams`, `/browse/players`, `/t/team/<id>`, `/play/leaderboard`, `/tournament/<id>/match`, `/manage/tournament`, `/manage/bracket`, `/manage/matches` and `/manage/disputes` all send you to their new place.
