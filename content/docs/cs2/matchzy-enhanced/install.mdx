@@ -6,6 +6,10 @@ icon: Download
 
 import { Step, Steps } from 'fumadocs-ui/components/steps';
 
+<Callout title="Older plugin, still supported">
+  MatchZy Enhanced still works with Auto Tournament: 1.4.x with Auto Tournament 2.x, and 2.0 or newer with 3.0 ([which version](/modules/cs2/matchzy-enhanced#which-version-for-which-platform)). For new setups on Auto Tournament 3.0, use [Ready Up](/cs2/ready-up): the platform links to it over the fleet link, and [CS2 Server Manager](/cs2/server-manager) installs it.
+</Callout>
+
 <Callout>
   If you use [CS2 Server Manager](/cs2/server-manager), it installs and updates the plugin for you. You can skip this page.
 </Callout>
@@ -38,12 +42,12 @@ Install both on the server and check that CounterStrikeSharp loads. Follow the C
 
 ### Download and copy the plugin
 
-The release zip has one top folder, `MatchZy-<version>/`. Copy what is **inside** that folder into the server's `game/csgo/` folder. Change `VERSION` to the [latest release](https://github.com/Auto-Tournament/cs2-plugin/releases/latest) and `CS2_DIR` to your server path:
+The release zip has one top folder, `MatchZy-<version>/`. Copy what is **inside** that folder into the server's `game/csgo/` folder. Change `VERSION` to the [latest release](https://github.com/Auto-Tournament/matchzy-enhanced/releases/latest) and `CS2_DIR` to your server path:
 
 ```bash
 VERSION=1.4.33
 CS2_DIR=/home/steam/cs2
-curl -L -o /tmp/MatchZy.zip "https://github.com/Auto-Tournament/cs2-plugin/releases/download/v${VERSION}/MatchZy-${VERSION}.zip"
+curl -L -o /tmp/MatchZy.zip "https://github.com/Auto-Tournament/matchzy-enhanced/releases/download/v${VERSION}/MatchZy-${VERSION}.zip"
 unzip -q -o /tmp/MatchZy.zip -d /tmp
 cp -r "/tmp/MatchZy-${VERSION}/." "${CS2_DIR}/game/csgo/"
 ```

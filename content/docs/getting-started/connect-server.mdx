@@ -13,7 +13,7 @@ The platform doesn't run CS2 itself. It runs CS2 dedicated servers on **machines
 - Linux (Debian or Ubuntu) on `x86_64` or `arm64`, and an account with `sudo`. The servers run as that account.
 - About 71 GB of disk for CS2, plus about 2 GB per server, and 8 GB RAM or more.
 - It reaches the platform at `FRONTEND_BASE_URL`. The platform never connects to the machine, so the machine needs no open inbound port for the platform; players need the game ports (UDP `27015`, `27025`, … one per server).
-- A Game Server Login Token per server if players join over the internet. A LAN doesn't need one.
+- No Game Server Login Token: players join from the match page. See [Game Server Login Token](/modules/cs2/server-requirements#game-server-login-token).
 
 How many servers per machine depends on the CPU: a match server mostly uses one or two cores. One server on a 4-core mini PC is comfortable; a big server takes many.
 

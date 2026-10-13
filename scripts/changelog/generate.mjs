@@ -37,7 +37,7 @@ const products = [
     title: 'Ready Up changelog',
     description: 'Release notes for each version of Ready Up, the native CS2 server plugin.',
     docs: '/cs2/ready-up',
-    intro: 'Ready Up is the native CS2 server plugin that replaces Auto Tournament CS2.',
+    intro: 'Ready Up is the native CS2 server plugin that replaces MatchZy Enhanced for new setups.',
   },
   {
     slug: 'csm',
@@ -49,14 +49,14 @@ const products = [
     intro: 'CS2 Server Manager (`csm`) runs several CS2 servers on one Linux machine.',
   },
   {
-    slug: 'cs2-plugin',
-    repo: 'Auto-Tournament/cs2-plugin',
-    name: 'Auto Tournament CS2 (formerly MatchZy Enhanced, ME)',
-    title: 'Auto Tournament CS2 changelog',
-    description: 'Release notes for each version of Auto Tournament CS2, formerly MatchZy Enhanced (ME).',
-    docs: '/cs2/plugin',
+    slug: 'matchzy-enhanced',
+    repo: 'Auto-Tournament/matchzy-enhanced',
+    name: 'MatchZy Enhanced (ME)',
+    title: 'MatchZy Enhanced changelog',
+    description: 'Release notes for each version of MatchZy Enhanced (ME), the MatchZy-based CS2 plugin.',
+    docs: '/cs2/matchzy-enhanced',
     intro:
-      'Auto Tournament CS2 was called **MatchZy Enhanced** (ME) before 2.0.0, and its releases were titled MatchZy. [Ready Up](/reference/changelog/ready-up) replaces it.',
+      'MatchZy Enhanced (ME) is the MatchZy-based CS2 plugin. Releases before 2.0.0 were titled MatchZy, and 2.0.0 was briefly titled Auto Tournament CS2. [Ready Up](/reference/changelog/ready-up) is the plugin for new Auto Tournament 3.0 setups.',
   },
 ];
 

@@ -16,10 +16,12 @@ The folder mirrors the server's `game/` folder. `csm` copies it over the servers
 
 | Your file | Goes to |
 | --- | --- |
-| Plugin settings | `~/overrides/game/csgo/cfg/MatchZy/config.cfg` |
-| Plugin database | `~/overrides/game/csgo/cfg/MatchZy/database.json` |
+| Ready Up settings | `~/overrides/game/csgo/cfg/ReadyUp/` (`readyup.cfg` and one file per plugin) |
+| MatchZy Enhanced settings | `~/overrides/game/csgo/cfg/MatchZy/config.cfg` |
+| MatchZy Enhanced database | `~/overrides/game/csgo/cfg/MatchZy/database.json` |
 | CS2 configs | `~/overrides/game/csgo/cfg/` |
 
+`~` is the home folder of the account that runs csm.
 
 After a change, copy it to the servers. This also restarts them:
 
@@ -79,7 +81,7 @@ If you cannot update the plugin, switch to SQLite: set `"DatabaseType": "SQLite"
 
 ## Where csm keeps its own files
 
-`csm` keeps its state and logs in your home folder. To use another folder, set `CSM_ROOT` every time you run `csm`:
+`csm` keeps its state, logs and servers in the home folder of the account that runs it. To use another folder, set `CSM_ROOT` every time you run `csm`:
 
 ```bash
 CSM_ROOT=/srv/csm csm

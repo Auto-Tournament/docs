@@ -9,7 +9,7 @@ icon: Wrench
 App log:
 
 ```bash
-docker compose logs -f matchzy-tournament
+docker compose logs -f auto-tournament
 ```
 
 In the app, **Admin Tools** has a **Server Events Monitor** that shows events from each server as they arrive, and the **Application Logs**.
@@ -26,11 +26,11 @@ csm logs 1 200
 
 - `FRONTEND_BASE_URL` must be exactly the address in your browser, including `http://` or `https://` and the port.
 - With an `https://` address, cookies are only sent over HTTPS. Behind a reverse proxy, the proxy must send `X-Forwarded-Proto`. See [Reverse proxy](/guides/reverse-proxy).
-- `STEAM_API_KEY` must be set for Steam login.
+- Steam login needs the Steam Web API key in **Settings → Sign-in → Steam**. The **Test** button there checks it.
 
 ### You are not admin
 
-Run `docker exec auto-tournament reset-admin`, open `/setup` with the code it prints and set a new admin password. Then give your Steam player admin under **Settings** > **Sign-in providers** > **Admin access**. See [Install](/getting-started/install#where-the-data-is).
+Ask an admin to turn on **Is admin** on your player, or add your email to **Admin emails** or your Steam64 ID to **Admin Steam IDs** in **Settings → Sign-in → Admin access**. If nobody can sign in as admin, run `docker exec auto-tournament reset-admin` on the host and open `/setup`. See [First login](/getting-started/first-login#locked-out).
 
 ### Everyone is logged out after a restart
 
@@ -54,8 +54,8 @@ Auto Tournament cannot reach the server over RCON.
 RCON works, but the server cannot send events back.
 
 1. On the CS2 machine, run `curl <webhook-url>/api/events/test`. It must answer `"success":true`.
-2. If it fails, fix the **Webhook URL** in **Settings** > **Integrations & Webhooks**, DNS or the firewall.
-3. Check that Auto Tournament CS2 (formerly MatchZy Enhanced) is loaded: run `css_plugins list` in the server console. The plugin still shows up as MatchZy.
+2. If it fails, fix the **Webhook URL** in **Settings → Counter-Strike 2**, DNS or the firewall.
+3. Check that MatchZy Enhanced is loaded: run `css_plugins list` in the server console. The plugin still shows up as MatchZy.
 4. Click **Retry** on the server.
 
 ### IP banned
@@ -88,7 +88,7 @@ Without CS2 Server Manager, update the server with SteamCMD and restart it. Then
 The CS2 plugin cannot reach **its own** database on the game server. This is not the Auto Tournament database.
 
 - With CS2 Server Manager and its MySQL container: run `csm`, open **Tools** and choose **MatchZy DB: verify/repair**.
-- With your own MySQL: check `game/csgo/cfg/MatchZy/database.json` (with CS2 Server Manager: `~/overrides/game/csgo/cfg/MatchZy/database.json`), that the database host is reachable, and the user and password.
+- With your own MySQL: check `game/csgo/cfg/MatchZy/database.json` (with CS2 Server Manager: `~/overrides/game/csgo/cfg/MatchZy/database.json` in the account that runs csm), that the database host is reachable, and the user and password.
 
 Restart the server and click **Refresh Status**.
 
@@ -102,7 +102,7 @@ csm update-plugins
 
 ### The same server shows up several times
 
-Several servers share one MySQL database with an old version of the CS2 plugin, or without a scope name. See [Several servers on one database](/cs2/plugin/install#several-servers-on-one-database).
+Several servers share one MySQL database with an old version of the CS2 plugin, or without a scope name. See [Several servers on one database](/cs2/matchzy-enhanced/install#several-servers-on-one-database).
 
 ## Tournaments and matches
 
@@ -116,7 +116,7 @@ Map veto needs a pool of exactly 7 maps. Use **Active Duty** or make a pool with
 
 ### Maps are missing
 
-Open **Settings** > **Integrations & Webhooks** and click **Sync CS2 Maps**. If GitHub rate-limits you, set `GITHUB_TOKEN` in `.env`.
+Open **Settings → Counter-Strike 2** and click **Sync CS2 Maps**. If GitHub rate-limits you, set `GITHUB_TOKEN` in `.env`.
 
 ### A match is stuck after a restart
 

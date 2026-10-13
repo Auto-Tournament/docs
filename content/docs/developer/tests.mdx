@@ -142,4 +142,10 @@ Things to know:
 
 ## In CI
 
-On each pull request, GitHub Actions runs lint, the typecheck ratchet, the i18n key check, the API docs check, and the E2E suite in 4 parallel jobs. Pull requests that only change docs skip the E2E jobs.
+On each pull request, GitHub Actions runs lint, the typecheck ratchet, the i18n key check, the API docs check, and the E2E suite.
+
+- **Only the affected specs.** `tests/ci-affected.mjs` picks the spec files a change can reach: the spec itself, its imports, the API routes it calls and what those routes import, and every UI spec for a client change. Shared files (dependencies, Docker, the Playwright config, the route tables, the database schema) run everything, and so does a server file no spec reaches. Docs-only changes run none. Pushes to `main` always run the whole suite. `node tests/ci-affected.mjs --explain <file>` shows which specs reach a file and why.
+- **Up to 16 shards**, sized to the selection: about 40 seconds of tests each. Files are packed by measured duration (`tests/ci-shard-weights.json`), and a file is never split across shards.
+- **One image build.** The app is compiled on the runner and packed into the release image (`APP_BUILD=prebuilt`), while the shards set themselves up in parallel.
+
+A full run takes about 3 minutes.

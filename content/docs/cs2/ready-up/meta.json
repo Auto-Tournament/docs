@@ -1,6 +1,6 @@
 {
   "title": "Ready Up",
-  "description": "The native CS2 server plugin that will replace Auto Tournament CS2",
+  "description": "The native CS2 server plugin that will replace MatchZy Enhanced",
   "icon": "BadgeCheck",
   "root": true,
   "pages": [

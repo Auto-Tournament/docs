@@ -4,6 +4,10 @@ description: Chat commands for players and admins, and console commands for the 
 icon: SquareTerminal
 ---
 
+<Callout title="Older plugin, still supported">
+  MatchZy Enhanced still works with Auto Tournament: 1.4.x with Auto Tournament 2.x, and 2.0 or newer with 3.0 ([which version](/modules/cs2/matchzy-enhanced#which-version-for-which-platform)). For new setups on Auto Tournament 3.0, use [Ready Up](/cs2/ready-up): the platform links to it over the fleet link, and [CS2 Server Manager](/cs2/server-manager) installs it.
+</Callout>
+
 Players type chat commands with a dot, for example `.ready`. Most also work with `!` (`!ready`) and as a console command with `css_` (`css_ready`).
 
 With Auto Tournament, admins usually control matches from the web app. See [Running matches](/guides/running-matches#admin-controls). The chat commands below still work on the server.
@@ -29,7 +33,7 @@ With Auto Tournament, admins usually control matches from the web app. See [Runn
 
 ## Admin commands
 
-See [Who is an admin](/cs2/plugin/configuration#who-is-an-admin).
+See [Who is an admin](/cs2/matchzy-enhanced/configuration#who-is-an-admin).
 
 | Command | What it does |
 | --- | --- |
@@ -100,6 +104,6 @@ If you load a match while the last series is still in postgame, it does not load
 | `matchzy_reload_config` | Run `cfg/MatchZy/config.cfg` again. |
 | `reload_admins` | Load `cfg/MatchZy/admins.json` again. |
 
-All settings on the [Configuration](/cs2/plugin/configuration) page are console commands too. Run them with a value to change a setting on a running server.
+All settings on the [Configuration](/cs2/matchzy-enhanced/configuration) page are console commands too. Run them with a value to change a setting on a running server.
 
 The plugin also accepts the Get5 names of some commands (`get5_loadmatch_url`, `get5_remote_log_url` and others), for tools made for Get5.

@@ -4,7 +4,7 @@ description: Fixes for common csm problems.
 icon: LifeBuoy
 ---
 
-For problems between Auto Tournament and the servers, see the main [Troubleshooting](/reference/troubleshooting) page. For plugin problems, see [CS2 plugin troubleshooting](/cs2/plugin/troubleshooting).
+For problems between Auto Tournament and the servers, see the main [Troubleshooting](/reference/troubleshooting) page. For plugin problems, see [CS2 plugin troubleshooting](/cs2/matchzy-enhanced/troubleshooting).
 
 ## Start with doctor
 
@@ -15,7 +15,7 @@ csm doctor
 `doctor` checks the most common problems and offers a fix for each one it finds:
 
 - **SteamCMD available**, and the SteamCMD wrapper in `/usr/bin/steamcmd`.
-- **Ownership under `/home/<cs2user>`**: files owned by root instead of the CS2 user.
+- **Ownership in your home folder**: files owned by root instead of your account. `sudo csm setup-host --skip-deps` fixes it.
 - **Steam Runtime installed (SteamRT3)**, on systems that need it.
 - **CS2 shared libs (libv8.so) present** on each server.
 - **MatchZy per-server config (shared database)**: servers on one MySQL database that would overwrite each other's settings.
