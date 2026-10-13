@@ -33,7 +33,7 @@ Run `csm` with no command to open the menu. Run `csm help` for a short list in t
 | --- | --- |
 | `csm update-game` | Update CS2 on all servers after a Valve update. Stops and starts the servers. |
 | `csm update-server <server>` | Update CS2 on one server. |
-| `csm update-plugins` | Download Metamod, CounterStrikeSharp and the CS2 plugin, copy them and your overrides to all servers, and restart them. |
+| `csm update-plugins` | Install or update Ready Up on all servers, copy your overrides and restart them. |
 | `csm monitor` | Run the update monitor once. It updates stopped servers and idle running servers. |
 | `csm updates hold on\|off` | Stop or allow automatic updates by the monitor, for example during an event. Saved across reboots. |
 | `csm updates status` | Show whether updates are on hold and the idle grace period. |
@@ -45,7 +45,7 @@ Run `csm` with no command to open the menu. Run `csm help` for a short list in t
 
 | Command | What it does |
 | --- | --- |
-| `sudo csm setup-host [--skip-deps] [--skip-linger] [--docker]` | One-time host setup for the account you run it from: packages, lingering and `csm`'s files. `--docker` also adds the `docker` group, for the legacy stack's MySQL container. Never touches servers. |
+| `sudo csm setup-host [--skip-deps] [--skip-linger]` | One-time host setup for the account you run it from: packages, lingering and `csm`'s files. Never touches servers. |
 | `sudo csm install-deps` | Install the system packages `csm` needs with `apt`. |
 | `sudo csm self-update` | Update `csm` itself to the latest release. |
 | `csm bootstrap` | Install or redeploy the servers without the menu. Options come from environment variables, see [Install without the menu](/cs2/server-manager/install#install-without-the-menu). |
@@ -57,7 +57,7 @@ Run `csm` with no command to open the menu. Run `csm help` for a short list in t
 | `csm extract-map-data` | Extract map preview images and icons. See [Map thumbnails](/cs2/server-manager/maps). |
 | `csm extract-skin-data` | Extract weapon skin images and `skins.json`. |
 | `csm logdir` | Show the `csm` log folder and the latest command logs. |
-| `sudo csm cleanup-all [--user <name>] [--delete-user]` | Delete your servers, their files and the MySQL container. Your account stays; `--delete-user` deletes a dedicated service account from an older install. See [Remove everything](/cs2/server-manager/install#remove-everything). |
+| `sudo csm cleanup-all [--user <name>] [--delete-user]` | Delete your servers and their files. Your account stays; `--delete-user` deletes a dedicated service account from an older install. See [Remove everything](/cs2/server-manager/install#remove-everything). |
 
 ## RCON bans
 
@@ -87,8 +87,6 @@ Set these in front of the command, for example `CSM_LAUNCH_MODE=alternate csm re
 | --- | --- |
 | `CSM_LAUNCH_MODE` | `alternate` or `binary`: launch mode for every start, also in updates and the monitor. |
 | `CSM_STEAMRT` | `1` forces the Steam Runtime (SteamRT3) launcher on, `0` forces it off. By default it is on for Debian 13+ and Ubuntu 25.04+. |
-| `CSM_METAMOD_VERSION` | Metamod release tag for `update-plugins`, or `latest`. Default `2.0.0.1411`. |
-| `CSM_MATCHZY_SCOPE_PREFIX` | Prefix for the plugin scope name, instead of the hostname. |
 | `CSM_VPK_HARDLINK` | `0` turns off VPK hardlinks. New copies are full copies. |
 | `CSM_ROOT` | Folder for csm's state, logs and servers. Default: the home folder of the account that runs csm. |
 | `CSM_LOG_DIR` | Folder for `csm` logs. Default `<CSM_ROOT>/logs`. |

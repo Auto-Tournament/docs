@@ -18,7 +18,6 @@ csm doctor
 - **Ownership in your home folder**: files owned by root instead of your account. `sudo csm setup-host --skip-deps` fixes it.
 - **Steam Runtime installed (SteamRT3)**, on systems that need it.
 - **CS2 shared libs (libv8.so) present** on each server.
-- **MatchZy per-server config (shared database)**: servers on one MySQL database that would overwrite each other's settings.
 
 Add `--yes` to apply all fixes without questions, or `--server 2` to check one server. Without a terminal (for example from a script), `doctor` only applies fixes with `--yes`.
 
@@ -70,7 +69,7 @@ Use `0` for all servers. `doctor` offers the same fix.
 
 ## Debian 13 and Ubuntu 25.04
 
-On Debian 13 and newer, and Ubuntu 25.04 and newer, CounterStrikeSharp can fail to load with the system libraries ([CounterStrikeSharp #1024](https://github.com/roflmuffin/CounterStrikeSharp/issues/1024)). On these systems `csm` installs Steam Runtime (SteamRT3, Steam app `1628350`) into `~/steamrt` and starts the servers through it.
+On Debian 13 and newer, and Ubuntu 25.04 and newer, `csm` installs Steam Runtime (SteamRT3, Steam app `1628350`) into `~/steamrt` and starts the servers through it.
 
 If it is missing, `doctor` offers to install it. To force Steam Runtime on or off on any system:
 
@@ -91,10 +90,6 @@ ln -sf ~/.local/share/Steam/steamcmd/linux64/steamclient.so ~/.steam/sdk64/steam
 csm restart
 ```
 
-## `Plugin uses old SourceHook Metamod build`
-
-Metamod is too new for the current CounterStrikeSharp. Run `csm update-plugins`. It installs Metamod `2.0.0.1411`, which works.
-
 ## Game files are broken
 
 Rebuild one server from `master-install`:
@@ -106,10 +101,6 @@ csm reinstall 2
 ## `Unable to locate package steamcmd`
 
 Run `sudo csm install-deps`. It turns on the apt source that has SteamCMD and tries again. See [Install](/cs2/server-manager/install#if-steamcmd-cannot-be-installed) to do it by hand.
-
-## The same server shows up several times in Auto Tournament
-
-The servers share one MySQL database and overwrite each other's settings. Run `csm doctor` and follow the steps under **MatchZy per-server config (shared database)**. See [Several servers on one database](/cs2/server-manager/configuration#several-servers-on-one-database).
 
 ## Other problems during install
 

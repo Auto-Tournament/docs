@@ -2,8 +2,8 @@
   "title": "CS2 servers",
   "pages": [
     "[Trophy][Host a CS2 tournament](/guides/host-cs2-tournament)",
-    "plugin",
     "ready-up",
-    "server-manager"
+    "server-manager",
+    "plugin"
   ]
 }

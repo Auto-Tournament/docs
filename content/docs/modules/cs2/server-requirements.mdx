@@ -12,7 +12,6 @@ For CS2 Server Manager:
 - An ordinary user account to run csm, with `sudo` for the one-time `sudo csm setup-host`. csm refuses to run as root.
 - At least 8 GB RAM, and 1 to 2 GB more for each server.
 - About 70 GB of disk for CS2. In instance mode every server shares that one install, so ten servers need about as much disk as one; without it, each server is a full copy. See [How much disk? in the csm README](https://github.com/Auto-Tournament/cs2-server-manager/blob/master/README.md#how-much-disk).
-- Docker only for the older MatchZy Enhanced stack's shared MySQL database.
 
 ## Software on each server
 
@@ -22,16 +21,7 @@ With **Ready Up**:
 - [Ready Up](/cs2/ready-up). No Metamod:Source or CounterStrikeSharp.
 - GOTV on (`tv_enable 1`) if you want demos.
 
-With **MatchZy Enhanced**:
-
-- CS2 dedicated server (Steam app 730), kept up to date.
-- Metamod:Source. Use `2.0.0.1411` for now, see the note in [Install MatchZy Enhanced](/cs2/matchzy-enhanced/install#install-metamodsource-and-counterstrikesharp).
-- CounterStrikeSharp.
-- [MatchZy Enhanced](/cs2/matchzy-enhanced), the same version on all servers.
-- An RCON password.
-- GOTV on (`tv_enable 1`) if you want demos.
-
-CS2 Server Manager installs either stack.
+CS2 Server Manager installs Ready Up.
 
 ### SteamCMD on Debian and Ubuntu
 
