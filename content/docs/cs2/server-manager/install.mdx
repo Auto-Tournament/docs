@@ -12,7 +12,6 @@ import { Step, Steps } from 'fumadocs-ui/components/steps';
 - A Linux account with `sudo` access. The servers run as that account: `csm` itself runs without `sudo`, and only the one-time host setup needs it. Use a separate account for the servers if you don't want them under your own login. csm refuses to run as root.
 - At least 8 GB RAM, and 1 to 2 GB more for each server.
 - About 70 GB of disk for CS2. In instance mode all servers share it; in classic mode each extra server adds about 2 GB.
-- Docker only for the legacy MatchZy Enhanced plugin with its shared MySQL database (Auto Tournament 2.x). Ready Up needs no database. See the [Docker install guide](https://docs.docker.com/engine/install/); `csm` does not install Docker for you.
 
 csm installs the other packages it needs (SteamCMD, tmux, rsync, the 32-bit libraries and more) with `apt`. See [Server requirements](/modules/cs2/server-requirements) for the network ports.
 
@@ -56,8 +55,6 @@ sudo csm setup-host
 ```
 
 It installs the packages `csm` needs (and accepts the Steam license the `steamcmd` package asks for), lets your account's services keep running after you log out (systemd lingering), and gives your account `csm`'s files. Leave out a step with `--skip-deps` or `--skip-linger`.
-
-Only for the legacy MatchZy Enhanced plugin with the shared MySQL database: add `--docker`. It starts Docker and adds your account to the `docker` group; log out and back in afterwards. Members of that group can control every container on the machine.
 
 </Step>
 
@@ -103,18 +100,16 @@ csm agent install
 
 Get the one-time code from **Servers → Machines → Add machine** in Auto Tournament, and paste it when `csm link` asks. Then create servers from the machine's card. The platform installs CS2 and Ready Up, and each server enrolls itself. See [Host a CS2 tournament](/guides/host-cs2-tournament).
 
-**On its own**, or for Auto Tournament 2.x: run `csm`, and in the menu choose **Install** > **Install or redeploy servers**. The installer asks for:
+**On its own**: run `csm`, and in the menu choose **Install** > **Install or redeploy servers**. The installer asks for:
 
-- **Plugins:** Ready Up (the default, for Auto Tournament 3.x) or the legacy MatchZy Enhanced stack (for 2.x).
 - **Ready Up license:** noncommercial (free: your own servers, a club, a school, a free event) or commercial (needs a paid license key).
-- Legacy stack only: **MatchZy storage**, shared MySQL in a Docker container or one SQLite file per server, or your own MySQL server.
 - **Number of servers.** The default is 3.
 - **Game port and GOTV port** of server 1. The defaults are `27015` and `27020`.
-- **Hostname prefix, RCON password and max players.** Change the default RCON password. You enter this password in Auto Tournament.
+- **Hostname prefix, RCON password and max players.** Change the default RCON password.
 - **GSLT.** Leave it empty. A GSLT only lists the server in the in-game server browser, and Valve can ban it on a server with the skins plugin. See [Game Server Login Token](/modules/cs2/server-requirements#game-server-login-token).
 - Update options: validate the game files with SteamCMD, update the plugins, and install the [update monitor](/cs2/server-manager/updates#the-update-monitor).
 
-A fresh install uses Ready Up. For Auto Tournament 2.x, switch to the MatchZy Enhanced stack first with `csm plugins stack legacy`. See [Plugins and updates](/cs2/server-manager/updates).
+csm installs [Ready Up](/cs2/ready-up), the native CS2 plugin, on every server. csm 1.23 and newer no longer install MatchZy Enhanced, which Auto Tournament 3.x does not support. See [Plugins and updates](/cs2/server-manager/updates).
 
 </Step>
 
@@ -130,7 +125,7 @@ The first install downloads CS2, about 70 GB. This can take a long time.
 
 ### Open the ports
 
-Open the game ports and GOTV ports in your firewall. See [Ports](#ports) for the numbers. Players need UDP. MatchZy Enhanced servers also need TCP on the game port for RCON from Auto Tournament; Ready Up servers need no inbound port for the platform.
+Open the game ports and GOTV ports in your firewall. See [Ports](#ports) for the numbers. Players need UDP. Ready Up needs no inbound port for the platform: it connects out.
 
 </Step>
 
@@ -162,9 +157,6 @@ csm update-plugins                  # installs Ready Up on every server
 | `BASE_GAME_PORT`, `BASE_TV_PORT` | `27015`, `27020` | Ports of server 1. |
 | `HOSTNAME_PREFIX` | `CS2 Server` | Start of each server name. |
 | `RCON_PASSWORD` | a fixed default | RCON password. Always set it. |
-| `MATCHZY_DB_ENGINE` | `mysql` | Legacy stack only: `sqlite` for one SQLite file per server. |
-| `MATCHZY_SKIP_DOCKER` | `0` | Legacy stack only: `1` to skip the MySQL container. |
-| `ENABLE_METAMOD` | `1` | Legacy stack only: `0` to install without Metamod. |
 | `UPDATE_MASTER` | `1` | `0` to skip the game update. |
 | `FRESH_INSTALL` | `0` | `1` to start over from a clean install. |
 
@@ -184,7 +176,7 @@ On Debian, add `contrib` and `non-free` to your apt sources, then run `sudo apt-
 
 ## Remove everything
 
-This stops and deletes your servers, the master install, the shared config, the plugin files and the MySQL container with its data. Your account and the rest of your home directory stay:
+This stops and deletes your servers, the master install, the shared config, and the plugin files. Your account and the rest of your home directory stay:
 
 ```bash
 csm cleanup-all

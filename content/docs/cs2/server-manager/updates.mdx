@@ -26,19 +26,9 @@ csm update-server 2
 csm update-plugins
 ```
 
-This downloads the plugins, copies them and your [overrides](/cs2/server-manager/configuration#your-own-config-files) to every server, and restarts the servers. It installs:
+This installs [Ready Up](/cs2/ready-up), the native CS2 plugin, on every server (on an instance host, as a new shared layer), copies your [overrides](/cs2/server-manager/configuration#your-own-config-files) and restarts the servers. It follows the Ready Up release channel and license answer set with `csm plugins` (see `csm plugins -h`). A host linked to Auto Tournament gets Ready Up updates from the platform's **Update Ready Up** button instead.
 
-- **Metamod:Source `2.0.0.1411`.** This version is fixed on purpose. Metamod builds from 2026-09-08 do not work with the current CounterStrikeSharp release, which then fails with `Plugin uses old SourceHook Metamod build`.
-- **CounterStrikeSharp**, the latest release.
-- **[MatchZy Enhanced](/cs2/matchzy-enhanced)**, the latest release.
-
-`update-plugins` always installs the whole bundle, so it replaces a newer Metamod with the fixed version. To choose another Metamod build, set `CSM_METAMOD_VERSION` to a [release tag](https://github.com/alliedmodders/metamod-source/releases), or to `latest` for the newest build:
-
-```bash
-CSM_METAMOD_VERSION=2.0.0.1468 csm update-plugins
-```
-
-Keep all servers on the same plugin version. Auto Tournament shows **Version mismatch** when they differ.
+csm 1.23 and newer no longer install MatchZy Enhanced, Metamod or CounterStrikeSharp. Auto Tournament 3.x does not support MatchZy Enhanced.
 
 ## The update monitor
 
@@ -68,21 +58,13 @@ csm monitor
 
 ### How the monitor works
 
-When Steam reports a new CS2 version, the plugin writes this line to the server log:
-
-```text
-[MATCHZY_UPDATE_AVAILABLE] required_version=<number>
-```
-
-The monitor looks for this line in each server's log. When it finds one:
+When Steam reports a new CS2 version, CS2 writes `MasterRequestRestart` to the server log. The monitor looks for this line in each server's log. When it finds one:
 
 - A **stopped** server is updated and started.
-- A **running** server is updated only when it is idle. That means no players are connected, no match is loaded, and both have been true for the idle grace period (10 minutes by default). The monitor asks the server over RCON: `status` for players, and the plugin's `get5_status` for the match. If the server doesn't answer, the monitor treats it as busy and waits.
+- A **running** server is updated only when it is idle. That means no players are connected, no match is loaded, and both have been true for the idle grace period (10 minutes by default). Ready Up tells it whether a match is loaded and who is connected. If the server doesn't answer, the monitor treats it as busy and waits.
 - If **updates are on hold**, the monitor only logs that an update is available and restarts nothing. See [Hold updates during an event](#hold-updates-during-an-event).
 
-To update an idle server, the monitor announces the restart in chat, stops the server, updates it, starts it and checks that it answers RCON again. It does this one server at a time and never touches a server with players on it.
-
-The plugin's default `matchzy_safeautoupdater_action warn_only` is fine for this. The server keeps running and the monitor restarts it once it is idle.
+To update an idle server, the monitor announces the restart in chat, stops the server, updates it, starts it and checks that it comes back. It does this one server at a time and never touches a server with players on it.
 
 After an update, the monitor waits an hour before it updates the same server again, so a server that keeps reporting an update does not restart in a loop.
 

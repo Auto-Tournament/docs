@@ -19,7 +19,7 @@ If you run 2.4.x for Counter-Strike 2, the short version is: back up, change one
 - **The name.** MatchZy Auto Tournament (MAT) is now Auto Tournament. Menus and pages were rebuilt, so the app looks different. The tasks are the same ones.
 - **CS2 is a module, not the whole app.** Counter-Strike 2 now sits in a module next to a second one, [manual reporting](/guides/manual-reporting), which runs tournaments for games the platform cannot watch. A CS2 tournament still does everything it did: servers, veto, live scores, demos and stats.
 - **The licence changed.** 3.0 and everything after it are under the PolyForm Noncommercial License 1.0.0. [What that means for you](#the-licence-change) is below.
-- **MatchZy Enhanced 2.0 on CS2 servers.** 3.0 sets servers up with MatchZy Enhanced 2.0's settings (they start with `at_`), so servers on 1.4.x need an update, or a move to [Ready Up](/cs2/ready-up). See [Your CS2 servers](#your-cs2-servers).
+- **Ready Up on CS2 servers.** Auto Tournament 3.x does not support MatchZy Enhanced. Servers run [Ready Up](/cs2/ready-up), the native CS2 plugin. See [Your CS2 servers](#your-cs2-servers).
 - **There is a new image name.** `sivertio/auto-tournament` on Docker Hub, and `ghcr.io/auto-tournament/auto-tournament` on GitHub's registry.
 - **The docs moved** from `docs.sivert.io/docs/mat` to [docs.autotournament.gg](https://docs.autotournament.gg). Old links redirect to the matching new page.
 
@@ -203,9 +203,11 @@ The version must be 3.0 or newer. Then open the app, sign in, and check that you
 
 ### Your CS2 servers
 
-3.0 sets servers up with MatchZy Enhanced 2.0's settings, so servers on 1.4.x stop working until they are updated. Either update MatchZy Enhanced to 2.0 or newer on every server (see [Update MatchZy Enhanced](/cs2/matchzy-enhanced/install#update)), then open the **Servers** page, click **Refresh Status**, and **Retry** any server that is not set up. Or move the servers to [Ready Up](/cs2/ready-up).
+Auto Tournament 3.x does not support MatchZy Enhanced (it keeps working with 2.x). Move every server to [Ready Up](/cs2/ready-up), the native CS2 plugin: no Metamod or CounterStrikeSharp, and no RCON or webhook URL between the platform and the server.
 
-If CS2 Server Manager manages your servers, move that machine to [Ready Up](/cs2/ready-up): csm installs MatchZy Enhanced only for 2.x platforms. Run `csm plugins stack readyup` and `csm update-plugins`, then [link the machine](/getting-started/connect-server). From then on the platform creates, starts and updates its servers.
+If CS2 Server Manager manages your servers: update csm (`sudo csm self-update`; 1.23 and newer install only Ready Up), run `csm update-plugins`, then [link the machine](/getting-started/connect-server). From then on the platform creates, starts and updates its servers. The old `game/csgo/addons/` folders (Metamod, CounterStrikeSharp, MatchZy) are no longer used and can be deleted.
+
+Servers you run yourself or at a game host: [install Ready Up](/cs2/ready-up/install) and enroll each server.
 
 </Step>
 

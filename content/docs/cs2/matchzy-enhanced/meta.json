@@ -1,6 +1,6 @@
 {
-  "title": "MatchZy Enhanced",
-  "description": "The older CS2 plugin (MatchZy-based). Still supported; Ready Up is for new setups.",
+  "title": "MatchZy Enhanced (2.x)",
+  "description": "The CS2 plugin for Auto Tournament 2.x. Not supported in 3.x; use Ready Up.",
   "icon": "Plug",
   "root": true,
   "pages": [
