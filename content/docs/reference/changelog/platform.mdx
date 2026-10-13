@@ -7,6 +7,78 @@ description: Release notes for each version of the Auto Tournament platform.
 
 Versions before 3.0 were released as **MatchZy Auto Tournament** (MAT). Their notes are under [Earlier versions](#earlier-versions). **3.0 is in beta**: the `3.0.0-beta.N` releases below are the 3.0 notes until 3.0.0 ships. See [Upgrading to 3.0](/guides/upgrading-to-3). Newest first. Each entry is the [GitHub release](https://github.com/Auto-Tournament/auto-tournament/releases) for that version. [Docs](/).
 
+## v3.0.0-beta.95
+
+<p className="text-sm text-fd-muted-foreground">2026-10-13 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.95)</p>
+
+- test(fleet): a tournament started with every csm server stopped gets one ([#811](https://github.com/Auto-Tournament/auto-tournament/pull/811))
+- feat(matchmaking): public queue counts per mode for bots ([#812](https://github.com/Auto-Tournament/auto-tournament/pull/812))
+
+## v3.0.0-beta.94
+
+<p className="text-sm text-fd-muted-foreground">2026-10-13 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.94)</p>
+
+- fix(teams): team pictures fill their rounded tile ([#792](https://github.com/Auto-Tournament/auto-tournament/pull/792))
+- feat(teams): match rows open the match; the opponent's name opens their team ([#793](https://github.com/Auto-Tournament/auto-tournament/pull/793))
+- fix(notices): a lasting problem raises once, and a dismissal holds ([#794](https://github.com/Auto-Tournament/auto-tournament/pull/794))
+- feat(games): players in a CS2 demo or match play CS2 ([#796](https://github.com/Auto-Tournament/auto-tournament/pull/796))
+- fix(skins): profile favourites are two big and four small ([#795](https://github.com/Auto-Tournament/auto-tournament/pull/795))
+- fix(shuffle): players on the home card, no veto, Round N, and its match opens ([#798](https://github.com/Auto-Tournament/auto-tournament/pull/798))
+- feat(account): turn two-step verification on or off from the account page ([#799](https://github.com/Auto-Tournament/auto-tournament/pull/799))
+- test(teams): click the match row by position, not a stale bounding box ([#802](https://github.com/Auto-Tournament/auto-tournament/pull/802))
+- feat(notifications): per-kind settings for players, sounds, and browser notifications ([#797](https://github.com/Auto-Tournament/auto-tournament/pull/797))
+- feat(fleet): one machine, several csm users: a host per user ([#803](https://github.com/Auto-Tournament/auto-tournament/pull/803))
+- feat(skins): a dot chip says which side a skin is on ([#800](https://github.com/Auto-Tournament/auto-tournament/pull/800))
+- fix(import): refuse a non-CS2 demo when picked; padded panels ([#804](https://github.com/Auto-Tournament/auto-tournament/pull/804))
+- feat(autoscale): a server whose match is over stops at once when not needed ([#807](https://github.com/Auto-Tournament/auto-tournament/pull/807))
+- feat(players): profile match rows link the match and the opponent's team ([#801](https://github.com/Auto-Tournament/auto-tournament/pull/801))
+- feat(results): a "Spent the most money" award ([#805](https://github.com/Auto-Tournament/auto-tournament/pull/805))
+- fix: restore [#794](https://github.com/Auto-Tournament/auto-tournament/pull/794), [#796](https://github.com/Auto-Tournament/auto-tournament/pull/796), [#798](https://github.com/Auto-Tournament/auto-tournament/pull/798) and [#802](https://github.com/Auto-Tournament/auto-tournament/pull/802), undone by later merges ([#809](https://github.com/Auto-Tournament/auto-tournament/pull/809))
+- feat(skins): skin tryout servers and "Try them in game" on the inventory ([#808](https://github.com/Auto-Tournament/auto-tournament/pull/808))
+- feat(login): a visible link to the admin username + password sign-in ([#810](https://github.com/Auto-Tournament/auto-tournament/pull/810))
+- feat(modules): warn when a game's sign-in is turned off ([#806](https://github.com/Auto-Tournament/auto-tournament/pull/806))
+
+## v3.0.0-beta.93
+
+<p className="text-sm text-fd-muted-foreground">2026-10-13 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.93)</p>
+
+- fix(cs2): upgraded installs get past 052-loadout-per-side ([#791](https://github.com/Auto-Tournament/auto-tournament/pull/791))
+
+## v3.0.0-beta.92
+
+<p className="text-sm text-fd-muted-foreground">2026-10-13 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.92)</p>
+
+- feat(chat): a player's name in the chat opens their profile ([#761](https://github.com/Auto-Tournament/auto-tournament/pull/761))
+- feat(skins): a drop is a choice of three; the player keeps one ([#762](https://github.com/Auto-Tournament/auto-tournament/pull/762))
+- fix(recorder): follow the player by account id; the kill feed names bots ([#763](https://github.com/Auto-Tournament/auto-tournament/pull/763))
+- feat(highlights): up to 20 clips per player; sharp profile stills; idle servers are grey ([#764](https://github.com/Auto-Tournament/auto-tournament/pull/764))
+- feat(highlights): notify the players a clip shows ([#765](https://github.com/Auto-Tournament/auto-tournament/pull/765))
+- fix(i18n): clip notice keys in every locale ([#766](https://github.com/Auto-Tournament/auto-tournament/pull/766))
+- fix: bracket test leftovers (admin-only fetch, bot-fill count, report over RCON, license-full autoscale) ([#767](https://github.com/Auto-Tournament/auto-tournament/pull/767))
+- test(tournament-end): delete the ended tournament afterwards ([#773](https://github.com/Auto-Tournament/auto-tournament/pull/773))
+- feat(teams): an invited player gets a notice, and pending invites show on Home and their profile ([#768](https://github.com/Auto-Tournament/auto-tournament/pull/768))
+- feat(skins): fair drops after every game and level-up, and public drop odds ([#770](https://github.com/Auto-Tournament/auto-tournament/pull/770))
+- feat(chat): "X is typing…" and an emoji picker ([#769](https://github.com/Auto-Tournament/auto-tournament/pull/769))
+- feat(skins): per-side loadout (CT/T) and the profile shows what is equipped ([#771](https://github.com/Auto-Tournament/auto-tournament/pull/771))
+- feat(match): /match/now for "my match", and a popup when the match server crashes ([#772](https://github.com/Auto-Tournament/auto-tournament/pull/772))
+- feat(skins): a finished tournament shows what its top three got ([#776](https://github.com/Auto-Tournament/auto-tournament/pull/776))
+- feat(matchmaking): searching for a game adds it to your games ([#777](https://github.com/Auto-Tournament/auto-tournament/pull/777))
+- feat(cs2): in-game messages from the platform ([#775](https://github.com/Auto-Tournament/auto-tournament/pull/775))
+- feat(admin): admin notifications (bell, dashboard, toasts) and recorder versions ([#774](https://github.com/Auto-Tournament/auto-tournament/pull/774))
+- test(fleet): the settings push spec waits for the saved rev ([#780](https://github.com/Auto-Tournament/auto-tournament/pull/780))
+- feat(matchmaking): search with bots in the empty seats (2v2, 5v5), unrated ([#778](https://github.com/Auto-Tournament/auto-tournament/pull/778))
+- feat(search): fuzzy site search over every page, tab, action and content ([#779](https://github.com/Auto-Tournament/auto-tournament/pull/779))
+- feat(recorders): Update all shows how many recorders are updated ([#781](https://github.com/Auto-Tournament/auto-tournament/pull/781))
+- feat(sockets): pages follow server topics instead of polling ([#782](https://github.com/Auto-Tournament/auto-tournament/pull/782))
+- feat(skins): trade-up contracts ([#784](https://github.com/Auto-Tournament/auto-tournament/pull/784))
+- feat(fleet): a csm command refused busy is sent again by itself ([#785](https://github.com/Auto-Tournament/auto-tournament/pull/785))
+- feat(sign-in): an OpenID Connect provider's own logo and button colour ([#786](https://github.com/Auto-Tournament/auto-tournament/pull/786))
+- test(allocation): the turnover spec probes a server of its own ([#790](https://github.com/Auto-Tournament/auto-tournament/pull/790))
+- fix(highlights): a failed clip holds the reels that would use it ([#783](https://github.com/Auto-Tournament/auto-tournament/pull/783))
+- fix(autoscale): practice servers are not the scaler's ([#787](https://github.com/Auto-Tournament/auto-tournament/pull/787))
+- feat(match): a paused match says whose seat is empty ([#789](https://github.com/Auto-Tournament/auto-tournament/pull/789))
+- feat(matches): a 5v5 pauses when a player drops, and goes on when they're back ([#788](https://github.com/Auto-Tournament/auto-tournament/pull/788))
+
 ## v3.0.0-beta.91
 
 <p className="text-sm text-fd-muted-foreground">2026-10-12 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.91)</p>
