@@ -294,5 +294,4 @@ Use your own backup's file name. `dropdb` deletes everything, including whatever
 - **The app will not start.** `docker compose logs matchzy-tournament` usually names the cause. A missing value in `.env` and a database it cannot reach are the two common ones.
 - **It won't start, and the log talks about the database name.** `DB_NAME` still says `matchzy_tournament` (set it to `auto_tournament`), or the 2.x container is still running and connected to the old database (stop it first). The log line says which, and the exact command when the database user may not rename it.
 - **Your data looks empty.** Almost always a volume that was recreated, or a database called `auto_tournament` that already existed next to the old one (the log says *both exist*). Check that `docker-compose.yml` still points at the same volume as before.
-- **A server shows a plugin version mismatch.** Update the plugin on every server to the same version. See [Server health warnings](/reference/servers-health).
 - **Anything else.** [Troubleshooting](/reference/troubleshooting), or ask on [Discord](https://discord.gg/n7gHYau7aW).

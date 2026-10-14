@@ -53,12 +53,11 @@ To add a tournament type, write a generator and add it to the registry.
 
 ### Game servers
 
-The CS2 module has two drivers (`api/src/integrations/cs2/driver.ts`), one per plugin:
+The CS2 module drives servers through one driver (`api/src/integrations/cs2/driver.ts`), for Ready Up:
 
 - **`fleet`, Ready Up.** The server keeps one outbound WebSocket to `/api/fleet/ws` (`fleet/gateway.ts`). Matches, settings and admins go out over it; state, events and round backups come back. The protocol is versioned JSON, described in `fleet/protocol/`. csm machines use a second link (`fleet/hosts/`) for server lifecycle, failover and auto-scaling.
-- **`rcon`, MatchZy Enhanced.** To the server: RCON, in `rconService`. When you add a server, `serverInitializationService` sets `at_server_id`, `at_bootstrap_token` and `at_bootstrap_url` over RCON, and the plugin downloads its settings from `GET /api/servers/:id/bootstrap`. From the server: events to `/api/events`, match reports to `/api/events/report`, and match configs from `/api/matches/<slug>.json`, each with `SERVER_TOKEN` in the `X-Auto-Tournament-Token` header. `events/matchEvents.ts` applies the events.
 
-`allocation.ts` picks a free server for each ready match, and `matchConfig.ts` builds the match config both drivers send. The plugin side is described in [Fleet mode](/cs2/ready-up/fleet) and [Events and report API](/cs2/matchzy-enhanced/events).
+`allocation.ts` picks a free server for each ready match, and `matchConfig.ts` builds the match config it sends. The plugin side is described in [Fleet mode](/cs2/ready-up/fleet).
 
 ## The web app
 

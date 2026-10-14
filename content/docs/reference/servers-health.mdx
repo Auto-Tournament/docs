@@ -7,39 +7,23 @@ icon: HeartPulse
 The **Servers** page shows a status chip, and sometimes extra warning chips, for
 each connected game server. This page explains what each one means.
 
-## Server offline or unreachable
+## Offline
 
-Auto Tournament cannot reach the server over RCON, or the server can reach
-Auto Tournament over RCON but its webhook calls back never arrive.
+The server's fleet link is down: Auto Tournament has had no heartbeat from it.
 
-- Check that the server is running (`csm status` with CS2 Server Manager).
-- Check the host, port and RCON password on the **Servers** page.
-- Check that the firewall allows TCP on the game port from the Auto Tournament
-  machine.
-- If Auto Tournament runs in Docker on the same machine as the server, use the
-  LAN IP, not `localhost`.
-- If RCON works but no events arrive, on the CS2 machine run
-  `curl <webhook-url>/api/events/test`. It must answer `"success":true`. If it
-  fails, fix the **Webhook URL** in **Settings → Counter-Strike 2**,
-  DNS or the firewall.
-- Click **Retry** on the server once fixed.
+- Check that the server is running: its machine's tile on the **Servers** page, or `csm status` on the machine. Start it from the tile.
+- Check that the server can reach the site at the address in **Settings → Counter-Strike 2 → Webhook URL**, over HTTPS. A firewall or DNS change on either side is the usual cause.
+- If Auto Tournament runs in Docker on the same machine as the server, use the LAN IP, not `localhost`.
 
-## IP banned (RCON)
+A match that was on the server waits for it, and the **Needs you** list on the manage page says so. Failover can move it to another server.
 
-The server temporarily banned Auto Tournament's IP after too many wrong RCON
-passwords.
+## Waiting to enroll
 
-1. Fix the RCON password on the **Servers** page first. Otherwise the ban
-   comes back.
-2. Remove the ban on the game server. With CS2 Server Manager:
+The server was added but has never connected. With [CS2 Server Manager](/cs2/server-manager) this happens on its own when the server starts the first time; check the machine's tile for an error. A server set up by hand needs its enrollment token, see [Fleet mode](/cs2/ready-up/fleet#enroll-a-server).
 
-```bash
-csm list-bans 1
-csm unban-all 1
-```
+## Revoked
 
-Use `0` instead of the server number for all servers. To remove one IP:
-`csm unban 1 <ip>`.
+An admin removed the server's credentials, so the site refuses it. Enroll it again to use it.
 
 ## CS2 update required
 
@@ -52,32 +36,6 @@ csm restart
 ```
 
 Without CS2 Server Manager, update the server with SteamCMD and restart it.
-Then click **Refresh Status** on the **Servers** page. The update monitor of
+The update monitor of
 CS2 Server Manager can do this for you, see
 [Plugins and updates](/cs2/server-manager/updates#the-update-monitor).
-
-## Plugin DB down
-
-MatchZy Enhanced cannot reach **its own**
-database on the game server. This is not the Auto Tournament database.
-
-- With CS2 Server Manager and its MySQL container: run `csm`, open
-  **Tools** and choose **MatchZy DB: verify/repair**.
-- With your own MySQL: check `game/csgo/cfg/MatchZy/database.json` (with CS2
-  Server Manager:
-  `~/overrides/game/csgo/cfg/MatchZy/database.json` in the account that runs csm),
-  that the database host is reachable, and the user and password.
-
-Restart the server and click **Refresh Status**.
-
-## Plugin version mismatch
-
-Some servers are running a different MatchZy Enhanced version than
-the rest of the fleet. Update all of them to the same version. With CS2
-Server Manager:
-
-```bash
-csm update-plugins
-```
-
-Then restart the affected servers.

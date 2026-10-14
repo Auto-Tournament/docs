@@ -38,71 +38,7 @@ Set `SESSION_SECRET` in `.env`.
 
 ## Server warnings
 
-The **Servers** page shows a status for each server. Hover over a warning to see the details.
-
-### Offline or RCON failed
-
-Auto Tournament cannot reach the server over RCON.
-
-- Check that the server is running (`csm status` with CS2 Server Manager).
-- Check the host, port and RCON password on the **Servers** page.
-- Check that the firewall allows TCP on the game port from the Auto Tournament machine.
-- If Auto Tournament runs in Docker on the same machine as the server, use the LAN IP, not `localhost`.
-
-### Server can't reach MAT (webhook), or no events
-
-RCON works, but the server cannot send events back.
-
-1. On the CS2 machine, run `curl <webhook-url>/api/events/test`. It must answer `"success":true`.
-2. If it fails, fix the **Webhook URL** in **Settings → Counter-Strike 2**, DNS or the firewall.
-3. Check that MatchZy Enhanced is loaded: run `css_plugins list` in the server console. The plugin still shows up as MatchZy.
-4. Click **Retry** on the server.
-
-### IP banned
-
-The server blocked Auto Tournament after too many wrong RCON passwords.
-
-1. Fix the RCON password on the **Servers** page first. Otherwise the ban comes back.
-2. Remove the ban on the game server. With CS2 Server Manager:
-
-```bash
-csm list-bans 1
-csm unban-all 1
-```
-
-Use `0` instead of the server number for all servers. To remove one IP: `csm unban 1 <ip>`.
-
-### CS2 update required
-
-Valve released a CS2 update and the server is behind. Auto Tournament does not load new matches on outdated servers.
-
-```bash
-csm update-game
-csm restart
-```
-
-Without CS2 Server Manager, update the server with SteamCMD and restart it. Then click **Refresh Status**. The update monitor of CS2 Server Manager can do this for you, see [Plugins and updates](/cs2/server-manager/updates#the-update-monitor).
-
-### Plugin DB down
-
-The CS2 plugin cannot reach **its own** database on the game server. This is not the Auto Tournament database.
-
-- With CS2 Server Manager and its MySQL container: run `csm`, open **Tools** and choose **MatchZy DB: verify/repair**.
-- With your own MySQL: check `game/csgo/cfg/MatchZy/database.json` (with CS2 Server Manager: `~/overrides/game/csgo/cfg/MatchZy/database.json` in the account that runs csm), that the database host is reachable, and the user and password.
-
-Restart the server and click **Refresh Status**.
-
-### Version mismatch
-
-The servers run different versions of the CS2 plugin. Update all of them to the same version:
-
-```bash
-csm update-plugins
-```
-
-### The same server shows up several times
-
-Several servers share one MySQL database with an old version of the CS2 plugin, or without a scope name. See [Several servers on one database](/cs2/matchzy-enhanced/install#several-servers-on-one-database).
+The **Servers** page shows a status for each server. Hover over a warning to see the details. What each one means and how to fix it: [Server health warnings](/reference/servers-health).
 
 ## Tournaments and matches
 
