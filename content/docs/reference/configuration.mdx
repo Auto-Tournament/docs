@@ -17,7 +17,7 @@ Everything else, such as sign-in providers, admins, match rules, the webhook URL
 | Variable | What it does |
 | --- | --- |
 | `SESSION_SECRET` | Secret for login sessions. Without it, everyone is logged out on each restart. Also the key for secrets saved in Settings when `SECRETS_KEY` is not set. Create one with `openssl rand -base64 32`. |
-| `SERVER_TOKEN` | Shared secret between Auto Tournament and MatchZy Enhanced servers. They send it as `X-Auto-Tournament-Token` with events, demo uploads and match config downloads. Ready Up servers use their own token from enrollment. Create one with `openssl rand -base64 24 \| tr -d '=+/'`. |
+| `SERVER_TOKEN` | Shared secret for server-side tools that are not enrolled servers, such as CS2 Server Manager's update hold and older demo uploads. They send it as `X-Auto-Tournament-Token`. Ready Up servers use their own token from enrollment. Create one with `openssl rand -base64 24 \| tr -d '=+/'`. |
 | `FRONTEND_BASE_URL` | The address people open in the browser, for example `https://tournament.example.com`. Used for login redirects, cookies (`https://` makes them HTTPS-only), callback URLs and the fleet link address. |
 
 ## Docker and database
@@ -94,8 +94,8 @@ See [API](/reference/api) for the format.
 
 | Variable | Default | What it does |
 | --- | --- | --- |
-| `API_BASE_URL` | `FRONTEND_BASE_URL` | Starting value for the webhook URL MatchZy Enhanced servers use, if they must use another address than the browser. After the first start, change it in **Settings → Counter-Strike 2**. Also used as the server address in `/api-docs`. |
-| `ALLOW_UNAUTHENTICATED_EVENTS` | `false` | Accept MatchZy Enhanced events without a token. Only for servers set up by hand or by a very old version. While it is on, anyone who can reach the API can send fake results. Turn it off again after you click **Retry** on your servers. |
+| `API_BASE_URL` | `FRONTEND_BASE_URL` | Starting value for the webhook URL your servers use to reach the site, if they must use another address than the browser. After the first start, change it in **Settings → Counter-Strike 2**. Also used as the server address in `/api-docs`. |
+| `ALLOW_UNAUTHENTICATED_EVENTS` | `false` | Accept server events without a token. Only for servers set up by a very old version. While it is on, anyone who can reach the API can send fake results. Leave it off. |
 | `FLEET_BACKUP_RETENTION_DAYS` | `14` | Days to keep the round backups Ready Up servers send, after a match ends. `0` keeps them forever. |
 | `FLEET_AUTOSCALE_INTERVAL_MS` | `15000` | How often automatic scaling checks the servers on csm machines. `0` turns its timer off. Turn scaling itself on or off on the **Servers** page. |
 | `AT_ENABLE_SIMULATION_IN_PROD` | `false` | Allow [simulation mode](/guides/simulation-mode). Only for test installs. |
