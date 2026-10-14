@@ -1,0 +1,132 @@
+---
+title: Let AI run your tournaments
+description: Connect Claude (or any MCP client) to your site and run tournaments by asking.
+icon: Bot
+---
+
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+
+Auto Tournament ships an MCP server. MCP (Model Context Protocol) is how an AI assistant such as Claude uses outside tools. With it connected, the assistant can read and run your site through the same API the app uses: set up a tournament from a description, suggest settings and rewards, watch matches, read the logs and fix what went wrong.
+
+The assistant can only do what its API token allows. A read-only token lets it look; an admin token lets it act like an admin.
+
+## What you can ask
+
+- "Set up a double elimination tournament for 8 teams on Saturday, best of 3 in the final, Mirage, Inferno, Nuke, Ancient, Anubis, Dust II and Train. Suggest the rest."
+- "Which matches are waiting, and why?"
+- "Match 4 is stuck in warmup. Find out what happened and fix it."
+- "Restore the last round on server 2; the power went out."
+- "Pick knives for the top three worth about 300, 150 and 75 dollars, and set them as the rewards."
+- "Give everyone who played today a drop."
+- "Tell every server the final starts in 10 minutes."
+
+## What you need
+
+- Your site running Auto Tournament 3.0 or later, and an admin account on it.
+- [Claude Code](https://claude.com/claude-code), or another MCP client.
+- Node.js 20 or later and a checkout of the [auto-tournament repository](https://github.com/Auto-Tournament/auto-tournament) on the computer you run the assistant on.
+
+## Set it up
+
+<Steps>
+
+<Step>
+
+### Make an API token
+
+In the app, open **Settings → API tokens** and make a token.
+
+- **Read only**: tournaments, matches, logs, servers and settings.
+- **Admin**: also starts, holds and decides matches, changes settings and gives skins.
+
+The token is shown once. Keep it like a password.
+
+</Step>
+
+<Step>
+
+### Run the setup
+
+From the checkout:
+
+```bash
+bash mcp/setup.sh
+```
+
+It asks for your site's address and the token (the token is not shown as you paste it), builds the server into `~/.auto-tournament/mcp` and adds it to Claude Code as `auto-tournament`.
+
+</Step>
+
+<Step>
+
+### Start a new session
+
+Start a new Claude Code session. The tools load when it starts. Ask it "How is my site doing?" to check that it works.
+
+</Step>
+
+</Steps>
+
+### Other MCP clients
+
+Run `node ~/.auto-tournament/mcp/dist/index.js` with two environment variables:
+
+```bash
+AT_URL=https://tournament.example.com
+AT_TOKEN=<your token>
+```
+
+## What it can do
+
+Reading:
+
+- The site's health, version, modules and what needs an admin.
+- Tournaments, templates, the bracket, matches with their live state, a match's event log and server console lines.
+- Teams, rosters and players.
+- The csm machines and their servers, the Ready Up servers, and the highlight recorders.
+- The platform's own logs.
+- Every setting, the skins settings and the skin catalogue with market prices for knives and gloves.
+
+Acting, each its own tool:
+
+- Create, change, start, pause, resume, end and archive a tournament.
+- Set a match's winner, restart, cancel or hold it, move it to another server, restore a round.
+- Create and change teams.
+- Start, stop and restart servers; run a console command (root admin only, logged); say something in game.
+- Change settings and the skins settings, give a player a skin, give drops.
+
+Anything else in the API it can reach with `api_get` and `api_write`. The API reference is at `/api-docs` on your site.
+
+## Keep control
+
+The site checks every call the way it checks the app. A read-only token is refused every change, and the usual rules apply: no winner for a match that has not been played, no archiving a running tournament.
+
+In Claude Code you can let the reading tools run without asking and keep every change behind a yes. Add the reading tools to `.claude/settings.json`:
+
+```json title=".claude/settings.json"
+{
+  "permissions": {
+    "allow": [
+      "mcp__auto-tournament__health",
+      "mcp__auto-tournament__tournament_current",
+      "mcp__auto-tournament__matches_list",
+      "mcp__auto-tournament__match",
+      "mcp__auto-tournament__match_log",
+      "mcp__auto-tournament__servers",
+      "mcp__auto-tournament__platform_logs"
+    ]
+  }
+}
+```
+
+Claude Code then asks before each change, and you see what it is about to do.
+
+## Updating
+
+After you pull a new version of the repository:
+
+```bash
+bash mcp/setup.sh --update
+```
+
+It rebuilds the server and keeps your site and token. To use another token, run `bash mcp/setup.sh` again and paste the new one.
