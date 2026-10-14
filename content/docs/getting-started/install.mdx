@@ -108,7 +108,7 @@ Everything else, the Steam Web API key and the sign-in providers included, is se
 ```bash
 docker compose pull
 docker compose up -d
-docker compose logs auto-tournament | grep SETUP
+docker compose logs auto-tournament
 ```
 
 `pull` first: a machine that ran Auto Tournament before keeps an older image under the same tag, and `up` alone starts that one.
@@ -119,43 +119,19 @@ docker compose logs auto-tournament | grep SETUP
 
 ### Create the first admin
 
-On its first start the platform prints a setup code in the log (the `grep` above shows it; the log lines are JSON, the code is in `msg`):
+On its first start the platform prints a setup code in the log:
 
 ```text
-[SETUP] No admin account exists yet.
-[SETUP] Open http://192.168.1.50:3069/setup and enter this code: 4F7K-...
+========================================================================
+  Auto Tournament: no admin account exists yet.
+  Open http://192.168.1.50:3069/setup and enter this code:
+
+      4F7K-...
 ```
 
-Open that address, enter the code and create the admin account: a username and a password. Then turn on two-step verification with an authenticator app, or skip it for now. The code works once and expires after 24 hours; restart the container for a new one.
+Open that address, enter the code and create the admin account: a username and a password. Then turn on two-step verification with an authenticator app, or skip it for now, and pick the games this site runs (Counter-Strike 2, and any games whose results players report). The code works once and expires after 24 hours; restart the container for a new one.
 
-</Step>
-
-<Step>
-
-### Turn on demo analysis
-
-The demo worker reads every map's demo after the match: trades, aim, money, the 2D replay and the moments that become [highlight clips](/guides/highlights). It is a third container and uses an API token.
-
-In the dashboard, open **Settings** > **API tokens**, create a token with full access and copy it. Add it to `.env`:
-
-```bash
-echo "AT_WORKER_TOKEN=paste-the-token-here" >> .env
-```
-
-Add the worker to `docker-compose.yml`, under `services:`:
-
-```yaml
-  auto-tournament-worker:
-    image: sivertio/auto-tournament-worker:next
-    restart: unless-stopped
-    depends_on:
-      - auto-tournament
-    env_file: .env
-    environment:
-      AT_URL: http://auto-tournament:3000
-```
-
-Then `docker compose up -d` again. Without it everything else works; maps show the round results the servers report, without the demo stats and the 2D replay.
+Demo analysis (stats, the 2D replay, the moments for [highlight clips](/guides/highlights)) runs inside the platform container; there is nothing to set up for it.
 
 </Step>
 

@@ -233,8 +233,8 @@ Settings are in [Configuration](/cs2/ready-up/configuration#status-endpoint).
 
 CS2 Server Manager (csm) links a whole machine to the platform with one command. After that, you create servers from the platform (or auto-scaling creates them), and each new server enrolls itself with a fleet key csm writes for it. You do not copy codes.
 
-1. In the platform, go to **Servers → Machines → Add machine** and copy the `csm link …` command.
-2. Run it on the machine as the user that runs csm (not root), then start the host agent with `csm agent install`.
+1. In the platform, go to **Servers → Machines → Add machine** and copy the line it shows.
+2. Run it on the machine as the user the servers run as (not root). It installs csm if needed, links the machine and starts the host agent.
 3. Use **Create server** on the machine. See [Host a CS2 tournament](/guides/host-cs2-tournament) for the full walk-through.
 
 ## CS2 Server Manager

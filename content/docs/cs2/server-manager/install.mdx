@@ -90,15 +90,7 @@ It installs the system packages and sets your account up to run csm: your server
 
 **With Auto Tournament 3.0** (recommended): let the platform create them.
 
-```bash
-csm instance config backend instances
-csm plugins license noncommercial   # or commercial: Ready Up's license, answered once
-csm plugins channel beta            # while Ready Up has only beta releases
-csm link https://tournament.example.com -
-csm agent install
-```
-
-Get the one-time code from **Servers → Machines → Add machine** in Auto Tournament, and paste it when `csm link` asks. Then create servers from the machine's card. The platform installs CS2 and Ready Up, and each server enrolls itself. See [Host a CS2 tournament](/guides/host-cs2-tournament).
+Copy the line from **Servers → Machines → Add machine** in Auto Tournament and run it on the machine (it installs csm if needed, links and starts the agent). With csm already installed, `csm link https://tournament.example.com -` does the same: paste the code when it asks; the agent service is installed and started with it. Then create servers from the machine's card. The platform installs CS2 and Ready Up, and each server enrolls itself. See [Host a CS2 tournament](/guides/host-cs2-tournament).
 
 **On its own**: run `csm`, and in the menu choose **Install** > **Install or redeploy servers**. The installer asks for:
 

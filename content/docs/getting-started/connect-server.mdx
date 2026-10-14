@@ -21,76 +21,25 @@ How many servers per machine depends on the CPU: a match server mostly uses one 
 
 <Step>
 
-### Install the CS2 module
-
-A fresh platform has no games. Open **Modules** (in the admin menu) and install **Counter-Strike 2**; the **Servers** page and everything CS2 comes with it.
-
-</Step>
-
-<Step>
-
-### Install `csm` on the machine
-
-Log in as the account the servers will run as:
-
-```bash
-arch=$(uname -m); \
-case "$arch" in \
-  x86_64)  asset="csm-linux-amd64" ;; \
-  aarch64|arm64) asset="csm-linux-arm64" ;; \
-  *) echo "Unsupported architecture: $arch" && exit 1 ;; \
-esac; \
-tmp=$(mktemp); \
-curl -L "https://github.com/Auto-Tournament/cs2-server-manager/releases/latest/download/$asset" -o "$tmp" && \
-sudo install -m 0755 "$tmp" /usr/local/bin/csm && \
-rm "$tmp"
-sudo csm setup-host
-```
-
-`setup-host` installs what `csm` needs (SteamCMD, tmux and more) and lets your account's services keep running after you log out. From here on, run `csm` without `sudo`.
-
-</Step>
-
-<Step>
-
-### Accept the Ready Up license
-
-The servers run [Ready Up](/cs2/ready-up), the plugin that plays the matches. Pick the license that fits:
-
-```bash
-csm plugins license noncommercial   # your own servers, a club, a school, a free event
-```
-
-Paid events take `commercial` and a license key; see [License](/guides/license).
-
-</Step>
-
-<Step>
-
 ### Add the machine in the dashboard
 
-Open **Servers** > **Add machine**, give the machine a name, and copy the command it shows. It looks like this:
+Open **Servers** > **Add machine** and give the machine a name. It shows one line to copy:
 
 ```bash
-csm link http://192.168.1.50:3069 RUE-7F3K-9QX2-LM4D-P8TW --insecure
+curl -fsSL https://cs.example.com/api/fleet/install-csm.sh | bash -s -- RUE-7F3K-9QX2-LM4D-P8TW
 ```
 
-The code works once and runs out after 15 minutes. `--insecure` is there when the platform is on plain `http://`, which is fine on a LAN; on the internet, put the platform behind HTTPS.
+The code works once and runs out after 15 minutes. (No Servers page? Install **Counter-Strike 2** under **Modules**, or pick it at the end of setup.)
 
 </Step>
 
 <Step>
 
-### Link the machine and start the agent
+### Run it on the machine
 
-Run the copied command on the machine, then start csm's agent as a service:
+Log in to the machine as the account the servers will run as (not root) and paste the line. It installs `csm` if it isn't there, asks for `sudo` once to prepare the machine (SteamCMD, tmux, services that keep running after you log out), links the machine and starts csm's agent. The dashboard says **Connected** within a few seconds.
 
-```bash
-csm link http://192.168.1.50:3069 RUE-7F3K-9QX2-LM4D-P8TW --insecure
-csm agent install
-```
-
-The dashboard says **Connected** within a few seconds, and the machine shows up on **Servers**.
+The servers run [Ready Up](/cs2/ready-up) under the license accepted on the platform ([License](/guides/license)); the machine needs no answer of its own. On a platform served over plain `http://` (fine on a LAN) the link uses `--insecure`; on the internet, put the platform behind HTTPS.
 
 </Step>
 
