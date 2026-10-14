@@ -7,6 +7,17 @@ description: Release notes for each version of CS2 Server Manager (csm).
 
 CS2 Server Manager (`csm`) runs several CS2 servers on one Linux machine. Newest first. Each entry is the [GitHub release](https://github.com/Auto-Tournament/cs2-server-manager/releases) for that version. [Docs](/cs2/server-manager).
 
+## v1.23.1
+
+<p className="text-sm text-fd-muted-foreground">2026-10-14 · [Release on GitHub](https://github.com/Auto-Tournament/cs2-server-manager/releases/tag/v1.23.1)</p>
+
+### Fixes
+
+- **CS2 updates are spotted again.** The monitor watches for CS2's own `MasterRequestRestart` line, so servers restart into a new CS2 build when Valve ships one. ([#120](https://github.com/Auto-Tournament/cs2-server-manager/pull/120))
+- **`csm doctor` looks in the service account's home**, not the caller's, and the last legacy leftovers are gone. ([#119](https://github.com/Auto-Tournament/cs2-server-manager/pull/119))
+
+Update with `sudo csm self-update`.
+
 ## v1.23.0
 
 <p className="text-sm text-fd-muted-foreground">2026-10-13 · [Release on GitHub](https://github.com/Auto-Tournament/cs2-server-manager/releases/tag/v1.23.0)</p>
