@@ -130,6 +130,35 @@ Open that address, enter the code and create the admin account: a username and a
 
 </Step>
 
+<Step>
+
+### Turn on demo analysis
+
+The demo worker reads every map's demo after the match: trades, aim, money, the 2D replay and the moments that become [highlight clips](/guides/highlights). It is a third container and uses an API token.
+
+In the dashboard, open **Settings** > **API tokens**, create a token with full access and copy it. Add it to `.env`:
+
+```bash
+echo "AT_WORKER_TOKEN=paste-the-token-here" >> .env
+```
+
+Add the worker to `docker-compose.yml`, under `services:`:
+
+```yaml
+  auto-tournament-worker:
+    image: sivertio/auto-tournament-worker:next
+    restart: unless-stopped
+    depends_on:
+      - auto-tournament
+    env_file: .env
+    environment:
+      AT_URL: http://auto-tournament:3000
+```
+
+Then `docker compose up -d` again. Without it everything else works; maps show the round results the servers report, without the demo stats and the 2D replay.
+
+</Step>
+
 </Steps>
 
 Next: [Sign-in and accounts](/getting-started/first-login).
