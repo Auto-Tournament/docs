@@ -106,9 +106,12 @@ Everything else, the Steam Web API key and the sign-in providers included, is se
 ### Start it
 
 ```bash
+docker compose pull
 docker compose up -d
-docker compose logs -f auto-tournament
+docker compose logs auto-tournament | grep SETUP
 ```
+
+`pull` first: a machine that ran Auto Tournament before keeps an older image under the same tag, and `up` alone starts that one.
 
 </Step>
 
@@ -116,7 +119,7 @@ docker compose logs -f auto-tournament
 
 ### Create the first admin
 
-On its first start the platform prints a setup code in the log:
+On its first start the platform prints a setup code in the log (the `grep` above shows it; the log lines are JSON, the code is in `msg`):
 
 ```text
 [SETUP] No admin account exists yet.
