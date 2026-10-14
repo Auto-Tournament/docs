@@ -13,6 +13,14 @@ CS2 Server Manager (`csm`) runs several CS2 servers on one Linux machine. Newest
 
 CS2 Server Manager (CSM) release v1.23.0
 
+**Ready Up only.** csm installs [Ready Up](https://github.com/Auto-Tournament/ready-up), the native CS2 plugin, on every server. No Metamod, no CounterStrikeSharp.
+
+**MatchZy Enhanced is no longer installed.** The legacy stack is gone: Metamod:Source, CounterStrikeSharp, MatchZy Enhanced, its MySQL/SQLite database setup, the doctor's database checks and the Docker step. Auto Tournament 3.x does not support MatchZy Enhanced; for Auto Tournament 2.x stay on csm 1.22.x or older.
+
+**Moving a host from MatchZy Enhanced:** `sudo csm self-update`, then `csm update-plugins` (Ready Up on every server), then `csm link` to your platform. The old `game/csgo/addons/` folders are no longer used: remove the `Game csgo/addons/metamod` line from each `gameinfo.gi` and delete `addons/`.
+
+Also in this release: instance hosts without a backend setting run instances ([#117](https://github.com/Auto-Tournament/cs2-server-manager/pull/117)).
+
 ## v1.22.0
 
 <p className="text-sm text-fd-muted-foreground">2026-10-13 · [Release on GitHub](https://github.com/Auto-Tournament/cs2-server-manager/releases/tag/v1.22.0)</p>
