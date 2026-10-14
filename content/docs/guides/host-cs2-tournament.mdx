@@ -71,23 +71,17 @@ The CS2 download is about 69 GB, once for all servers. It runs the first time a 
 ### Link the machine to the platform
 
 1. Open **Servers**. Under **Machines**, click **Add machine**. Give it a name if you like, then click **Get the command**.
-2. The platform shows a `csm link` command with a one-time code. The code works once and for 15 minutes.
-3. Run the link command as the account that runs csm. Use `-` in place of the code, so the code is read from your keyboard and stays out of the shell history:
+2. The platform shows one line with a one-time code (it works once and for 15 minutes):
 
    ```bash
-   csm link https://tournament.example.com -
+   curl -fsSL https://tournament.example.com/api/fleet/install-csm.sh | bash -s -- RUE-7F3K-9QX2-LM4D-P8TW
    ```
 
-   Paste the code and press Enter. If it does not continue, press Ctrl+D.
-4. Install the host agent as a service, so it keeps running and starts again after a reboot:
-
-   ```bash
-   csm agent install
-   ```
+3. Paste it on the machine, as the account the servers run as (not root). It installs csm if it is missing, asks for `sudo` once, links the machine and starts csm's agent as a service (it starts again after a reboot).
 
 The dialog changes to **Connected. The machine is ready.** The machine now shows as **Online** under **Machines**, with its CPU, memory and disk.
 
-If your platform address starts with `http://`, the command the platform shows has `--insecure` in it. Keep it when you build your own command. The link token then travels unencrypted, so serve the platform over https when you can. See [Reverse proxy](/guides/reverse-proxy).
+If your platform address starts with `http://`, the link uses `--insecure`. The link token then travels unencrypted, so serve the platform over https when you can. See [Reverse proxy](/guides/reverse-proxy).
 
 The link is one outbound connection from the machine to the platform. You open no inbound port for it, and you need no SSH from here on.
 

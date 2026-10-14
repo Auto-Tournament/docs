@@ -106,9 +106,12 @@ Everything else, the Steam Web API key and the sign-in providers included, is se
 ### Start it
 
 ```bash
+docker compose pull
 docker compose up -d
-docker compose logs -f auto-tournament
+docker compose logs auto-tournament
 ```
+
+`pull` first: a machine that ran Auto Tournament before keeps an older image under the same tag, and `up` alone starts that one.
 
 </Step>
 
@@ -119,11 +122,16 @@ docker compose logs -f auto-tournament
 On its first start the platform prints a setup code in the log:
 
 ```text
-[SETUP] No admin account exists yet.
-[SETUP] Open http://192.168.1.50:3069/setup and enter this code: 4F7K-...
+========================================================================
+  Auto Tournament: no admin account exists yet.
+  Open http://192.168.1.50:3069/setup and enter this code:
+
+      4F7K-...
 ```
 
-Open that address, enter the code and create the admin account: a username and a password. Then turn on two-step verification with an authenticator app, or skip it for now. The code works once and expires after 24 hours; restart the container for a new one.
+Open that address, enter the code and create the admin account: a username and a password. Then turn on two-step verification with an authenticator app, or skip it for now, and pick the games this site runs (Counter-Strike 2, and any games whose results players report). The code works once and expires after 24 hours; restart the container for a new one.
+
+Demo analysis (stats, the 2D replay, the moments for [highlight clips](/guides/highlights)) runs inside the platform container; there is nothing to set up for it.
 
 </Step>
 
