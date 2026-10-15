@@ -7,6 +7,77 @@ description: Release notes for each version of Ready Up, the native CS2 server p
 
 Ready Up is the native CS2 server plugin that replaces MatchZy Enhanced for new setups. Newest first. Each entry is the [GitHub release](https://github.com/Auto-Tournament/ready-up/releases) for that version. [Docs](/cs2/ready-up).
 
+## v0.1.0-beta.53
+
+<p className="text-sm text-fd-muted-foreground">2026-10-15 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/ready-up/releases/tag/v0.1.0-beta.53)</p>
+
+> **Pre-release** for testing. It is not marked latest: the installer's default and the
+> platform's update check keep the last stable release. Install it on purpose with
+> `--version v0.1.0-beta.53` (this build) or `--channel beta` (the newest build, pre-releases included).
+
+### Changes since v0.1.0-beta.52
+
+- ci: build in the GHCR mirror of the sniper SDK ([#225](https://github.com/Auto-Tournament/ready-up/pull/225))
+- ci: mirror the sniper SDK image to GHCR; no per-zip uploads on pull requests ([#224](https://github.com/Auto-Tournament/ready-up/pull/224))
+- feat(movement): surf, bhop and kz plugin ([#223](https://github.com/Auto-Tournament/ready-up/pull/223))
+
+## v0.1.0-beta.52
+
+<p className="text-sm text-fd-muted-foreground">2026-10-15 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/ready-up/releases/tag/v0.1.0-beta.52)</p>
+
+> **Pre-release** for testing. It is not marked latest: the installer's default and the
+> platform's update check keep the last stable release. Install it on purpose with
+> `--version v0.1.0-beta.52` (this build) or `--channel beta` (the newest build, pre-releases included).
+
+### Changes since v0.1.0-beta.51
+
+- feat(match): rules and commands in chat, one message per line ([#219](https://github.com/Auto-Tournament/ready-up/pull/219))
+- fix(skins): a player's first loadout repaints what they hold ([#222](https://github.com/Auto-Tournament/ready-up/pull/222))
+- fix(skins): a knife swapped to another knife is painted again a quarter second later ([#221](https://github.com/Auto-Tournament/ready-up/pull/221))
+- fix(match): admins are kicked at the end of a match and at a hand-over too ([#220](https://github.com/Auto-Tournament/ready-up/pull/220))
+- fix(match): players not on the match's roster are moved to spectators, admins too ([#218](https://github.com/Auto-Tournament/ready-up/pull/218))
+
+## v0.1.0-beta.51
+
+<p className="text-sm text-fd-muted-foreground">2026-10-15 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/ready-up/releases/tag/v0.1.0-beta.51)</p>
+
+> **Pre-release** for testing. It is not marked latest: the installer's default and the
+> platform's update check keep the last stable release. Install it on purpose with
+> `--version v0.1.0-beta.51` (this build) or `--channel beta` (the newest build, pre-releases included).
+
+### Changes since v0.1.0-beta.50
+
+- fix(skins): a knife swapped to another knife is sent in full on its first tick ([#217](https://github.com/Auto-Tournament/ready-up/pull/217))
+
+## v0.1.0-beta.50
+
+<p className="text-sm text-fd-muted-foreground">2026-10-15 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/ready-up/releases/tag/v0.1.0-beta.50)</p>
+
+> **Pre-release** for testing. It is not marked latest: the installer's default and the
+> platform's update check keep the last stable release. Install it on purpose with
+> `--version v0.1.0-beta.50` (this build) or `--channel beta` (the newest build, pre-releases included).
+
+### Changes since v0.1.0-beta.49
+
+- fix(match): enemy-only ADR, joiners spawn in warmup, rules on go-live ([#216](https://github.com/Auto-Tournament/ready-up/pull/216))
+- feat(match): say in chat when a player leaves a live map; leavers stay in the damage report ([#215](https://github.com/Auto-Tournament/ready-up/pull/215))
+- fix(match): the no-pauses-left reply says "used all 3", not "(3/3)" ([#214](https://github.com/Auto-Tournament/ready-up/pull/214))
+
+## v0.1.0-beta.49
+
+<p className="text-sm text-fd-muted-foreground">2026-10-15 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/ready-up/releases/tag/v0.1.0-beta.49)</p>
+
+> **Pre-release** for testing. It is not marked latest: the installer's default and the
+> platform's update check keep the last stable release. Install it on purpose with
+> `--version v0.1.0-beta.49` (this build) or `--channel beta` (the newest build, pre-releases included).
+
+### Changes since v0.1.0-beta.48
+
+- fix(match): bot fill gives rostered players 5 minutes, then the bots play ([#213](https://github.com/Auto-Tournament/ready-up/pull/213))
+- perf(match): half the per-frame cost (player list once per frame, bounded weapon sweep, clock-driven work at 16/s) ([#212](https://github.com/Auto-Tournament/ready-up/pull/212))
+- feat(community): .rank, .top, .speclist and admin .kick for community servers ([#211](https://github.com/Auto-Tournament/ready-up/pull/211))
+- feat(mapvote): map voting plugin (.rtv, .nominate, end-of-map vote, .timeleft) ([#210](https://github.com/Auto-Tournament/ready-up/pull/210))
+
 ## v0.1.0-beta.48
 
 <p className="text-sm text-fd-muted-foreground">2026-10-14 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/ready-up/releases/tag/v0.1.0-beta.48)</p>
