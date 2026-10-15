@@ -7,6 +7,48 @@ description: Release notes for each version of the Auto Tournament platform.
 
 Versions before 3.0 were released as **MatchZy Auto Tournament** (MAT). Their notes are under [Earlier versions](#earlier-versions). **3.0 is in beta**: the `3.0.0-beta.N` releases below are the 3.0 notes until 3.0.0 ships. See [Upgrading to 3.0](/guides/upgrading-to-3). Newest first. Each entry is the [GitHub release](https://github.com/Auto-Tournament/auto-tournament/releases) for that version. [Docs](/).
 
+## v3.0.0-beta.130
+
+<p className="text-sm text-fd-muted-foreground">2026-10-15 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.130)</p>
+
+- Make the CLA a copyright assignment ([#970](https://github.com/Auto-Tournament/auto-tournament/pull/970))
+- fix(api): an integrator token imports players too (POST /api/players/import) ([#971](https://github.com/Auto-Tournament/auto-tournament/pull/971))
+
+## v3.0.0-beta.129
+
+<p className="text-sm text-fd-muted-foreground">2026-10-15 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.129)</p>
+
+- fix: team size from the settings reaches the tournament row; presets resync as defined now ([#962](https://github.com/Auto-Tournament/auto-tournament/pull/962))
+- feat(bracket): your team gets an orange ring and a You tag ([#966](https://github.com/Auto-Tournament/auto-tournament/pull/966))
+- feat: "Nice, you're still in it!" after a won match ([#964](https://github.com/Auto-Tournament/auto-tournament/pull/964))
+- feat: browser and phone notifications (Web Push), and a modal that recommends them ([#965](https://github.com/Auto-Tournament/auto-tournament/pull/965))
+- feat(shuffle): players join a shuffle tournament on their own ([#967](https://github.com/Auto-Tournament/auto-tournament/pull/967))
+
+## v3.0.0-beta.128
+
+<p className="text-sm text-fd-muted-foreground">2026-10-15 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.128)</p>
+
+- feat: Valve trademark / not-affiliated line at the bottom of every page; MCP tournament tools take teamSize ([#942](https://github.com/Auto-Tournament/auto-tournament/pull/942))
+- feat(skins): take a skin off one side in one click ([#943](https://github.com/Auto-Tournament/auto-tournament/pull/943))
+- fix(cs2): no "webhook URL not configured" toast; a timed-out or simulated veto loads its match without one ([#945](https://github.com/Auto-Tournament/auto-tournament/pull/945))
+- feat(manage): update notices as a banner across the top ([#944](https://github.com/Auto-Tournament/auto-tournament/pull/944))
+- fix(failover): resume only from this match's backups and maps; a server that refused the resume is not asked again every pass ([#947](https://github.com/Auto-Tournament/auto-tournament/pull/947))
+- fix(allocation): a server's turnover wait follows the kick delay Ready Up actually uses ([#948](https://github.com/Auto-Tournament/auto-tournament/pull/948))
+- fix(skins): players already on a server get their skins when a match is assigned to it ([#949](https://github.com/Auto-Tournament/auto-tournament/pull/949))
+- fix(restart): end a match Ready Up kept on its own before reloading; a match that cannot reload goes back to the allocator ([#950](https://github.com/Auto-Tournament/auto-tournament/pull/950))
+- fix(cs2): the "Your match is back" notice closes once the player is on the server again ([#951](https://github.com/Auto-Tournament/auto-tournament/pull/951))
+- fix: a tournament without a veto never says "veto" in the navbar or the next-match dialog ([#952](https://github.com/Auto-Tournament/auto-tournament/pull/952))
+- fix(team match): the match room knows when the tournament has no veto ([#953](https://github.com/Auto-Tournament/auto-tournament/pull/953))
+- fix(cs2): later rounds of a veto-off tournament don't wait for a veto ([#954](https://github.com/Auto-Tournament/auto-tournament/pull/954))
+- chore(cs2): remove match-rules settings Ready Up never read ([#946](https://github.com/Auto-Tournament/auto-tournament/pull/946))
+- fix: map pictures for every map; the restart notice clears once you're back; clearer placement dialog buttons ([#956](https://github.com/Auto-Tournament/auto-tournament/pull/956))
+- fix(failover): give a returning server a few seconds to report its match ([#955](https://github.com/Auto-Tournament/auto-tournament/pull/955))
+- fix(skins): the tryout server link uses the machine's public address ([#957](https://github.com/Auto-Tournament/auto-tournament/pull/957))
+- feat(skins): the Skin tryout server is a surf server (movement + skins) ([#958](https://github.com/Auto-Tournament/auto-tournament/pull/958))
+- fix(failover): a backup stored in the match's first second counts as the match's own ([#960](https://github.com/Auto-Tournament/auto-tournament/pull/960))
+- feat(skins): a warning wherever skins show that they are not real CS2 skins ([#961](https://github.com/Auto-Tournament/auto-tournament/pull/961))
+- feat(cs2): map and skin pictures served by the platform, bundled with the module ([#959](https://github.com/Auto-Tournament/auto-tournament/pull/959))
+
 ## v3.0.0-beta.127
 
 <p className="text-sm text-fd-muted-foreground">2026-10-15 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.127)</p>
