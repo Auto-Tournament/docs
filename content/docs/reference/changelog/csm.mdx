@@ -7,6 +7,17 @@ description: Release notes for each version of CS2 Server Manager (csm).
 
 CS2 Server Manager (`csm`) runs several CS2 servers on one Linux machine. Newest first. Each entry is the [GitHub release](https://github.com/Auto-Tournament/cs2-server-manager/releases) for that version. [Docs](/cs2/server-manager).
 
+## v1.27.4
+
+<p className="text-sm text-fd-muted-foreground">2026-10-16 · [Release on GitHub](https://github.com/Auto-Tournament/cs2-server-manager/releases/tag/v1.27.4)</p>
+
+CS2 Server Manager (CSM) release v1.27.4
+
+### Fixed
+- Round restore works again. Since the October 2026 CS2 update, a server only writes round backup files when it's started with `-allow_round_backup_files`, so restoring a round (Ready Up's `.restore`, the platform's round restore) failed with `restore refused: no backup …`. csm now passes the flag on every launch: Valve's `cs2.sh`, `csm.sh`, the binary and instances ([#137](https://github.com/Auto-Tournament/cs2-server-manager/pull/137)).
+
+After updating, restart your servers (`csm restart`) so they start with the flag.
+
 ## v1.27.3
 
 <p className="text-sm text-fd-muted-foreground">2026-10-15 · [Release on GitHub](https://github.com/Auto-Tournament/cs2-server-manager/releases/tag/v1.27.3)</p>
