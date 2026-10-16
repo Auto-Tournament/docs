@@ -105,7 +105,7 @@ New servers get Ready Up, connect to the platform on their own and show up in th
 
 Two things are on by default:
 
-- **Automatic scaling** starts stopped servers before the bracket needs them and stops idle ones after a cool-down. When all servers are busy and the machine has room, it creates one more. Servers are never deleted. The defaults are 2 minutes of lead time, 10 minutes idle before a stop, and 4 servers per machine. Change them in **Automatic scaling** on the **Servers** page.
+- **Automatic scaling** starts stopped servers before the bracket needs them and stops idle ones after a cool-down. When all servers are busy and the machine has room, it creates one more. Servers are never deleted. The defaults are 2 minutes of lead time, 10 minutes idle before a stop, and up to 32 servers per machine (as long as it has 3 GB of RAM and 5 GB of disk free). Change them in **Automatic scaling** on the **Servers** page.
 - **Failover** moves a match to another server if its server dies. See [What failover does](#what-failover-does).
 
 <Callout type="warn" title="Spare servers count toward the license">
