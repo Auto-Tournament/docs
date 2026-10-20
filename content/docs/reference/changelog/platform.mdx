@@ -7,6 +7,66 @@ description: Release notes for each version of the Auto Tournament platform.
 
 Versions before 3.0 were released as **MatchZy Auto Tournament** (MAT). Their notes are under [Earlier versions](#earlier-versions). **3.0 is in beta**: the `3.0.0-beta.N` releases below are the 3.0 notes until 3.0.0 ships. See [Upgrading to 3.0](/guides/upgrading-to-3). Newest first. Each entry is the [GitHub release](https://github.com/Auto-Tournament/auto-tournament/releases) for that version. [Docs](/).
 
+## v3.0.0-beta.182
+
+<p className="text-sm text-fd-muted-foreground">2026-10-20 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.182)</p>
+
+- refactor(tournament): isStarted and isUpcoming instead of two-status checks ([#1162](https://github.com/Auto-Tournament/auto-tournament/pull/1162))
+- refactor(templates): isStarted and isUpcoming for the existing-tournament check ([#1163](https://github.com/Auto-Tournament/auto-tournament/pull/1163))
+- refactor(tournament): split OverviewLive into the page, its hero and its parts ([#1164](https://github.com/Auto-Tournament/auto-tournament/pull/1164))
+- refactor(tournament): split draftUi into team, pills and blocks files ([#1165](https://github.com/Auto-Tournament/auto-tournament/pull/1165))
+- refactor(setup): TournamentSetup's site rules, templates and sign-up become hooks ([#1167](https://github.com/Auto-Tournament/auto-tournament/pull/1167))
+- fix(webhooks): the delivery log shows older deliveries on request ([#1169](https://github.com/Auto-Tournament/auto-tournament/pull/1169))
+- refactor(setup): the Format and Teams steps become components ([#1168](https://github.com/Auto-Tournament/auto-tournament/pull/1168))
+- fix(highlights): music under the game defaults to 50% ([#1170](https://github.com/Auto-Tournament/auto-tournament/pull/1170))
+- fix(highlights): a tournament reel names its tournament, its date and its players ([#1171](https://github.com/Auto-Tournament/auto-tournament/pull/1171))
+- refactor(shuffle): ShuffleJoin's round views become their own components ([#1166](https://github.com/Auto-Tournament/auto-tournament/pull/1166))
+- fix(results): team and player names in results and standings are links ([#1172](https://github.com/Auto-Tournament/auto-tournament/pull/1172))
+- fix(profiles): tournament and team names in profiles and the next-match card are links ([#1173](https://github.com/Auto-Tournament/auto-tournament/pull/1173))
+- fix(manage): tournament and team names in Manage lists are links ([#1174](https://github.com/Auto-Tournament/auto-tournament/pull/1174))
+- fix(match): a map's winner on the match page links to the team ([#1175](https://github.com/Auto-Tournament/auto-tournament/pull/1175))
+
+## v3.0.0-beta.181
+
+<p className="text-sm text-fd-muted-foreground">2026-10-20 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.181)</p>
+
+- refactor(tournament): one typeLabel and seriesLabel for the tournament pages ([#1156](https://github.com/Auto-Tournament/auto-tournament/pull/1156))
+- fix(fleet): a renumbered stream drops assignments a newer one replaced ([#1157](https://github.com/Auto-Tournament/auto-tournament/pull/1157))
+- refactor(tournament): typeLabel and seriesLabel in the remaining views ([#1159](https://github.com/Auto-Tournament/auto-tournament/pull/1159))
+- fix(layout): one footer on every page, with the license line ([#1160](https://github.com/Auto-Tournament/auto-tournament/pull/1160))
+- feat(chat): the chat button pulses while there are unread messages ([#1161](https://github.com/Auto-Tournament/auto-tournament/pull/1161))
+
+## v3.0.0-beta.180
+
+<p className="text-sm text-fd-muted-foreground">2026-10-20 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.180)</p>
+
+- fix(fleet): a server whose fleet state was reset gets its queued commands ([#1150](https://github.com/Auto-Tournament/auto-tournament/pull/1150))
+- refactor(servers): the tile line colour without a nested ternary ([#1152](https://github.com/Auto-Tournament/auto-tournament/pull/1152))
+- test(fleet): age the token so the reset test has a reliable message to ack ([#1153](https://github.com/Auto-Tournament/auto-tournament/pull/1153))
+- fix(license): only a signed-in admin changes the license; the MCP says so ([#1154](https://github.com/Auto-Tournament/auto-tournament/pull/1154))
+- fix(allocation): a server that does not answer is passed over; a restart mid-assign lets go ([#1151](https://github.com/Auto-Tournament/auto-tournament/pull/1151))
+- fix(tournament): one header in every state, with the banner while live and after ([#1155](https://github.com/Auto-Tournament/auto-tournament/pull/1155))
+
+## v3.0.0-beta.179
+
+<p className="text-sm text-fd-muted-foreground">2026-10-20 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.179)</p>
+
+- test(shuffle): wait for the bracket redirect before opening a match ([#1137](https://github.com/Auto-Tournament/auto-tournament/pull/1137))
+- test: drop configureWebhook from nine API specs (1/5) ([#1141](https://github.com/Auto-Tournament/auto-tournament/pull/1141))
+- test: drop the webhook URL from settings calls in ten specs (3/5) ([#1143](https://github.com/Auto-Tournament/auto-tournament/pull/1143))
+- chore/tests drop webhook url 4 ([#1144](https://github.com/Auto-Tournament/auto-tournament/pull/1144))
+- fix(cs2): an imported match is in its players' match history ([#1146](https://github.com/Auto-Tournament/auto-tournament/pull/1146))
+- fix(fleet): a resume past what a restored database has is taken, not closed ([#1135](https://github.com/Auto-Tournament/auto-tournament/pull/1135))
+- fix(client): one shared Socket.IO connection for useTopic and useSocket ([#1138](https://github.com/Auto-Tournament/auto-tournament/pull/1138))
+- feat(admin): a notice opens its page with what happened and what to do ([#1145](https://github.com/Auto-Tournament/auto-tournament/pull/1145))
+- fix(servers): an offline machine's tile text meets contrast ([#1147](https://github.com/Auto-Tournament/auto-tournament/pull/1147))
+- fix(client): the chat, matchmaking, social and presence stores share the socket ([#1139](https://github.com/Auto-Tournament/auto-tournament/pull/1139))
+- docs(api): recorder routes show "recorder key or admin", not public ([#1136](https://github.com/Auto-Tournament/auto-tournament/pull/1136))
+- chore/tests drop webhook url 2 ([#1142](https://github.com/Auto-Tournament/auto-tournament/pull/1142))
+- fix(client): the remaining hooks and pages share the socket (scopedSocket) ([#1140](https://github.com/Auto-Tournament/auto-tournament/pull/1140))
+- chore/tests drop webhook url 5 ([#1148](https://github.com/Auto-Tournament/auto-tournament/pull/1148))
+- feat(admin): notices of one kind stack in the bell and Needs you ([#1149](https://github.com/Auto-Tournament/auto-tournament/pull/1149))
+
 ## v3.0.0-beta.178
 
 <p className="text-sm text-fd-muted-foreground">2026-10-19 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.178)</p>
