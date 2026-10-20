@@ -27,32 +27,9 @@ The bot finds players by the Discord account on their profile: they sign in with
 
 1. Open the [Discord Developer Portal](https://discord.com/developers/applications) and sign in.
 2. Click **New Application**, give it a name (for example `Auto Tournament`), agree to the terms and click **Create**.
-3. On **General Information**, copy the **Application ID**. You need it in the next step.
-4. In the left menu, click **Bot**. Click **Reset Token**, confirm, and copy the token. Discord shows it only once.
+3. In the left menu, click **Bot**. Click **Reset Token**, confirm, and copy the token. Discord shows it only once.
 
 The bot needs no privileged gateway intents. Leave those switches off.
-
-</Step>
-
-<Step>
-
-### Invite the bot to your Discord server
-
-Open this link, with your Application ID in place of `APP_ID`:
-
-```text
-https://discord.com/oauth2/authorize?client_id=APP_ID&scope=bot%20applications.commands&permissions=286280720
-```
-
-Pick your Discord server and click **Authorize**. The link asks for these permissions:
-
-| Permission | Why |
-| --- | --- |
-| Manage Channels | Make the team voice and text channels, and remove them after |
-| Manage Roles | Make the team roles, and keep the team channels private |
-| Move Members | Move players into their team's voice channel |
-| View Channels, Connect | See and join the channels it makes |
-| Send Messages, Embed Links | Post the match cards in #results |
 
 </Step>
 
@@ -62,9 +39,26 @@ Pick your Discord server and click **Authorize**. The link asks for these permis
 
 1. In Auto Tournament, open **Modules → Discord bot** and click **Open**.
 2. Paste the token under **Bot token** and click **Save**. The page says **Connected as** and your bot's name.
-3. Under **Discord server**, pick your server. Only servers the bot is in show up.
+3. Click **Invite to a server**, next to **Discord server**. Discord opens in a new tab: pick your server and click **Authorize**.
+4. Back on the page, pick your server under **Discord server**.
 
 The token is checked with Discord and stored encrypted. It is never shown again; to change it, paste a new one.
+
+</Step>
+
+<Step>
+
+### What the bot is allowed to do
+
+**Invite to a server** asks Discord for these permissions:
+
+| Permission | Why |
+| --- | --- |
+| Manage Channels | Make the team voice and text channels, and remove them after |
+| Manage Roles | Make the team roles, and keep the team channels private |
+| Move Members | Move players into their team's voice channel |
+| View Channels, Connect | See and join the channels it makes |
+| Send Messages, Embed Links | Post the match cards in #results |
 
 </Step>
 
@@ -120,4 +114,4 @@ Discord sends a test request when you save, so it only saves when your site answ
 
 **A player gets no DMs.** They need to share a Discord server with the bot, and to allow DMs from server members in their Discord privacy settings.
 
-**Something didn't work and the page doesn't say why.** The bot raises a **Discord bot failed** notice in **Needs you**, with Discord's answer. A missing permission is the usual cause: invite the bot again with the link above.
+**Something didn't work and the page doesn't say why.** The bot raises a **Discord bot failed** notice in **Needs you**, with Discord's answer. A missing permission is the usual cause: click **Invite to a server** again and authorize it.
