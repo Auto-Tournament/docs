@@ -7,6 +7,54 @@ description: Release notes for each version of the Auto Tournament platform.
 
 Versions before 3.0 were released as **MatchZy Auto Tournament** (MAT). Their notes are under [Earlier versions](#earlier-versions). **3.0 is in beta**: the `3.0.0-beta.N` releases below are the 3.0 notes until 3.0.0 ships. See [Upgrading to 3.0](/guides/upgrading-to-3). Newest first. Each entry is the [GitHub release](https://github.com/Auto-Tournament/auto-tournament/releases) for that version. [Docs](/).
 
+## v3.0.0-beta.187
+
+<p className="text-sm text-fd-muted-foreground">2026-10-20 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.187)</p>
+
+- fix(addons): an add-on counts as running while its start() runs ([#1205](https://github.com/Auto-Tournament/auto-tournament/pull/1205))
+- feat(discord): Invite to a server button, and a setup checklist that never makes duplicates ([#1203](https://github.com/Auto-Tournament/auto-tournament/pull/1203))
+- ci: pull the base image from Docker Hub as our account, not the anonymous mirror ([#1206](https://github.com/Auto-Tournament/auto-tournament/pull/1206))
+
+## v3.0.0-beta.186
+
+<p className="text-sm text-fd-muted-foreground">2026-10-20 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.186)</p>
+
+- feat(discord): slash commands over the gateway; no Interactions URL needed ([#1202](https://github.com/Auto-Tournament/auto-tournament/pull/1202))
+
+## v3.0.0-beta.185
+
+<p className="text-sm text-fd-muted-foreground">2026-10-20 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.185)</p>
+
+- feat(discord): the bot shows as online ("Watching 2 matches") ([#1201](https://github.com/Auto-Tournament/auto-tournament/pull/1201))
+
+## v3.0.0-beta.184
+
+<p className="text-sm text-fd-muted-foreground">2026-10-20 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.184)</p>
+
+- refactor(tournament): move the setup form's helpers out of the manage page ([#1178](https://github.com/Auto-Tournament/auto-tournament/pull/1178))
+- refactor(tournament): one runner for the manage page's confirm actions ([#1179](https://github.com/Auto-Tournament/auto-tournament/pull/1179))
+- chore: remove the stale bot ([#1181](https://github.com/Auto-Tournament/auto-tournament/pull/1181))
+- refactor(tournament): the save's change list is a function of its own ([#1180](https://github.com/Auto-Tournament/auto-tournament/pull/1180))
+- fix(signup): a player plays for one team per tournament ([#1182](https://github.com/Auto-Tournament/auto-tournament/pull/1182))
+- fix(settings): simulation speed tops out at 4×, as Ready Up does ([#1183](https://github.com/Auto-Tournament/auto-tournament/pull/1183))
+- refactor(discord): the bot's token and REST calls get a module of their own ([#1184](https://github.com/Auto-Tournament/auto-tournament/pull/1184))
+- feat(discord): one queue for Discord calls; pick the bot's Discord server ([#1185](https://github.com/Auto-Tournament/auto-tournament/pull/1185))
+- refactor(discord): the bot's code moves to addons/discord ([#1190](https://github.com/Auto-Tournament/auto-tournament/pull/1190))
+- test: clear every tournament before the setup wizard specs ([#1191](https://github.com/Auto-Tournament/auto-tournament/pull/1191))
+- fix(results): the champion's final is the grand final in double elimination ([#1192](https://github.com/Auto-Tournament/auto-tournament/pull/1192))
+- feat(modules): add-on modules, turned on and off while the platform runs ([#1188](https://github.com/Auto-Tournament/auto-tournament/pull/1188))
+- feat(modules): add-ons on the Modules page, each with its own page ([#1189](https://github.com/Auto-Tournament/auto-tournament/pull/1189))
+- feat(discord): the Discord bot is an add-on, set up on Modules → Discord ([#1193](https://github.com/Auto-Tournament/auto-tournament/pull/1193))
+- fix(tournament): a darker shade behind the header's title on a banner ([#1200](https://github.com/Auto-Tournament/auto-tournament/pull/1200))
+- feat(discord): the Discord add-on's features (voice, announcements, team channels and roles, slash commands, server setup) ([#1194](https://github.com/Auto-Tournament/auto-tournament/pull/1194))
+
+## v3.0.0-beta.183
+
+<p className="text-sm text-fd-muted-foreground">2026-10-20 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.183)</p>
+
+- fix(links): team names in tables, the live side table, the scoreboard and recent results ([#1176](https://github.com/Auto-Tournament/auto-tournament/pull/1176))
+- fix(recorders): seek back when a resume's answer goes missing ([#1177](https://github.com/Auto-Tournament/auto-tournament/pull/1177))
+
 ## v3.0.0-beta.182
 
 <p className="text-sm text-fd-muted-foreground">2026-10-20 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.182)</p>
