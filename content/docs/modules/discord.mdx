@@ -1,0 +1,123 @@
+---
+title: Discord bot
+description: Your own Discord bot for your tournaments. It makes team voice channels, moves players, posts results and answers slash commands.
+icon: Bot
+---
+
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+
+The Discord bot is an **add-on**. It is built into Auto Tournament and runs inside it, so there is no extra program to host. You make your own bot in Discord, paste its token, and it starts working on your Discord server.
+
+Here's what it does once it's set up:
+
+- **Waiting room.** When a tournament starts, every player gets a DM asking them to join the **Lobby** voice channel. People in the Lobby can listen but not talk.
+- **Team voice per match.** When a match is on its server, each team gets a private voice channel. Players who are in voice (the Lobby or anywhere else on your Discord server) are moved into it. The rest get a DM with a link. The channels go a few minutes after the match.
+- **Team roles and channels.** While a tournament runs, each team gets a role in its team colour and a private text channel. Players find the link on their team page.
+- **Match announcements.** A card in #results when a match is ready, when it goes live, and with its result. Ready and live ping both teams (`@Kestrel vs @Halcyon`). The card has a **Go to match** button.
+- **Slash commands.** `/matches` (what is on a server right now), `/mymatch` (your match) and `/setup` (for server admins).
+- **Player DMs.** "Your match is ready", "your turn in the veto" and the other notifications players turn on under **Account → Notifications**.
+
+The bot finds players by the Discord account on their profile: they sign in with Discord, or an admin adds their Discord ID. A player without one still plays; they just get no DMs and are not moved.
+
+<Steps>
+
+<Step>
+
+### Create the bot in Discord
+
+1. Open the [Discord Developer Portal](https://discord.com/developers/applications) and sign in.
+2. Click **New Application**, give it a name (for example `Auto Tournament`), agree to the terms and click **Create**.
+3. On **General Information**, copy the **Application ID**. You need it in the next step.
+4. In the left menu, click **Bot**. Click **Reset Token**, confirm, and copy the token. Discord shows it only once.
+
+The bot needs no privileged gateway intents. Leave those switches off.
+
+</Step>
+
+<Step>
+
+### Invite the bot to your Discord server
+
+Open this link, with your Application ID in place of `APP_ID`:
+
+```text
+https://discord.com/oauth2/authorize?client_id=APP_ID&scope=bot%20applications.commands&permissions=286280720
+```
+
+Pick your Discord server and click **Authorize**. The link asks for these permissions:
+
+| Permission | Why |
+| --- | --- |
+| Manage Channels | Make the team voice and text channels, and remove them after |
+| Manage Roles | Make the team roles, and keep the team channels private |
+| Move Members | Move players into their team's voice channel |
+| View Channels, Connect | See and join the channels it makes |
+| Send Messages, Embed Links | Post the match cards in #results |
+
+</Step>
+
+<Step>
+
+### Paste the token in Auto Tournament
+
+1. In Auto Tournament, open **Modules → Discord bot** and click **Open**.
+2. Paste the token under **Bot token** and click **Save**. The page says **Connected as** and your bot's name.
+3. Under **Discord server**, pick your server. Only servers the bot is in show up.
+
+The token is checked with Discord and stored encrypted. It is never shown again; to change it, paste a new one.
+
+</Step>
+
+<Step>
+
+### Set up your Discord server
+
+Click **Set up this server**. The bot makes:
+
+- an **Auto Tournament** category, where the team channels go;
+- **#results** in it, for the match announcements;
+- a **Lobby** voice channel, where players wait to be moved.
+
+It also turns on the team voice channels and points the announcements at #results. Anything with those names that already exists is reused. Nothing you made is deleted or renamed.
+
+You can do the same from Discord: a server admin types `/setup`. Type `/` in your server to see **/matches**, **/mymatch** and **/setup** under your bot.
+
+</Step>
+
+<Step>
+
+### Choose what the bot does
+
+On **Modules → Discord bot**:
+
+- **Team voice channels**: on after **Set up this server**. **Category** is where they go.
+- **Team channels**: a private text channel and a role per team while a tournament runs.
+- **Match announcements**: the channel for the match cards, or **Off**.
+
+To turn the whole bot off, use the switch next to **Discord bot** on the **Modules** page.
+
+</Step>
+
+</Steps>
+
+## Slash commands over HTTP (optional)
+
+Slash commands reach the bot over its own connection to Discord, so they work with no setup, even on a LAN without a public address. If you'd rather Discord sent them to your site directly, paste this as **Interactions Endpoint URL** on your application's **General Information** page in the Developer Portal, and save:
+
+```text
+FRONTEND_BASE_URL/api/addons/discord/interactions
+```
+
+Discord sends a test request when you save, so it only saves when your site answers. **Linked Roles Verification URL**, **Terms of Service URL** and **Privacy Policy URL** can stay empty.
+
+## Troubleshooting
+
+**"The application did not respond" after a slash command.** The bot is not connected (it shows as offline), or an Interactions Endpoint URL is set that Discord can't reach. Clear the URL in the Developer Portal to use the bot's own connection.
+
+**The bot shows as offline.** It connects a few seconds after the token is saved or the platform starts. If it stays offline, the token was reset in the Developer Portal: paste the new one.
+
+**A player isn't moved into the team channel.** Discord can only move someone who is already in a voice channel on your server. Everyone else gets a DM with the link instead. A player with no Discord account on their profile gets neither.
+
+**A player gets no DMs.** They need to share a Discord server with the bot, and to allow DMs from server members in their Discord privacy settings.
+
+**Something didn't work and the page doesn't say why.** The bot raises a **Discord bot failed** notice in **Needs you**, with Discord's answer. A missing permission is the usual cause: invite the bot again with the link above.
