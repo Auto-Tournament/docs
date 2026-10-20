@@ -10,10 +10,10 @@ The Discord bot is an **add-on**. It is built into Auto Tournament and runs insi
 
 Here's what it does once it's set up:
 
-- **Waiting room.** When a tournament starts, every player gets a DM asking them to join the **Lobby** voice channel. People in the Lobby can listen but not talk.
-- **Team voice per match.** When a match is on its server, each team gets a private voice channel. Players who are in voice (the Lobby or anywhere else on your Discord server) are moved into it. The rest get a DM with a link. The channels go a few minutes after the match.
+- **A place per tournament.** When a tournament starts, the bot makes a category named after it that only its players see (they get a "*tournament* players" role). In it: a channel for the tournament, a **Lobby** voice channel (players can listen but not talk), the team channels and the match voice channels. Every player gets a DM asking them to join the Lobby. Three days after the tournament ends, the category and its roles are removed.
+- **Team voice per match.** When a match is on its server, each team gets a private voice channel in the tournament's category. Players who are in voice (the Lobby or anywhere else on your Discord server) are moved into it. The rest get a DM with a link. The channels go a few minutes after the match.
 - **Team roles and channels.** While a tournament runs, each team gets a role in its team colour and a private text channel. Players find the link on their team page.
-- **Match announcements.** A card in #results when a match is ready, when it goes live, and with its result. Ready and live ping both teams (`@Kestrel vs @Halcyon`). The card has a **Go to match** button.
+- **Match announcements.** A card in #results when a match is ready, when it goes live (it keeps the score as the match goes), and with its result: each map's score, the top player and who the winner plays next. #results is for the whole server and pings no one. When a match is ready, each team also gets the card in its own channel with `@Kestrel, your match is ready.` The card has a **Go to match** button.
 - **Slash commands.** `/matches` (what is on a server right now), `/mymatch` (your match) and `/setup` (for server admins).
 - **Player DMs.** "Your match is ready", "your turn in the veto" and the other notifications players turn on under **Account → Notifications**.
 
@@ -69,8 +69,9 @@ The token is checked with Discord and stored encrypted. It is never shown again;
 Click **Set up this server**. The bot makes:
 
 - an **Auto Tournament** category, where the team channels go;
-- **#results** in it, for the match announcements;
-- a **Lobby** voice channel, where players wait to be moved.
+- **#results** in it, for the match announcements.
+
+Each tournament's own category, with its Lobby and team channels, is made when the tournament starts.
 
 It also turns on the team voice channels and points the announcements at #results. Anything with those names that already exists is reused. Nothing you made is deleted or renamed.
 
