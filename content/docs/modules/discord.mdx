@@ -15,8 +15,8 @@ Here's what it does once it's set up:
 - **A card per match.** Each match gets one card in each team's channel. It pings the team once, then it's edited as the match moves on: scheduled, map veto, ready, live (with the score) and **Done** (each map's score, the top player and what's next). Edits ping no one. The card has a **Go to match** button.
 - **Moving players.** When a match is on its server, players who are in voice on your Discord server are moved into their team's voice channel.
 - **Veto timer.** If the timer runs out on a team's turn and the platform bans or picks for them, the team's channel says so.
-- **Call to the Lobby.** On a running tournament's overview, an admin can call everyone to the Lobby: players in voice are moved there, the rest get a DM, and #chat gets one post.
-- **Slash commands.** `/matches` shows what's on a server right now. `/mymatch` shows your match.
+- **Call to the Lobby.** Type `/lobby` in the tournament's #chat. Players in voice are moved to the Lobby, the rest get a DM, and #chat gets one post. Players in a live match stay put unless you add `include_live`. Only people who can move members see the command.
+- **Slash commands.** `/matches` shows what's on a server right now. `/mymatch` shows your match. `/lobby` is for admins (see above).
 - **DMs, only when needed.** A player gets a short welcome the first time they get a tournament's channels. After that the bot only DMs them when they have something to do and aren't on the site: their veto turn (captains only), their match is ready, or the tournament is starting. Players choose what they get under **Account → Notifications**.
 - **Admin calls.** When a player calls for an admin from the game server, admins who aren't on the site get a DM. It says who called, what they wrote, and links to the match.
 
