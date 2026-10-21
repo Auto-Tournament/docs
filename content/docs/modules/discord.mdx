@@ -1,6 +1,6 @@
 ---
 title: Discord bot
-description: Your own Discord bot for your tournaments. It makes team voice channels, moves players, posts results and answers slash commands.
+description: Your own Discord bot for your tournaments. It makes private channels for each tournament and team, keeps a card per match up to date, moves players and answers slash commands.
 icon: Bot
 ---
 
@@ -10,12 +10,16 @@ The Discord bot is an **add-on**. It is built into Auto Tournament and runs insi
 
 Here's what it does once it's set up:
 
-- **A place per tournament.** When a tournament starts, the bot makes a category named after it that only its players see (they get a "*tournament* players" role). In it: a channel for the tournament, a **Lobby** voice channel (players can listen but not talk), the team channels and the match voice channels. Every player gets a DM asking them to join the Lobby. Three days after the tournament ends, the category and its roles are removed.
-- **Team voice per match.** When a match is on its server, each team gets a private voice channel in the tournament's category. Players who are in voice (the Lobby or anywhere else on your Discord server) are moved into it. The rest get a DM with a link. The channels go a few minutes after the match.
-- **Team roles and channels.** While a tournament runs, each team gets a role in its team colour and a private text channel. Players find the link on their team page.
-- **Match announcements.** A card in #results when a match is ready, when it goes live (it keeps the score as the match goes), and with its result: each map's score, the top player and who the winner plays next. #results is for the whole server and pings no one. When a match is ready, each team also gets the card in its own channel with `@Kestrel, your match is ready.` The card has a **Go to match** button.
-- **Slash commands.** `/matches` (what is on a server right now), `/mymatch` (your match) and `/setup` (for server admins).
-- **Player DMs.** "Your match is ready", "your turn in the veto" and the other notifications players turn on under **Account → Notifications**.
+- **A place per tournament.** When a tournament starts, the bot makes a category named after it that only its players see (they get a "*tournament* players" role). In it: **#chat** for the tournament (the start and announcements) and a **Lobby** (a Stage, or a voice channel where players listen but can't talk if your server has no Stages). Every player gets a DM asking them to join the Lobby. People who aren't playing see none of it.
+- **Your team.** Each team gets a role in its team colour and a private text and voice channel for the whole tournament. They all sit in one **Your team** category, and each player only sees their own team's. Players find the text channel on their team page.
+- **A card per match.** Each match gets one card in each team's channel. It pings the team once, then it's edited as the match moves on: scheduled, map veto, ready, live (with the score) and **Done** (each map's score, the top player and what's next). Edits ping no one. The card has a **Go to match** button.
+- **Moving players.** When a match is on its server, players who are in voice on your Discord server are moved into their team's voice channel.
+- **Veto timer.** If the timer runs out on a team's turn and the platform bans or picks for them, the team's channel says so.
+- **Call to the Lobby.** On a running tournament's overview, an admin can call everyone to the Lobby: players in voice are moved there, the rest get a DM, and #chat gets one post.
+- **Slash commands.** `/matches` (what is on a server right now) and `/mymatch` (your match).
+- **DMs, only when needed.** A short welcome the first time a player gets a tournament's channels. After that the bot only DMs when a player has something to do and isn't on the site: their veto turn (captains), their match is ready, the tournament is starting. Admins who aren't on the site get a DM when a player calls for an admin, with who called, what they said and a link to the match. Players choose what they get under **Account → Notifications**.
+
+Three days after a tournament ends, its category, its team channels and its roles are removed.
 
 The bot finds players by the Discord account on their profile: they sign in with Discord, or an admin adds their Discord ID. A player without one still plays; they just get no DMs and are not moved.
 
@@ -54,28 +58,11 @@ The token is checked with Discord and stored encrypted. It is never shown again;
 
 | Permission | Why |
 | --- | --- |
-| Manage Channels | Make the team voice and text channels, and remove them after |
+| Manage Channels | Make the tournament and team channels, and remove them after |
 | Manage Roles | Make the team roles, and keep the team channels private |
-| Move Members | Move players into their team's voice channel |
+| Move Members | Move players into their team's voice channel and the Lobby |
 | View Channels, Connect | See and join the channels it makes |
-| Send Messages, Embed Links | Post the match cards in #results |
-
-</Step>
-
-<Step>
-
-### Set up your Discord server
-
-Click **Set up this server**. The bot makes:
-
-- an **Auto Tournament** category, where the team channels go;
-- **#results** in it, for the match announcements.
-
-Each tournament's own category, with its Lobby and team channels, is made when the tournament starts.
-
-It also turns on the team voice channels and points the announcements at #results. Anything with those names that already exists is reused. Nothing you made is deleted or renamed.
-
-You can do the same from Discord: a server admin types `/setup`. Type `/` in your server to see **/matches**, **/mymatch** and **/setup** under your bot.
+| Send Messages, Embed Links | Post the match cards in the team channels |
 
 </Step>
 
@@ -85,9 +72,10 @@ You can do the same from Discord: a server admin types `/setup`. Type `/` in you
 
 On **Modules → Discord bot**:
 
-- **Team voice channels**: on after **Set up this server**. **Category** is where they go.
-- **Team channels**: a private text channel and a role per team while a tournament runs.
-- **Match announcements**: the channel for the match cards, or **Off**.
+- **Team voice channels**: players are moved into their team's voice channel when their match is ready.
+- **Team channels**: a private text and voice channel and a role per team while a tournament runs.
+
+Either one makes the tournament and team channels. There's nothing to set up on your Discord server first: it all appears when a tournament starts.
 
 To turn the whole bot off, use the switch next to **Discord bot** on the **Modules** page.
 
@@ -111,7 +99,7 @@ Discord sends a test request when you save, so it only saves when your site answ
 
 **The bot shows as offline.** It connects a few seconds after the token is saved or the platform starts. If it stays offline, the token was reset in the Developer Portal: paste the new one.
 
-**A player isn't moved into the team channel.** Discord can only move someone who is already in a voice channel on your server. Everyone else gets a DM with the link instead. A player with no Discord account on their profile gets neither.
+**A player isn't moved into their team's voice channel.** Discord can only move someone who is already in a voice channel on your server. A player with no Discord account on their profile isn't moved at all.
 
 **A player gets no DMs.** They need to share a Discord server with the bot, and to allow DMs from server members in their Discord privacy settings.
 
