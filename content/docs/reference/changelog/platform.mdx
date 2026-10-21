@@ -7,6 +7,56 @@ description: Release notes for each version of the Auto Tournament platform.
 
 Versions before 3.0 were released as **MatchZy Auto Tournament** (MAT). Their notes are under [Earlier versions](#earlier-versions). **3.0 is in beta**: the `3.0.0-beta.N` releases below are the 3.0 notes until 3.0.0 ships. See [Upgrading to 3.0](/guides/upgrading-to-3). Newest first. Each entry is the [GitHub release](https://github.com/Auto-Tournament/auto-tournament/releases) for that version. [Docs](/).
 
+## v3.0.0-beta.208
+
+<p className="text-sm text-fd-muted-foreground">2026-10-21 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.208)</p>
+
+- feat(home): the next-match card estimates the wait, and pulses when it needs you ([#1253](https://github.com/Auto-Tournament/auto-tournament/pull/1253))
+- feat(tournament): the tournament page shows your match with the home page's card ([#1260](https://github.com/Auto-Tournament/auto-tournament/pull/1260))
+- feat(teams): a player can own up to three teams ([#1255](https://github.com/Auto-Tournament/auto-tournament/pull/1255))
+- perf(client): the same GET on its way is shared, not sent again ([#1262](https://github.com/Auto-Tournament/auto-tournament/pull/1262))
+- perf(cs2): the module's pages load when first opened ([#1265](https://github.com/Auto-Tournament/auto-tournament/pull/1265))
+- feat(cs2): a tournament chooses which address its players get: LAN, internet or both ([#1263](https://github.com/Auto-Tournament/auto-tournament/pull/1263))
+- feat(profile): choose which of your teams shows under your name ([#1256](https://github.com/Auto-Tournament/auto-tournament/pull/1256))
+- fix(match): the LAN or internet address you picked is remembered ([#1257](https://github.com/Auto-Tournament/auto-tournament/pull/1257))
+- feat(cs2): the connect panel learns which networks reach a machine over LAN ([#1264](https://github.com/Auto-Tournament/auto-tournament/pull/1264))
+- perf(client): only the viewer's language is downloaded ([#1266](https://github.com/Auto-Tournament/auto-tournament/pull/1266))
+- perf(modules): a module's languages can load on demand; CS2's do ([#1267](https://github.com/Auto-Tournament/auto-tournament/pull/1267))
+- fix(match): no 'Match ready' toast, and no small print under Connect ([#1258](https://github.com/Auto-Tournament/auto-tournament/pull/1258))
+- fix(chat): system lines no longer count as unread ([#1254](https://github.com/Auto-Tournament/auto-tournament/pull/1254))
+- fix(discord): no 'join the Lobby' DM for players already in voice ([#1259](https://github.com/Auto-Tournament/auto-tournament/pull/1259))
+- perf(client): pages load when first opened, not all up front ([#1261](https://github.com/Auto-Tournament/auto-tournament/pull/1261))
+
+## v3.0.0-beta.207
+
+<p className="text-sm text-fd-muted-foreground">2026-10-21 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.207)</p>
+
+- feat(discord): the bot checks its own permissions and asks for a re-invite ([#1250](https://github.com/Auto-Tournament/auto-tournament/pull/1250))
+- feat(home): the next-match card shows where the match is, and lights up when you must act ([#1251](https://github.com/Auto-Tournament/auto-tournament/pull/1251))
+- fix(tournament): 'Fancy another game?' is a quiet hint under the result ([#1252](https://github.com/Auto-Tournament/auto-tournament/pull/1252))
+
+## v3.0.0-beta.206
+
+<p className="text-sm text-fd-muted-foreground">2026-10-21 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.206)</p>
+
+- fix(discord): players are moved as soon as their team's voice channel is made ([#1247](https://github.com/Auto-Tournament/auto-tournament/pull/1247))
+- feat(discord): /lobby calls a tournament's players to its Lobby, from Discord ([#1248](https://github.com/Auto-Tournament/auto-tournament/pull/1248))
+- feat(discord): Connect Discord stands out, and players without it get a bell reminder ([#1249](https://github.com/Auto-Tournament/auto-tournament/pull/1249))
+
+## v3.0.0-beta.205
+
+<p className="text-sm text-fd-muted-foreground">2026-10-21 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.205)</p>
+
+- feat(discord): turn on player linking from the bot page, and the bot makes the server invite ([#1244](https://github.com/Auto-Tournament/auto-tournament/pull/1244))
+- feat(discord): a notice asks players to link Discord or join the server ([#1245](https://github.com/Auto-Tournament/auto-tournament/pull/1245))
+- feat(discord): linking Discord puts the player on the bot's server ([#1246](https://github.com/Auto-Tournament/auto-tournament/pull/1246))
+
+## v3.0.0-beta.204
+
+<p className="text-sm text-fd-muted-foreground">2026-10-21 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.204)</p>
+
+- fix(discord): the line above a team's match card follows the stage ([#1243](https://github.com/Auto-Tournament/auto-tournament/pull/1243))
+
 ## v3.0.0-beta.203
 
 <p className="text-sm text-fd-muted-foreground">2026-10-21 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.203)</p>
