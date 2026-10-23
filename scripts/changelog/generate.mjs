@@ -49,6 +49,16 @@ const products = [
     intro: 'CS2 Server Manager (`csm`) runs several CS2 servers on one Linux machine.',
   },
   {
+    slug: 'frame-by-frame',
+    repo: 'Auto-Tournament/frame-by-frame',
+    name: 'Frame by Frame',
+    title: 'Frame by Frame changelog',
+    description: 'Release notes for each version of Frame by Frame, the CS2 plugin the highlight recorder uses.',
+    docs: '/guides/highlights',
+    intro:
+      "Frame by Frame is the CS2 plugin the highlight recorder loads to record clips one frame at a time. The recorder installs it, so it doesn't need setting up.",
+  },
+  {
     slug: 'matchzy-enhanced',
     repo: 'Auto-Tournament/matchzy-enhanced',
     name: 'MatchZy Enhanced (ME)',
@@ -148,6 +158,7 @@ function cleanBody(body, release, repo) {
   const out = [];
   let inFence = false;
   let skipLevel = 0; // > 0 while inside a dropped section
+  let inPrereleaseNote = false; // Ready Up's "> **Pre-release** for testing." quote, in every beta
   for (const line of lines) {
     const fence = /^\s*(```|~~~)/.test(line);
     if (!inFence) {
@@ -178,6 +189,11 @@ function cleanBody(body, release, repo) {
     if (inFence) {
       out.push(line);
       continue;
+    }
+    if (/^>\s*\*\*Pre-release\*\* for testing/.test(line)) inPrereleaseNote = true;
+    if (inPrereleaseNote) {
+      if (line.startsWith('>')) continue;
+      inPrereleaseNote = false;
     }
     if (/^This is a \*\*prerelease\/beta build\*\*/.test(line)) continue;
     if (/^Built from commit \w+\s*$/.test(line)) continue;
