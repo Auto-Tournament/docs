@@ -27,7 +27,7 @@ The recording happens on **recorders**: Linux PCs with a GPU, CS2 and Steam that
 
 | Setting | What it does |
 | --- | --- |
-| Resolution and frame rate | What the recorders make, up to 4K and 240 fps. Smaller and fewer frames record faster: 720p at 30 fps takes about half as long as 1440p at 120 fps. |
+| Video quality | **Smooth** (recommended): 720p at 240 fps, so slow motion at 0.25× still plays at 60 frames a second, and clips stay small enough to stream. **Crisp**: 1080p at 120 fps. **LAN, maximum**: 1440p at 240 fps and 60 Mbit/s, for events watched on a local network. **Custom**: your own resolution, frame rate and bitrate. Leave the bitrate on Automatic unless you have a reason not to. |
 | Clips per player per map | 1 to 6. Each takes a recorder a few minutes. |
 | Auto Tournament logo | A faint logo in the corner. |
 | Music under reels | Every track, only the ones you pick, or none. You add the tracks (Auto Tournament ships none). |
@@ -90,3 +90,5 @@ Don't play or run other GPU work on a recorder while it records: the GPU is shar
 | A recorder is Paused | Its clips stuttered: something else was using the GPU, or the refresh rate is too high. Close the game or run the benchmark again. |
 | No recorder picks anything up | Its key (revoked?), whether its group is enabled, and its last run's log on the Recorders page. |
 | Clips take long | The resolution and frame rate in Settings, and the recorder's GPU (its seconds per clip on the Recorders page). |
+| Clips stop to buffer while they play | The bitrate is higher than the viewer's connection. Use Smooth, or a lower bitrate under Custom. The first view of each clip comes from your machine, so a slow upload buffers too. Behind Cloudflare, add the [cache rule](/guides/reverse-proxy#cloudflare). |
+| Slow motion looks choppy | Clips at 60 fps play at 15 frames a second at 0.25×. Use 240 fps (Smooth), then **Make the outdated ones again** on the Clips page. |
