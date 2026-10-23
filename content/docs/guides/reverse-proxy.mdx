@@ -106,3 +106,16 @@ server {
 - `X-Forwarded-Proto` tells Auto Tournament that the page uses HTTPS. Without it, login can fail.
 - `Upgrade` and `Connection` let the live updates use WebSocket.
 - `client_max_body_size 0` removes the upload limit. Demo files are large, and the nginx default of 1 MB blocks demo uploads.
+
+## Cloudflare
+
+Behind Cloudflare, either with the domain's DNS record proxied (orange cloud) or with a [Cloudflare Tunnel](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/) (`cloudflared`) pointing at `http://localhost:3069`, add one cache rule. WebSocket works without changes.
+
+Clips and reels keep their file name when they are recorded again, and Auto Tournament asks for them to be cached for five minutes. Cloudflare raises that to your zone's browser cache time, four hours by default, so after a clip is recorded again, viewers keep getting the old video for hours.
+
+In the Cloudflare dashboard, open **Caching → Cache Rules** and create a rule:
+
+- **When:** hostname equals `tournament.example.com` and URI path starts with `/api/game/cs2/highlights/`
+- **Cache eligibility:** eligible for cache
+- **Edge TTL:** use cache-control header if present
+- **Browser TTL:** respect origin TTL
