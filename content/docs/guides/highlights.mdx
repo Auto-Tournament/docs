@@ -91,4 +91,4 @@ Don't play or run other GPU work on a recorder while it records: the GPU is shar
 | No recorder picks anything up | Its key (revoked?), whether its group is enabled, and its last run's log on the Recorders page. |
 | Clips take long | The resolution and frame rate in Settings, and the recorder's GPU (its seconds per clip on the Recorders page). |
 | Clips stop to buffer while they play | The bitrate is higher than the viewer's connection. Use Smooth, or a lower bitrate under Custom. The first view of each clip comes from your machine, so a slow upload buffers too. Behind Cloudflare, add the [cache rule](/guides/reverse-proxy#cloudflare). |
-| Slow motion looks choppy | Clips at 60 fps play at 15 frames a second at 0.25×. Use 240 fps (Smooth), then **Redo outdated** to make the old clips again. |
+| Slow motion looks choppy | Clips at 60 fps play at 15 frames a second at 0.25×. Use 240 fps (Smooth), then **Make the outdated ones again** on the Clips page. |
