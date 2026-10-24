@@ -1,0 +1,45 @@
+---
+title: Frame by Frame
+description: The CS2 plugin the highlight recorder uses to record clips one frame at a time, on any GPU.
+icon: Clapperboard
+---
+
+Frame by Frame is a small CS2 plugin that the [highlight recorder](/guides/highlights) loads into its own CS2. With it, CS2 renders a demo one frame at a time and saves every frame and the game's own sound. A slow GPU gets the same clip as a fast one; it just takes longer.
+
+You don't install or set it up: the recorder does that, and only while its own CS2 runs.
+
+- Source and releases: [github.com/Auto-Tournament/frame-by-frame](https://github.com/Auto-Tournament/frame-by-frame)
+- [Changelog](/reference/changelog/frame-by-frame)
+- License: [PolyForm Noncommercial 1.0.0](https://github.com/Auto-Tournament/frame-by-frame/blob/master/LICENSE)
+
+## What it does
+
+CS2 can already save a demo as frames with `startmovie`, but retail CS2 hides that command. Frame by Frame does two things inside the game:
+
+- **Unhides `startmovie`.** It asks CS2 to unhide its developer-only commands, after checking that it's calling the right function.
+- **Runs commands on exact frames.** The recorder writes a list of commands, each for a given frame, and the plugin runs each one at the start of that frame. That's how a clip renders at 480 frames a game second only where it's slowed, and at 240 everywhere else.
+
+It patches no game code and needs no Metamod or CounterStrikeSharp.
+
+## After a CS2 update
+
+A CS2 update can move what the plugin relies on. It checks before it does anything, and when a check fails it stops that part and logs it. The game keeps running, and the recorder still records, just more slowly:
+
+| State | What it means | Recording |
+| --- | --- | --- |
+| **Frame actions** | Everything works. | Fastest. |
+| **One movie** | The frame-exact commands are off for this CS2 build. | Each clip is one movie at the slowed rate: slower, same result. |
+| **Off** | CS2 no longer unhides `startmovie` for the plugin. | Clips are recorded from the video stream, as before Frame by Frame. |
+
+Each recorder checks after its CS2 updates and reports the state:
+
+- On **Manage → Highlights → CS2 → Recorders**, a recorder shows a warning when it isn't on frame actions, with the CS2 build that turned it off.
+- The [compatibility page](https://autotournament.gg/compatibility) shows the newest check for Frame by Frame next to Ready Up's.
+
+When that happens, update the recorder once a new Frame by Frame release is out. **Update all** on the Recorders page does it.
+
+## Try it by hand
+
+To use it outside the recorder, put a release's `frame-by-frame` folder in `game/csgo/`, add `Game csgo/frame-by-frame` above `Game csgo` in `gameinfo.gi`, and start CS2 with `-insecure`. The console then shows `[Frame by Frame] movie commands unhidden`. The [README](https://github.com/Auto-Tournament/frame-by-frame#how-a-recording-works) explains the commands file.
+
+To make a recorder skip the frame-exact commands, set `AT_FBF_ACTIONS=0` on it. It then records like the **One movie** state.
