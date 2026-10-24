@@ -18,7 +18,7 @@ The recording happens on **recorders**: Linux PCs with a GPU, CS2 and Steam that
 
 1. A map ends and its demo arrives (Ready Up uploads it).
 2. The **demo worker** (the `auto-tournament-worker` container next to the platform) reads it: stats, the 2D replay, and the moments.
-3. A **recorder** takes the moments of a map, plays the demo in CS2 and records each one, then uploads the clips and the player's reel.
+3. A **recorder** takes the moments of a map, plays the demo in CS2 and records each one frame by frame with [Frame by Frame](/guides/frame-by-frame), then uploads the clips and the player's reel.
 4. When a match is all recorded, the match and team reels are joined from the clips.
 
 ## Settings
@@ -45,7 +45,7 @@ Open **Manage → Highlights → CS2 → Recorders** and click **Add a recorder*
 
 A Linux PC with Docker, Steam (signed in) and CS2 installed, and an NVIDIA or AMD GPU. Paste the command in a terminal in its desktop session. It starts the recorder container, which uses the PC's GPU and finds CS2 in its Steam libraries. It starts again whenever Docker does.
 
-Switch Steam to offline mode: demo playback needs no online session, so every recorder can use the same Steam account.
+Switch Steam to offline mode: demo playback needs no online session, so every recorder can use the same Steam account. The recorder takes Steam online by itself only to update CS2 (see [CS2 updates](#cs2-updates)).
 
 </Step>
 
@@ -66,7 +66,7 @@ Then, once: open the web UI it prints (https, port `8483`), sign in with the fir
 
 ### Check it on the Recorders page
 
-The recorder shows up under its own name the first time it asks for work; rename it in the list. On its first job it runs a short **benchmark** (one moment at 240 and 120 Hz, timed and checked for smoothness) and keeps the fastest smooth setting. The list shows its GPU, the benchmark, seconds per clip and every run with its log. **Update all** updates every recorder to the platform's version.
+The recorder shows up under its own name the first time it asks for work; rename it in the list. On its first job it runs a short **benchmark** (one moment at 240 and 120 Hz, timed and checked for smoothness) and keeps the fastest smooth setting. The list shows its GPU, the benchmark, seconds per clip and every run with its log. A warning shows there when a CS2 update has turned [Frame by Frame](/guides/frame-by-frame#after-a-cs2-update) off. **Update all** updates every recorder to the platform's version.
 
 </Step>
 
@@ -77,6 +77,22 @@ Windows isn't supported yet: the recorder captures CS2 through gamescope, which 
 ## Playing on a recorder
 
 Don't play or run other GPU work on a recorder while it records: the GPU is shared and the clips stutter. Every clip is checked for repeated frames (a stutter): at 4% or more the platform turns it down and has it recorded again, preferably on another recorder. A recorder with three turned-down clips in a row gets no work for 15 minutes and shows as **Paused**; **Resume** gives it work again sooner.
+
+## CS2 updates
+
+A recorder keeps its CS2 up to date by itself. While it has no work, it asks Steam every 30 minutes whether CS2 is current. When it's behind, the recorder takes Steam online with its saved login, waits for the update to finish (up to an hour), and puts Steam back in offline mode. It takes no work meanwhile, and the Recorders page shows **updating CS2**.
+
+If Steam can't sign in (the saved login expired), the run log says so: sign Steam in again on the recorder's desktop. To update CS2 yourself instead, set `AT_CS2_UPDATE=0` on the recorder.
+
+## Recording clips again
+
+On **Manage → Highlights → CS2 → Clips**, **Redo** records a clip or reel again, and **Make the outdated ones again** redoes everything made at older settings. A redo keeps the old video until the new one is ready:
+
+- **Keep the old videos** stops the redos still waiting and keeps what they had.
+- A redo that fails all three attempts keeps its old video too.
+- A clip that failed and has no video holds its reels back, so a reel is never made without a match's best plays. Redo it, or drop it on the Clips page.
+
+A job has no time limit, so a recorder can work through a long match for hours. Only a job that makes no progress for 30 minutes is stopped and tried again.
 
 ## Matches played somewhere else
 
@@ -89,6 +105,6 @@ Don't play or run other GPU work on a recorder while it records: the GPU is shar
 | *Failed to connect to wayland socket* in a run log | The container needs the PC's display: `WAYLAND_DISPLAY` and the `/run/user/<uid>` mount. |
 | A recorder is Paused | Its clips stuttered: something else was using the GPU, or the refresh rate is too high. Close the game or run the benchmark again. |
 | No recorder picks anything up | Its key (revoked?), whether its group is enabled, and its last run's log on the Recorders page. |
-| Clips take long | The resolution and frame rate in Settings, and the recorder's GPU (its seconds per clip on the Recorders page). |
+| Clips take long | The resolution and frame rate in Settings, and the recorder's GPU (its seconds per clip on the Recorders page). After a CS2 update, check the Recorders page for a [Frame by Frame](/guides/frame-by-frame#after-a-cs2-update) warning. |
 | Clips stop to buffer while they play | The bitrate is higher than the viewer's connection. Use Smooth, or a lower bitrate under Custom. The first view of each clip comes from your machine, so a slow upload buffers too. Behind Cloudflare, add the [cache rule](/guides/reverse-proxy#cloudflare). |
 | Slow motion looks choppy | Clips at 60 fps play at 15 frames a second at 0.25×. Use 240 fps (Smooth), then **Make the outdated ones again** on the Clips page. |

@@ -54,7 +54,7 @@ const products = [
     name: 'Frame by Frame',
     title: 'Frame by Frame changelog',
     description: 'Release notes for each version of Frame by Frame, the CS2 plugin the highlight recorder uses.',
-    docs: '/guides/highlights',
+    docs: '/guides/frame-by-frame',
     intro:
       "Frame by Frame is the CS2 plugin the highlight recorder loads to record clips one frame at a time. The recorder installs it, so it doesn't need setting up.",
   },
