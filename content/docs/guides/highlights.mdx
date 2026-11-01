@@ -84,6 +84,83 @@ Windows isn't supported yet: the recorder captures CS2 through gamescope, which 
 
 Don't play or run other GPU work on a recorder while it records: the GPU is shared and the clips stutter. Every clip is checked for repeated frames (a stutter): at 4% or more the platform turns it down and has it recorded again, preferably on another recorder. A recorder with three turned-down clips in a row gets no work for 15 minutes and shows as **Paused**; **Resume** gives it work again sooner.
 
+## Several recorders on one GPU
+
+A second recorder on the same GPU adds real speed, if the card has the memory for it. What we measured on an RTX 3060 12 GB, recording the same clip:
+
+| Recorders on the card | Seconds per clip | Clips per hour, compared to one | Video memory |
+| --- | --- | --- | --- |
+| 1 | 276–288 | 1x | about 5.8 GB |
+| 2 | 315–344 | about 1.6–1.7x | 11.0–11.7 GB |
+| 3 | Fails | Runs out of memory in 3 of 6 tries | The whole card |
+
+The clips from two recorders had no stutter. That's one card model; expect your numbers to differ.
+
+The rule is about 5.8 GB per recorder, plus 512 MB left free. A 12 GB card fits two, and anything else using the card counts against that.
+
+A map stays one CS2 session on one recorder, so extra recorders work on other maps. They don't speed up a single map.
+
+### Add one by hand
+
+On a [server](#server-headless) installed with the `at-recorder` command:
+
+```bash
+/srv/at-recorder/at-recorder scale --gpu GPU-UUID --dry-run
+/srv/at-recorder/at-recorder scale --gpu GPU-UUID
+```
+
+`nvidia-smi -L` lists the UUIDs. The new recorder is a copy with its own Steam home and CS2. On btrfs or XFS the copy takes almost no disk space; on other disks it needs `--allow-full-copy`, which copies all of CS2. It copies only while the first recorder is idle.
+
+### Let it scale by itself
+
+`at-recorder autoscale` starts recorders when jobs wait and stops them after 20 idle minutes. It's off until you turn it on, and uses only the GPUs you list. It runs as its own container:
+
+```yaml
+services:
+  at-recorder-autoscaler:
+    image: sivertio/auto-tournament-recorder-autoscaler:next
+    container_name: at-recorder-autoscaler
+    restart: unless-stopped
+    runtime: nvidia
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=utility
+      - AT_AUTOSCALE=1
+      - AT_AUTOSCALE_GPUS=GPU-your-card-uuid
+      - AT_RECORDER_ROOT=/srv/at-recorder
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /srv/at-recorder:/srv/at-recorder
+      - /sys/bus/pci/devices:/sys/bus/pci/devices:ro
+```
+
+- It only touches containers it made. It never starts or stops your first recorder, and never stops a recorder at a job.
+- It adds one recorder at a time, and gives each 5 minutes to come up.
+- After a recorder runs out of GPU memory, it allows one fewer on that card until it restarts.
+
+The Recorders page shows a stopped copy as **Standby**, and lists each card with why it has no room.
+
+<Callout type="warn">
+  The Docker socket gives this container root on the host. Only run it on a machine you'd trust with the recorder's own host agent.
+</Callout>
+
+### A PC with two NVIDIA GPUs
+
+A recorder pinned to the second GPU alone can fail: CS2 runs, but video won't encode. It's a [reported NVIDIA driver problem](https://forums.developer.nvidia.com/t/347361) in containers on machines with several GPUs. The fix is to let the container see every GPU, and point the work at one. On the second card, set these on the container:
+
+```yaml
+environment:
+  - NVIDIA_VISIBLE_DEVICES=all
+  - CUDA_VISIBLE_DEVICES=GPU-your-card-uuid
+  - DRI_PRIME=pci-0000_82_00_0 # the card's PCI address, from nvidia-smi
+```
+
+We tested this on one machine with two RTX 3060s, one recorder on the second card. Recorders running on both cards at once are untested.
+
+## Benchmark results we collect
+
+After a benchmark, a recorder sends its result to autotournament.gg: GPU and CPU model, driver, video memory, recorder version, resolution, seconds per clip, frames per second, peak video memory, failed tries and how many recorders share the card, with a random ID for the install. No names, keys or match data. The results make up the [recorder performance page](https://autotournament.gg/recorder-performance). Turn it off on **Manage → Highlights → CS2 → Settings**.
+
 ## CS2 updates
 
 A recorder keeps its CS2 up to date by itself. While it has no work, it asks Steam every 30 minutes whether CS2 is current. When it's behind, the recorder takes Steam online with its saved login, waits for the update to finish (up to an hour), and puts Steam back in offline mode. It takes no work meanwhile, and the Recorders page shows **updating CS2**.
@@ -111,6 +188,7 @@ A job has no time limit, so a recorder can work through a long match for hours. 
 | *Failed to connect to wayland socket* in a run log | The container needs the PC's display: `WAYLAND_DISPLAY` and the `/run/user/<uid>` mount. |
 | A recorder is Paused | Its clips stuttered: something else was using the GPU, or the refresh rate is too high. Close the game or run the benchmark again. |
 | No recorder picks anything up | Its key (revoked?), whether its group is enabled, and its last run's log on the Recorders page. |
+| A benchmark try says *the demo's map never loaded* | It can happen on the first try after a recorder starts. If the next try works, there's nothing to do. |
 | Clips take long | The resolution and frame rate in Settings, and the recorder's GPU (its seconds per clip on the Recorders page). After a CS2 update, check the Recorders page for a [Frame by Frame](/guides/frame-by-frame#after-a-cs2-update) warning. |
 | Clips stop to buffer while they play | The bitrate is higher than the viewer's connection. Use Smooth, or a lower bitrate under Custom. The first view of each clip comes from your machine, so a slow upload buffers too. Behind Cloudflare, add the [cache rule](/guides/reverse-proxy#cloudflare). |
 | Slow motion looks choppy | Clips at 60 fps play at 15 frames a second at 0.25×. Use 240 fps (Smooth), then **Make the outdated ones again** on the Clips page. |
