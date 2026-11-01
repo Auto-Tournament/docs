@@ -7,6 +7,71 @@ description: Release notes for each version of the Auto Tournament platform.
 
 Versions before 3.0 were released as **MatchZy Auto Tournament** (MAT). Their notes are under [Earlier versions](#earlier-versions). **3.0 is in beta**: the `3.0.0-beta.N` releases below are the 3.0 notes until 3.0.0 ships. See [Upgrading to 3.0](/guides/upgrading-to-3). Newest first. Each entry is the [GitHub release](https://github.com/Auto-Tournament/auto-tournament/releases) for that version. [Docs](/).
 
+## v3.0.0-beta.237
+
+<p className="text-sm text-fd-muted-foreground">2026-11-01 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.237)</p>
+
+- fix(worker): a clip waits for GPU memory instead of being skipped ([#1450](https://github.com/Auto-Tournament/auto-tournament/pull/1450))
+- feat(worker): plan how many recorders each graphics card should run ([#1451](https://github.com/Auto-Tournament/auto-tournament/pull/1451))
+- feat(recorder): a recorder key can read how many jobs are waiting ([#1452](https://github.com/Auto-Tournament/auto-tournament/pull/1452))
+- feat(at-recorder): scale adds a recorder on a GPU, if it fits ([#1453](https://github.com/Auto-Tournament/auto-tournament/pull/1453))
+- fix(worker): the images keep the benchmark demo ([#1457](https://github.com/Auto-Tournament/auto-tournament/pull/1457))
+- feat(at-recorder): autoscale starts recorders with the queue and stops them when idle ([#1456](https://github.com/Auto-Tournament/auto-tournament/pull/1456))
+- fix(client): every page starts at the top, not only the admin ones ([#1454](https://github.com/Auto-Tournament/auto-tournament/pull/1454))
+
+## v3.0.0-beta.236
+
+<p className="text-sm text-fd-muted-foreground">2026-11-01 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.236)</p>
+
+- feat(demos): one-taps from the shots fired, not from Deagle plus headshot ([#1436](https://github.com/Auto-Tournament/auto-tournament/pull/1436))
+- feat(demos): kills carry flick, snap, flash assist, collateral, distance, moving and the victim's gun ([#1437](https://github.com/Auto-Tournament/auto-tournament/pull/1437))
+- feat(demos): kills carry the fight: shots, hits, damage, time, walls, crouch, quick-scope, a denied defuse ([#1439](https://github.com/Auto-Tournament/auto-tournament/pull/1439))
+- feat(worker): at-worker analyze keeps the replay too, with AT_REPLAY_OUT ([#1440](https://github.com/Auto-Tournament/auto-tournament/pull/1440))
+- feat(demos): each round says when its freeze time ended ([#1441](https://github.com/Auto-Tournament/auto-tournament/pull/1441))
+- feat(demos): the replay says who has whom in view, and what each player holds ([#1442](https://github.com/Auto-Tournament/auto-tournament/pull/1442))
+- fix(worker): the recorder's CS2 update no longer waits on Steam's delay ([#1443](https://github.com/Auto-Tournament/auto-tournament/pull/1443))
+- feat(highlights): a shared link keeps the song you chose ([#1444](https://github.com/Auto-Tournament/auto-tournament/pull/1444))
+- feat(highlights): a clip's player name and picture open their profile ([#1445](https://github.com/Auto-Tournament/auto-tournament/pull/1445))
+- feat(matchmaking): profile shows commend types with icons, negatives only to the player and admins ([#1446](https://github.com/Auto-Tournament/auto-tournament/pull/1446))
+- feat(worker): ship the benchmark demo, so every recorder times the same clip ([#1447](https://github.com/Auto-Tournament/auto-tournament/pull/1447))
+- feat(worker): send a benchmark's anonymous result to the website ([#1448](https://github.com/Auto-Tournament/auto-tournament/pull/1448))
+- feat(highlights): an admin setting turns off sending benchmark results ([#1449](https://github.com/Auto-Tournament/auto-tournament/pull/1449))
+
+## v2.4.16-beta.1
+
+<p className="text-sm text-fd-muted-foreground">2026-11-01 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v2.4.16-beta.1)</p>
+
+- feat(highlights): Record highlights switch for tournaments and manual matches ([#1419](https://github.com/Auto-Tournament/auto-tournament/pull/1419))
+- feat(highlights): clip budget for matchmaking ([#1420](https://github.com/Auto-Tournament/auto-tournament/pull/1420))
+- fix(highlights): unset matchmaking clip count defaults to 3, not all ([#1421](https://github.com/Auto-Tournament/auto-tournament/pull/1421))
+- feat(highlights): more varied crowd in reels (seven recordings) ([#1422](https://github.com/Auto-Tournament/auto-tournament/pull/1422))
+- feat(footer): Support the project link ([#1425](https://github.com/Auto-Tournament/auto-tournament/pull/1425))
+- feat(highlights): the logo is hard-coded on every highlight video ([#1424](https://github.com/Auto-Tournament/auto-tournament/pull/1424))
+- feat(music): even tracks out by loudness above 200 Hz and rate their energy ([#1426](https://github.com/Auto-Tournament/auto-tournament/pull/1426))
+- fix(tests): upgrade test signs in again after the upgrade ([#1427](https://github.com/Auto-Tournament/auto-tournament/pull/1427))
+- fix(recorder): play demos from servers with a client addon ([#1428](https://github.com/Auto-Tournament/auto-tournament/pull/1428))
+- feat(demos): kills carry place, killer health, round clock and bomb state ([#1423](https://github.com/Auto-Tournament/auto-tournament/pull/1423))
+- fix(veto): a match with its veto off has no veto ([#1429](https://github.com/Auto-Tournament/auto-tournament/pull/1429))
+- fix(demos): spotted and time-to-damage keyed by UserID, not SteamID ([#1430](https://github.com/Auto-Tournament/auto-tournament/pull/1430))
+- perf(recorder): dress clips at the output's size and frame rate ([#1431](https://github.com/Auto-Tournament/auto-tournament/pull/1431))
+- fix(highlights): no "Round 0" in the corner of imported and manual matches ([#1432](https://github.com/Auto-Tournament/auto-tournament/pull/1432))
+- fix(cs2): an elimination match plays overtime on a tie, even with overtime off ([#1434](https://github.com/Auto-Tournament/auto-tournament/pull/1434))
+- feat(discord): the idle bot shows "Watching autotournament.gg" ([#1433](https://github.com/Auto-Tournament/auto-tournament/pull/1433))
+- feat(license): a paid install works offline with a lease from the console ([#1435](https://github.com/Auto-Tournament/auto-tournament/pull/1435))
+- feat(demos): one-taps from the shots fired, not from Deagle plus headshot ([#1436](https://github.com/Auto-Tournament/auto-tournament/pull/1436))
+- feat(demos): kills carry flick, snap, flash assist, collateral, distance, moving and the victim's gun ([#1437](https://github.com/Auto-Tournament/auto-tournament/pull/1437))
+- feat(demos): kills carry the fight: shots, hits, damage, time, walls, crouch, quick-scope, a denied defuse ([#1439](https://github.com/Auto-Tournament/auto-tournament/pull/1439))
+- feat(worker): at-worker analyze keeps the replay too, with AT_REPLAY_OUT ([#1440](https://github.com/Auto-Tournament/auto-tournament/pull/1440))
+- feat(demos): each round says when its freeze time ended ([#1441](https://github.com/Auto-Tournament/auto-tournament/pull/1441))
+- feat(demos): the replay says who has whom in view, and what each player holds ([#1442](https://github.com/Auto-Tournament/auto-tournament/pull/1442))
+- fix(worker): the recorder's CS2 update no longer waits on Steam's delay ([#1443](https://github.com/Auto-Tournament/auto-tournament/pull/1443))
+- feat(highlights): a shared link keeps the song you chose ([#1444](https://github.com/Auto-Tournament/auto-tournament/pull/1444))
+- feat(highlights): a clip's player name and picture open their profile ([#1445](https://github.com/Auto-Tournament/auto-tournament/pull/1445))
+- feat(matchmaking): profile shows commend types with icons, negatives only to the player and admins ([#1446](https://github.com/Auto-Tournament/auto-tournament/pull/1446))
+- feat(worker): ship the benchmark demo, so every recorder times the same clip ([#1447](https://github.com/Auto-Tournament/auto-tournament/pull/1447))
+- feat(worker): send a benchmark's anonymous result to the website ([#1448](https://github.com/Auto-Tournament/auto-tournament/pull/1448))
+- feat(highlights): an admin setting turns off sending benchmark results ([#1449](https://github.com/Auto-Tournament/auto-tournament/pull/1449))
+
 ## v3.0.0-beta.235
 
 <p className="text-sm text-fd-muted-foreground">2026-10-28 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.235)</p>
