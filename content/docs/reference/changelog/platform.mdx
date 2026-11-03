@@ -7,6 +7,56 @@ description: Release notes for each version of the Auto Tournament platform.
 
 Versions before 3.0 were released as **MatchZy Auto Tournament** (MAT). Their notes are under [Earlier versions](#earlier-versions). **3.0 is in beta**: the `3.0.0-beta.N` releases below are the 3.0 notes until 3.0.0 ships. See [Upgrading to 3.0](/guides/upgrading-to-3). Newest first. Each entry is the [GitHub release](https://github.com/Auto-Tournament/auto-tournament/releases) for that version. [Docs](/).
 
+## v3.0.0-beta.249
+
+<p className="text-sm text-fd-muted-foreground">2026-11-03 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.249)</p>
+
+- fix(match): an admin releasing a both-short hold doesn't start the full-team timer again ([#1508](https://github.com/Auto-Tournament/auto-tournament/pull/1508))
+
+## v3.0.0-beta.248
+
+<p className="text-sm text-fd-muted-foreground">2026-11-03 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.248)</p>
+
+- fix(signup): sign-up stays open while check-in is open ([#1505](https://github.com/Auto-Tournament/auto-tournament/pull/1505))
+- fix(signup): You're in and lineup copy found testing on cs ([#1506](https://github.com/Auto-Tournament/auto-tournament/pull/1506))
+- fix(match): auto-start waits while a team is short and the full-team timer runs ([#1507](https://github.com/Auto-Tournament/auto-tournament/pull/1507))
+
+## v3.0.0-beta.247
+
+<p className="text-sm text-fd-muted-foreground">2026-11-03 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.247)</p>
+
+- fix(match): no full-team timer when bots play (simulation, bot fill) ([#1503](https://github.com/Auto-Tournament/auto-tournament/pull/1503))
+- fix(modules): a code module's built-in templates and minutes per map reach the setup ([#1504](https://github.com/Auto-Tournament/auto-tournament/pull/1504))
+
+## v3.0.0-beta.246
+
+<p className="text-sm text-fd-muted-foreground">2026-11-03 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.246)</p>
+
+- feat(signup): tournaments playing at the same time (API)
+- feat(setup): heads-up about tournaments on the same days and times, and the player's card
+- feat(setup): Valve official fills the rules for players and the rulebook link
+- fix(setup): 24-hour times in the new fields; a round's window never runs overnight
+- feat(setup): 'Getting on the server' minutes and 'Check in again before each match' (settings)
+- feat(signup): subs count as checked in; a starter who didn't check in is replaced by a sub
+- feat(signup): 'You're in!' after sign-up, sent to the owner and captains
+- feat(match): check in before each match
+- feat(match): a full team on the server in N minutes, or the complete team can take a walkover
+- feat(match): 'Get your team on the server' card and the walkover choice
+- fix(highlights): every match keeps only plays of the smallest play or a clutch ([#1477](https://github.com/Auto-Tournament/auto-tournament/pull/1477))
+- feat(cs2): a tournament can make everyone play the default agents ([#1478](https://github.com/Auto-Tournament/auto-tournament/pull/1478))
+- feat(cs2): auto-start minutes per tournament ([#1479](https://github.com/Auto-Tournament/auto-tournament/pull/1479))
+- fix(commends): only players who played can be commended or reported ([#1482](https://github.com/Auto-Tournament/auto-tournament/pull/1482))
+- feat(cs2): a tournament sets its own knife round, team ready, pauses, .gg and skins ([#1480](https://github.com/Auto-Tournament/auto-tournament/pull/1480))
+- fix(i18n): nb språkvask, part 1 of 4: sign-in, admin tools, webhooks, maps, brackets ([#1484](https://github.com/Auto-Tournament/auto-tournament/pull/1484))
+- fix(i18n): nb språkvask, part 2 of 4: players, teams, modals, settings, social ([#1485](https://github.com/Auto-Tournament/auto-tournament/pull/1485))
+- fix(i18n): nb språkvask, part 3 of 4: tournament pages, home, matchmaking, chat ([#1486](https://github.com/Auto-Tournament/auto-tournament/pull/1486))
+- fix(i18n): nb språkvask, part 4 of 4: the CS2 module ([#1487](https://github.com/Auto-Tournament/auto-tournament/pull/1487))
+- fix(setup): no 'need at least 2 teams' error when teams sign up themselves ([#1488](https://github.com/Auto-Tournament/auto-tournament/pull/1488))
+- feat(setup): Match settings step: preset dropdown with saved presets, Valve official template, orange marks ([#1481](https://github.com/Auto-Tournament/auto-tournament/pull/1481))
+- feat(ui): the site's own date and time pickers ([#1489](https://github.com/Auto-Tournament/auto-tournament/pull/1489))
+- feat(signup): sign-up opens at a set time, check-in counted from the start, captains check in teammates (API) ([#1491](https://github.com/Auto-Tournament/auto-tournament/pull/1491))
+- feat(signup): Teams step sets sign-up opening and check-in minutes, as drawn ([#1492](https://github.com/Auto-Tournament/auto-tournament/pull/1492))
+
 ## v3.0.0-beta.245
 
 <p className="text-sm text-fd-muted-foreground">2026-11-02 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.245)</p>
