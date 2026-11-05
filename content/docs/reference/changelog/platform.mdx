@@ -7,6 +7,69 @@ description: Release notes for each version of the Auto Tournament platform.
 
 Versions before 3.0 were released as **MatchZy Auto Tournament** (MAT). Their notes are under [Earlier versions](#earlier-versions). **3.0 is in beta**: the `3.0.0-beta.N` releases below are the 3.0 notes until 3.0.0 ships. See [Upgrading to 3.0](/guides/upgrading-to-3). Newest first. Each entry is the [GitHub release](https://github.com/Auto-Tournament/auto-tournament/releases) for that version. [Docs](/).
 
+## v3.0.2
+
+<p className="text-sm text-fd-muted-foreground">2026-11-05 · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.2)</p>
+
+- fix(release): a version bump updates docs/openapi.json too, so main stays green ([#1519](https://github.com/Auto-Tournament/auto-tournament/pull/1519))
+- fix(docker): the compose file runs sivertio/auto-tournament now that 3.0 is out ([#1518](https://github.com/Auto-Tournament/auto-tournament/pull/1518))
+- chore(cs2): drop the dead batch server form strings, and a start step that said RCON ([#1517](https://github.com/Auto-Tournament/auto-tournament/pull/1517))
+- feat(skins): rarity comes from the market price of the finish in its wear ([#1520](https://github.com/Auto-Tournament/auto-tournament/pull/1520))
+- feat(skins): a price scale shows where each skin sits, in its rarity's colour ([#1521](https://github.com/Auto-Tournament/auto-tournament/pull/1521))
+- fix(release): the bump commit may change docs/openapi.json ([#1522](https://github.com/Auto-Tournament/auto-tournament/pull/1522))
+
+## v3.0.1
+
+<p className="text-sm text-fd-muted-foreground">2026-11-05 · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.1)</p>
+
+- fix(release): post betas to Discord too, marked as beta ([#1513](https://github.com/Auto-Tournament/auto-tournament/pull/1513))
+- fix(release): a stable release's Discord changelog counts from the previous stable ([#1514](https://github.com/Auto-Tournament/auto-tournament/pull/1514))
+- fix(upgrade): a 2.x config's database name works: 3.0 renames it on its own ([#1515](https://github.com/Auto-Tournament/auto-tournament/pull/1515))
+- feat(cs2): match setting presets an admin saves for every tournament's setup ([#1483](https://github.com/Auto-Tournament/auto-tournament/pull/1483))
+- fix(docs): API docs current again, and the notification-settings route parses ([#1516](https://github.com/Auto-Tournament/auto-tournament/pull/1516))
+
+## v3.0.0
+
+<p className="text-sm text-fd-muted-foreground">2026-11-05 · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0)</p>
+
+- feat(ui): confirm dialog, player avatar and compat dot come from the design system ([#1474](https://github.com/Auto-Tournament/auto-tournament/pull/1474))
+- feat(ui): mark and state pills come from the design system ([#1475](https://github.com/Auto-Tournament/auto-tournament/pull/1475))
+- feat(ui): clip cards, event marks, rating chart and presence dot from the design system ([#1476](https://github.com/Auto-Tournament/auto-tournament/pull/1476))
+- fix(highlights): every match keeps only plays of the smallest play or a clutch ([#1477](https://github.com/Auto-Tournament/auto-tournament/pull/1477))
+- feat(cs2): a tournament can make everyone play the default agents ([#1478](https://github.com/Auto-Tournament/auto-tournament/pull/1478))
+- feat(cs2): auto-start minutes per tournament ([#1479](https://github.com/Auto-Tournament/auto-tournament/pull/1479))
+- fix(commends): only players who played can be commended or reported ([#1482](https://github.com/Auto-Tournament/auto-tournament/pull/1482))
+- feat(cs2): a tournament sets its own knife round, team ready, pauses, .gg and skins ([#1480](https://github.com/Auto-Tournament/auto-tournament/pull/1480))
+- fix(i18n): nb språkvask, part 1 of 4: sign-in, admin tools, webhooks, maps, brackets ([#1484](https://github.com/Auto-Tournament/auto-tournament/pull/1484))
+- fix(i18n): nb språkvask, part 2 of 4: players, teams, modals, settings, social ([#1485](https://github.com/Auto-Tournament/auto-tournament/pull/1485))
+- fix(i18n): nb språkvask, part 3 of 4: tournament pages, home, matchmaking, chat ([#1486](https://github.com/Auto-Tournament/auto-tournament/pull/1486))
+- fix(i18n): nb språkvask, part 4 of 4: the CS2 module ([#1487](https://github.com/Auto-Tournament/auto-tournament/pull/1487))
+- fix(setup): no 'need at least 2 teams' error when teams sign up themselves ([#1488](https://github.com/Auto-Tournament/auto-tournament/pull/1488))
+- feat(setup): Match settings step: preset dropdown with saved presets, Valve official template, orange marks ([#1481](https://github.com/Auto-Tournament/auto-tournament/pull/1481))
+- feat(ui): the site's own date and time pickers ([#1489](https://github.com/Auto-Tournament/auto-tournament/pull/1489))
+- feat(signup): sign-up opens at a set time, check-in counted from the start, captains check in teammates (API) ([#1491](https://github.com/Auto-Tournament/auto-tournament/pull/1491))
+- feat(signup): Teams step sets sign-up opening and check-in minutes, as drawn ([#1492](https://github.com/Auto-Tournament/auto-tournament/pull/1492))
+- fix(match): no full-team timer when bots play (simulation, bot fill) ([#1503](https://github.com/Auto-Tournament/auto-tournament/pull/1503))
+- fix(modules): a code module's built-in templates and minutes per map reach the setup ([#1504](https://github.com/Auto-Tournament/auto-tournament/pull/1504))
+- fix(signup): sign-up stays open while check-in is open ([#1505](https://github.com/Auto-Tournament/auto-tournament/pull/1505))
+- fix(signup): You're in and lineup copy found testing on cs ([#1506](https://github.com/Auto-Tournament/auto-tournament/pull/1506))
+- fix(match): auto-start waits while a team is short and the full-team timer runs ([#1507](https://github.com/Auto-Tournament/auto-tournament/pull/1507))
+- fix(match): an admin releasing a both-short hold doesn't start the full-team timer again ([#1508](https://github.com/Auto-Tournament/auto-tournament/pull/1508))
+- feat(match): the full team chooses the walkover in game (.walkover / .play) ([#1509](https://github.com/Auto-Tournament/auto-tournament/pull/1509))
+- feat(match): the walkover choice on the Ready Up HUD ([#1510](https://github.com/Auto-Tournament/auto-tournament/pull/1510))
+- feat(fleet): Tournament and Fun servers run the addons plugin ([#1511](https://github.com/Auto-Tournament/auto-tournament/pull/1511))
+- feat(fleet): addons is always on, like fleet ([#1512](https://github.com/Auto-Tournament/auto-tournament/pull/1512))
+- fix(release): post betas to Discord too, marked as beta ([#1513](https://github.com/Auto-Tournament/auto-tournament/pull/1513))
+- fix(release): a stable release's Discord changelog counts from the previous stable ([#1514](https://github.com/Auto-Tournament/auto-tournament/pull/1514))
+- fix(upgrade): a 2.x config's database name works: 3.0 renames it on its own ([#1515](https://github.com/Auto-Tournament/auto-tournament/pull/1515))
+
+## v3.0.0-beta.252
+
+<p className="text-sm text-fd-muted-foreground">2026-11-05 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.252)</p>
+
+- feat(fleet): Tournament and Fun servers run the addons plugin ([#1511](https://github.com/Auto-Tournament/auto-tournament/pull/1511))
+- feat(fleet): addons is always on, like fleet ([#1512](https://github.com/Auto-Tournament/auto-tournament/pull/1512))
+
 ## v3.0.0-beta.251
 
 <p className="text-sm text-fd-muted-foreground">2026-11-03 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/auto-tournament/releases/tag/v3.0.0-beta.251)</p>
