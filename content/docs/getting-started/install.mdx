@@ -10,10 +10,6 @@ This guide takes you from nothing to a first tournament in four parts: install t
 
 The platform is two containers: the app and a PostgreSQL database. Run it on any machine with Docker and Docker Compose: a VPS, a home server, or one PC at a LAN. The game servers run on other machines, with [CS2 Server Manager](/getting-started/connect-server).
 
-<Callout title="3.0 is in beta">
-  3.0 is published as the `next` tag until it is released. Then it moves to `latest`, and you change the tag in `docker-compose.yml`.
-</Callout>
-
 <Steps>
 
 <Step>
@@ -48,7 +44,7 @@ services:
       retries: 5
 
   auto-tournament:
-    image: sivertio/auto-tournament:next
+    image: sivertio/auto-tournament:latest
     container_name: auto-tournament
     restart: unless-stopped
     depends_on:

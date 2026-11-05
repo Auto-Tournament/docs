@@ -6,13 +6,9 @@ icon: CircleArrowUp
 
 import { Step, Steps } from 'fumadocs-ui/components/steps';
 
-<Callout title="Not released yet" type="warn">
-  3.0 is in development. The current release is 2.4.x, which you can keep running. This page describes the upcoming update so you can plan for it.
-</Callout>
-
 Version 3.0 is the first release under the name **Auto Tournament**. Your players, teams, tournaments, matches, ratings, stats, servers, sign-ins and settings all move over. This page shows what changes, how to update a Docker install, and how to go back.
 
-If you run 2.4.x for Counter-Strike 2, the short version is: back up, change one line, pull, restart. Your CS2 tournaments run the same way afterwards.
+If you run 2.4.x for Counter-Strike 2, the short version is: back up, pull, restart, then move your servers to CS2 Server Manager. Your CS2 tournaments run the same way afterwards.
 
 ## What changes
 
@@ -25,10 +21,10 @@ If you run 2.4.x for Counter-Strike 2, the short version is: back up, change one
 
 ### What does not change
 
-Two things change: the database name in `.env` (required) and the image name (optional):
+Your `docker-compose.yml` and `.env` keep working as they are:
 
 - The Compose service is still `matchzy-tournament`, and the containers are still `matchzy-tournament-api` and `matchzy-postgres`.
-- The database is renamed from `matchzy_tournament` to `auto_tournament` on the first start, on the same volume. Your data stays; you only set `DB_NAME=auto_tournament` (below).
+- The database is renamed from `matchzy_tournament` to `auto_tournament` on the first start, on the same volume. Your data stays, and you don't have to change `DB_NAME`: an `.env` or compose file that still says `matchzy_tournament` is read as the new name.
 - Every environment variable in your `.env` keeps its name and its meaning, and 3.0 adds no required ones. The new things you can turn on, such as game search, are configured in the app's own settings.
 - The app still listens on port 3069.
 
@@ -76,7 +72,7 @@ In 3.0 the endpoint needs either the `X-MatchZy-Token` header with your `SERVER_
 - Your install runs 2.4.x with Docker Compose, as in [Install](/getting-started/install). The upgrade is tested from **2.4.15**; if you are on an older 2.4.x, update to 2.4.15 first.
 - No match is running. The app restarts.
 - You have the folder with your `docker-compose.yml` and `.env`. Run every command below in that folder.
-- Your CS2 servers can stay on the plugin version they have; 3.0 sets no minimum. Updating them to the latest is still a good idea, and it is a step below.
+- Your CS2 servers move to [CS2 Server Manager](/cs2/server-manager) and Ready Up. 3.x does not talk to MatchZy Enhanced; see [Your CS2 servers](#your-cs2-servers).
 
 ## Update
 
@@ -123,33 +119,27 @@ Again, "No such file or directory" just means you never uploaded any. `./data/ma
 
 <Step>
 
-### Set the database name, and change the image name
+### Change the image name (optional)
 
-3.0 calls the database `auto_tournament`. On its first start it renames your `matchzy_tournament` database to that, in place: same volume, same data. It needs `DB_NAME` to say the new name, and it refuses to start while it still says `matchzy_tournament`.
+3.0 calls the database `auto_tournament`. On its first start it renames your `matchzy_tournament` database to that, in place: same volume, same data. You don't have to touch `DB_NAME`; setting `DB_NAME=auto_tournament` in `.env` is tidier, and it is what the [rollback](#go-back-to-2415) needs.
 
-Set it in `.env` (replace the line if `DB_NAME` is already there):
-
-```bash
-grep -q '^DB_NAME=' .env && sed -i.bak 's/^DB_NAME=.*/DB_NAME=auto_tournament/' .env || echo 'DB_NAME=auto_tournament' >> .env
-```
-
-Then the image. Open `docker-compose.yml`, find the `image:` line of the `matchzy-tournament` service, and set the new name:
+The image name is optional too: `sivertio/matchzy-auto-tournament:latest` gets 3.0. To use the new name, open `docker-compose.yml`, find the `image:` line of the `matchzy-tournament` service, and set the new name:
 
 ```yaml title="docker-compose.yml"
 services:
   matchzy-tournament:
-    image: sivertio/auto-tournament:next
+    image: sivertio/auto-tournament:3.0.0
 ```
 
 Or from the shell, keeping a copy of the old file as `docker-compose.yml.bak`:
 
 ```bash
-sed -i.bak 's#sivertio/matchzy-auto-tournament:[^ ]*#sivertio/auto-tournament:next#' docker-compose.yml
+sed -i.bak 's#sivertio/matchzy-auto-tournament:[^ ]*#sivertio/auto-tournament:3.0.0#' docker-compose.yml
 ```
 
-`next` is the 3.0 beta. Once 3.0 is released, a fixed version like `3.0.0` is worth using, because it makes going back a one-line change; see the [tags on Docker Hub](https://hub.docker.com/r/sivertio/auto-tournament/tags). `ghcr.io/auto-tournament/auto-tournament` works too.
+A fixed version like `3.0.0` makes going back a one-line change; `latest` follows every release. See the [tags on Docker Hub](https://hub.docker.com/r/sivertio/auto-tournament/tags). `ghcr.io/auto-tournament/auto-tournament` works too.
 
-Keep the service name, the container names and the volumes as they are. The image name is optional: `sivertio/matchzy-auto-tournament` gets the same 3.0 build. `DB_NAME` is not.
+Keep the service name, the container names and the volumes as they are.
 
 </Step>
 
@@ -207,7 +197,7 @@ Auto Tournament 3.x does not support MatchZy Enhanced (it keeps working with 2.x
 
 If CS2 Server Manager manages your servers: update csm (`sudo csm self-update`; 1.23 and newer install only Ready Up), run `csm update-plugins`, then [link the machine](/getting-started/connect-server). From then on the platform creates, starts and updates its servers. The old `game/csgo/addons/` folders (Metamod, CounterStrikeSharp, MatchZy) are no longer used and can be deleted.
 
-Servers you run yourself or at a game host: [install Ready Up](/cs2/ready-up/install) and enroll each server.
+Servers you set up by hand, with an IP, port and RCON password, can't be added in 3.x: install csm on the machine and link it instead. A game host that doesn't let you run csm can't run Auto Tournament's servers.
 
 </Step>
 
@@ -247,7 +237,11 @@ services:
     image: sivertio/matchzy-auto-tournament:2.4.15
 ```
 
-Keep `DB_NAME=auto_tournament` in `.env`: 3.0 renamed the database, and 2.4.15 reads whatever name `DB_NAME` gives it.
+Set `DB_NAME=auto_tournament` in `.env` (and in `DATABASE_URL`, if you set it): 3.0 renamed the database, and 2.4.15 reads whatever name `DB_NAME` gives it, so with the old name it finds nothing.
+
+```bash
+grep -q '^DB_NAME=' .env && sed -i.bak 's/^DB_NAME=.*/DB_NAME=auto_tournament/' .env || echo 'DB_NAME=auto_tournament' >> .env
+```
 
 If you used the `sed` command above, `mv docker-compose.yml.bak docker-compose.yml` puts the old file back; then pin `2.4.15` in it, so a later `pull` does not fetch 3.0 again through `latest`.
 
@@ -292,6 +286,6 @@ Use your own backup's file name. `dropdb` deletes everything, including whatever
 ## If something goes wrong
 
 - **The app will not start.** `docker compose logs matchzy-tournament` usually names the cause. A missing value in `.env` and a database it cannot reach are the two common ones.
-- **It won't start, and the log talks about the database name.** `DB_NAME` still says `matchzy_tournament` (set it to `auto_tournament`), or the 2.x container is still running and connected to the old database (stop it first). The log line says which, and the exact command when the database user may not rename it.
+- **It won't start, and the log talks about the database name.** The 2.x container is still running and connected to the old database (stop it first), or the database user may not rename it. The log line says which, with the exact command to run in the second case.
 - **Your data looks empty.** Almost always a volume that was recreated, or a database called `auto_tournament` that already existed next to the old one (the log says *both exist*). Check that `docker-compose.yml` still points at the same volume as before.
 - **Anything else.** [Troubleshooting](/reference/troubleshooting), or ask on [Discord](https://discord.gg/n7gHYau7aW).
