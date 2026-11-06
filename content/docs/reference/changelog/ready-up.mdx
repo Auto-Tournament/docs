@@ -7,6 +7,121 @@ description: Release notes for each version of Ready Up, the native CS2 server p
 
 Ready Up is the native CS2 server plugin that replaces MatchZy Enhanced for new setups. Newest first. Each entry is the [GitHub release](https://github.com/Auto-Tournament/ready-up/releases) for that version. [Docs](/cs2/ready-up).
 
+## v0.2.0
+
+<p className="text-sm text-fd-muted-foreground">2026-11-06 · [Release on GitHub](https://github.com/Auto-Tournament/ready-up/releases/tag/v0.2.0)</p>
+
+### Changes since v0.1.0
+
+- fix(match): answer a console exec on a server with no match
+- chore(match): remove the old HTML HUD tests (.ru hud test, .ru hud anim)
+- i18n(help): .help lines from each plugin in the player's language (ru_help_v1.line_lang)
+- i18n(skins, hud): .skins reload replies and the no-menu line per language
+- i18n(community): .rank, .top, .speclist and the kick line per language
+- i18n(movement): timer, finish lines, HUD menu and replies per language
+- i18n(midas): cards and the golden-touch line per language
+- fix(essentials): needs.json lists the per-player centre panel calls
+- fix(mapvote): needs.json lists the per-player centre panel calls
+- i18n(deathmatch): leaderboard, winner panel, game lines and player replies per language
+- i18n(essentials): map change and download panels, broadcasts and .help per language
+- i18n(mapvote): replies, broadcasts, the ballot and the HUD menus per language
+- i18n(match): admin broadcasts, welcome card and end-of-map screen per language
+- i18n(match): coach, walkover, admin call, round restore and damage report per language
+- i18n(match): admin and platform lines, series end, overtime rules, GOTV and HUD notices per language
+- i18n(practice): drop the Ready Up lead-in from broadcast keys (core adds the prefix)
+- i18n(practice): scenario replies and broadcasts per language
+- i18n(practice): hit and flash feedback, dry run, toggles and refusals per language
+- i18n(practice): translate replies into all 29 languages
+- feat(practice): practice tool replies in each player's language
+- feat(i18n): HUD menus and vote cards in all 29 languages
+- feat(match): HUD menus and vote cards in each player's language
+- feat(fleet): take each player's language from match.assign and add_player
+- feat(i18n): Thai, Vietnamese and Indonesian
+- feat(i18n): Japanese and Korean
+- feat(i18n): Chinese (Simplified, Traditional)
+- feat(i18n): Turkish and Hungarian
+- feat(i18n): Bulgarian and Greek
+- feat(i18n): Polish and Czech
+- feat(i18n): Russian and Ukrainian
+- fix(match): server_settings test finds libs/readyup/i18n.h
+- feat(i18n): Romanian
+- feat(i18n): Italian and Portuguese (Brazil, Portugal)
+- feat(i18n): French, Spanish and Latin American Spanish
+- feat(i18n): Danish, Dutch and Finnish
+- feat(i18n): German, Norwegian and Swedish
+- feat(match): pauses, forfeits, force ready and votes in each player's language
+- feat(match): go-live, result and admin-call cards in each player's language
+- feat(match): the ready HUD and its clickable cards in each player's language
+- feat(match): player commands, go-live rules and leaving players in each language
+- feat(match): scrim, knife and go-live chat in each player's language
+- feat(fleet): players.language sets each player's language from the platform
+- feat(api): 1.19 player language for plugins; whitelist speaks it
+- feat(core): each player's language, and .lang to choose it
+- feat(i18n): translation tables compiled into plugins
+- fix(release): a stable release's Discord changelog counts from the previous stable ([#305](https://github.com/Auto-Tournament/ready-up/pull/305))
+- fix(release): the Discord post runs (the script was not executable) ([#304](https://github.com/Auto-Tournament/ready-up/pull/304))
+
+## v0.2.0-beta.2
+
+<p className="text-sm text-fd-muted-foreground">2026-11-06 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/ready-up/releases/tag/v0.2.0-beta.2)</p>
+
+### Changes since v0.2.0-beta.1
+
+- fix(match): answer a console exec on a server with no match
+
+## v0.2.0-beta.1
+
+<p className="text-sm text-fd-muted-foreground">2026-11-06 · <span className="rounded border border-amber-500/50 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">Pre-release</span> · [Release on GitHub](https://github.com/Auto-Tournament/ready-up/releases/tag/v0.2.0-beta.1)</p>
+
+### Changes since v0.1.0
+
+- chore(match): remove the old HTML HUD tests (.ru hud test, .ru hud anim)
+- i18n(help): .help lines from each plugin in the player's language (ru_help_v1.line_lang)
+- i18n(skins, hud): .skins reload replies and the no-menu line per language
+- i18n(community): .rank, .top, .speclist and the kick line per language
+- i18n(movement): timer, finish lines, HUD menu and replies per language
+- i18n(midas): cards and the golden-touch line per language
+- fix(essentials): needs.json lists the per-player centre panel calls
+- fix(mapvote): needs.json lists the per-player centre panel calls
+- i18n(deathmatch): leaderboard, winner panel, game lines and player replies per language
+- i18n(essentials): map change and download panels, broadcasts and .help per language
+- i18n(mapvote): replies, broadcasts, the ballot and the HUD menus per language
+- i18n(match): admin broadcasts, welcome card and end-of-map screen per language
+- i18n(match): coach, walkover, admin call, round restore and damage report per language
+- i18n(match): admin and platform lines, series end, overtime rules, GOTV and HUD notices per language
+- i18n(practice): drop the Ready Up lead-in from broadcast keys (core adds the prefix)
+- i18n(practice): scenario replies and broadcasts per language
+- i18n(practice): hit and flash feedback, dry run, toggles and refusals per language
+- i18n(practice): translate replies into all 29 languages
+- feat(practice): practice tool replies in each player's language
+- feat(i18n): HUD menus and vote cards in all 29 languages
+- feat(match): HUD menus and vote cards in each player's language
+- feat(fleet): take each player's language from match.assign and add_player
+- feat(i18n): Thai, Vietnamese and Indonesian
+- feat(i18n): Japanese and Korean
+- feat(i18n): Chinese (Simplified, Traditional)
+- feat(i18n): Turkish and Hungarian
+- feat(i18n): Bulgarian and Greek
+- feat(i18n): Polish and Czech
+- feat(i18n): Russian and Ukrainian
+- fix(match): server_settings test finds libs/readyup/i18n.h
+- feat(i18n): Romanian
+- feat(i18n): Italian and Portuguese (Brazil, Portugal)
+- feat(i18n): French, Spanish and Latin American Spanish
+- feat(i18n): Danish, Dutch and Finnish
+- feat(i18n): German, Norwegian and Swedish
+- feat(match): pauses, forfeits, force ready and votes in each player's language
+- feat(match): go-live, result and admin-call cards in each player's language
+- feat(match): the ready HUD and its clickable cards in each player's language
+- feat(match): player commands, go-live rules and leaving players in each language
+- feat(match): scrim, knife and go-live chat in each player's language
+- feat(fleet): players.language sets each player's language from the platform
+- feat(api): 1.19 player language for plugins; whitelist speaks it
+- feat(core): each player's language, and .lang to choose it
+- feat(i18n): translation tables compiled into plugins
+- fix(release): a stable release's Discord changelog counts from the previous stable ([#305](https://github.com/Auto-Tournament/ready-up/pull/305))
+- fix(release): the Discord post runs (the script was not executable) ([#304](https://github.com/Auto-Tournament/ready-up/pull/304))
+
 ## v0.1.0
 
 <p className="text-sm text-fd-muted-foreground">2026-11-05 · [Release on GitHub](https://github.com/Auto-Tournament/ready-up/releases/tag/v0.1.0)</p>
