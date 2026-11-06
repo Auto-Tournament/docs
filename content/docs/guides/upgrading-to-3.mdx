@@ -128,16 +128,16 @@ The image name is optional too: `sivertio/matchzy-auto-tournament:latest` gets 3
 ```yaml title="docker-compose.yml"
 services:
   matchzy-tournament:
-    image: sivertio/auto-tournament:3.0.0
+    image: sivertio/auto-tournament:3.0.6
 ```
 
 Or from the shell, keeping a copy of the old file as `docker-compose.yml.bak`:
 
 ```bash
-sed -i.bak 's#sivertio/matchzy-auto-tournament:[^ ]*#sivertio/auto-tournament:3.0.0#' docker-compose.yml
+sed -i.bak 's#sivertio/matchzy-auto-tournament:[^ ]*#sivertio/auto-tournament:3.0.6#' docker-compose.yml
 ```
 
-A fixed version like `3.0.0` makes going back a one-line change; `latest` follows every release. See the [tags on Docker Hub](https://hub.docker.com/r/sivertio/auto-tournament/tags). `ghcr.io/auto-tournament/auto-tournament` works too.
+A fixed version like `3.0.6` makes going back a one-line change; `latest` follows every release. See the [tags on Docker Hub](https://hub.docker.com/r/sivertio/auto-tournament/tags). `ghcr.io/auto-tournament/auto-tournament` works too.
 
 Keep the service name, the container names and the volumes as they are.
 

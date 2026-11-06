@@ -6,8 +6,8 @@ icon: Download
 
 import { Step, Steps } from 'fumadocs-ui/components/steps';
 
-<Callout title="Stable and beta">
-  `install.sh` installs the latest stable release. Add `--channel beta` for the newest beta, or pin a version with `--version v0.1.0`. See the [Ready Up changelog](/reference/changelog/ready-up).
+<Callout title="Stable by default">
+  `install.sh` installs the latest stable release. To pin a version, add `--version v0.2.5`. Betas are only for trying experimental features early: add `--channel beta`. See the [Ready Up changelog](/reference/changelog/ready-up).
 </Callout>
 
 ## What you need
@@ -62,15 +62,15 @@ The answer is saved in `game/csgo/readyup/license-acceptance.json`, so updates d
 In a terminal, the installer then shows the components, what is installed and what the release has:
 
 ```text
-> [x] Core       new 0.2.0   required
-  [x] Match      new 0.2.0   ready-up, knife, pauses, webhooks
-  [x] Fleet      new 0.2.0   link to the Auto Tournament platform (idle until configured)
-  [ ] Skins      new 0.2.0   may get servers banned
-  [ ] Hello      new 0.2.0   example plugin
-  [ ] Midas      new 0.2.0   fun: gold weapons (off until enabled)
-  [ ] Whitelist  new 0.2.0   only listed players may join (off until turned on)
-  [x] Practice   new 0.2.0   practice mode + tools (.prac, .savepos, .rethrow, .bot)
-  [x] Essentials new 0.2.0   admins + map commands (needed for admins without a match config)
+> [x] Core       new 0.2.5   required
+  [x] Match      new 0.2.5   ready-up, knife, pauses, webhooks
+  [x] Fleet      new 0.2.5   link to the Auto Tournament platform (idle until configured)
+  [ ] Skins      new 0.2.5   may get servers banned
+  [ ] Hello      new 0.2.5   example plugin
+  [ ] Midas      new 0.2.5   fun: gold weapons (off until enabled)
+  [ ] Whitelist  new 0.2.5   only listed players may join (off until turned on)
+  [x] Practice   new 0.2.5   practice mode + tools (.prac, .savepos, .rethrow, .bot)
+  [x] Essentials new 0.2.5   admins + map commands (needed for admins without a match config)
 ```
 
 Move with the arrow keys (or `j` and `k`), toggle with space, and confirm with enter. `q` quits without changes. Core is always ticked. On a fresh install, the Essentials bundle is ticked. The installer then asks once more before it changes anything.

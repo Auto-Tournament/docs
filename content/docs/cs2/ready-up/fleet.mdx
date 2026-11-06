@@ -6,8 +6,8 @@ icon: Network
 
 import { Step, Steps } from 'fumadocs-ui/components/steps';
 
-<Callout title="Beta" type="info">
-  Fleet mode is in beta: Ready Up 0.1.0-beta.3 and later, Auto Tournament 3.0 betas and CS2 Server Manager 1.14. Details can still change between betas.
+<Callout title="Versions">
+  Fleet mode needs Ready Up 0.1.0 or later, Auto Tournament 3.0 or later and CS2 Server Manager 1.14 or later.
 </Callout>
 
 A Ready Up server runs in one of two modes:
@@ -229,7 +229,7 @@ This is how local tools find the endpoint. If you do not set a token, the genera
 
 Settings are in [Configuration](/cs2/ready-up/configuration#status-endpoint).
 
-## With CS2 Server Manager (beta)
+## With CS2 Server Manager
 
 CS2 Server Manager (csm) links a whole machine to the platform with one command. After that, you create servers from the platform (or auto-scaling creates them), and each new server enrolls itself with a fleet key csm writes for it. You do not copy codes.
 
@@ -240,5 +240,3 @@ CS2 Server Manager (csm) links a whole machine to the platform with one command.
 ## CS2 Server Manager
 
 [CS2 Server Manager](/cs2/server-manager) can read each server's `status.json` and `/stream` to show a live table of all Ready Up servers, and wait for `update_safe` before it restarts or updates a server during a match. Available in CS2 Server Manager 1.12 and later (`csm status`).
-
-Later, CS2 Server Manager will also enroll with the platform as a host agent. The platform can then start, stop, restart and update servers through it, and write the fleet key into new servers so they enroll on their own.
