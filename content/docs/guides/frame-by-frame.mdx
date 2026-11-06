@@ -23,13 +23,13 @@ It patches no game code and needs no Metamod or CounterStrikeSharp.
 
 ## After a CS2 update
 
-A CS2 update can move what the plugin relies on. It checks before it does anything, and when a check fails it stops that part and logs it. The game keeps running, and the recorder still records, just more slowly:
+A CS2 update can move what the plugin relies on. It checks before it does anything, and when a check fails it stops that part and logs it. The game keeps running. How the recorder copes depends on what still works:
 
 | State | What it means | Recording |
 | --- | --- | --- |
 | **Frame actions** | Everything works. | Fastest. |
 | **One movie** | The frame-exact commands are off for this CS2 build. | Each clip is one movie at the slowed rate: slower, same result. |
-| **Off** | CS2 no longer unhides `startmovie` for the plugin. | Clips are recorded from the video stream, as before Frame by Frame. |
+| **Off** | CS2 no longer unhides `startmovie` for the plugin. | The recorder can't record clips until it's updated to a Frame by Frame release that works with this build. |
 
 Each recorder checks after its CS2 updates and reports the state:
 
