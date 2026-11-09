@@ -1,0 +1,14 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Auto Tournament bug or feature
+    url: https://github.com/Auto-Tournament/auto-tournament/issues/new/choose
+    about: Problems with the site you host, the Servers page, tournaments or matches.
+  - name: CS2 Server Manager bug or feature
+    url: https://github.com/Auto-Tournament/cs2-server-manager/issues/new/choose
+    about: Problems with csm on your machines.
+  - name: Ready Up bug or feature
+    url: https://github.com/Auto-Tournament/ready-up/issues/new/choose
+    about: Problems with the plugin on your CS2 servers.
+  - name: Discord
+    url: https://discord.gg/n7gHYau7aW
+    about: Questions and help from the community.
