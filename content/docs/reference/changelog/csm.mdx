@@ -7,6 +7,29 @@ description: Release notes for each version of CS2 Server Manager (csm).
 
 CS2 Server Manager (`csm`) runs several CS2 servers on one Linux machine. Newest first. Each entry is the [GitHub release](https://github.com/Auto-Tournament/cs2-server-manager/releases) for that version. [Docs](/cs2/server-manager).
 
+## v1.27.6
+
+<p className="text-sm text-fd-muted-foreground">2026-11-09 · [Release on GitHub](https://github.com/Auto-Tournament/cs2-server-manager/releases/tag/v1.27.6)</p>
+
+CS2 Server Manager (CSM) release v1.27.6
+
+### Fixed
+- A second "Create server" on a new machine, while the first CS2 download is still running, now says it is waiting for that download and shows its progress ("Waiting for the CS2 download that is already running: downloading 41 % (30.1 of 73.4 GB)"). Before, it showed the install step with numbers that seemed to belong to it ([#145](https://github.com/Auto-Tournament/cs2-server-manager/pull/145)).
+
+## v1.27.5
+
+<p className="text-sm text-fd-muted-foreground">2026-11-09 · [Release on GitHub](https://github.com/Auto-Tournament/cs2-server-manager/releases/tag/v1.27.5)</p>
+
+CS2 Server Manager (CSM) release v1.27.5
+
+### Fixed
+- Creating the first servers on a new machine shows the CS2 download as it goes ("downloading 74 % (31.5 of 42.2 GB)") instead of sitting on one step for an hour. A second create that waits for a download already running shows that download's progress too ([#141](https://github.com/Auto-Tournament/cs2-server-manager/pull/141)).
+- A slow first CS2 download is no longer cut off: the SteamCMD limit is now 6 hours, it starts after any wait for a download already running, and SteamCMD is stopped only when it prints nothing for 20 minutes ([#141](https://github.com/Auto-Tournament/cs2-server-manager/pull/141)).
+- The Active Duty map pool comes from CS2's competitive template again. CS2's own `mg_active` list is out of date (it still had Train, Overpass and Vertigo) ([#139](https://github.com/Auto-Tournament/cs2-server-manager/pull/139)).
+
+### Added
+- `csm doctor` checks that every running server was started with `-allow_round_backup_files`, and names the ones to restart (`csm restart server-N`) so round restore works ([#138](https://github.com/Auto-Tournament/cs2-server-manager/pull/138)).
+
 ## v1.27.4
 
 <p className="text-sm text-fd-muted-foreground">2026-10-16 · [Release on GitHub](https://github.com/Auto-Tournament/cs2-server-manager/releases/tag/v1.27.4)</p>
