@@ -1,0 +1,155 @@
+---
+title: Custom HUD
+description: Show your own screens on the in-game HUD, or ship a HUD layout of your own.
+icon: PanelsTopLeft
+---
+
+Ready Up's in-game HUD is a Panorama layout that CS2 draws through its `custom_hud_layout` entity. The layouts live in the [Auto Tournament HUD](https://steamcommunity.com/sharedfiles/filedetails/?id=3827905393) Workshop addon. Every Ready Up server mounts it, so players download it when they join.
+
+The `hud` plugin (`hud.so`) owns the entity and publishes the `readyup.hud.v1` interface. Your plugin uses that interface. There are two ways to put something of your own on screen:
+
+| | What you do | Publish an addon? |
+| --- | --- | --- |
+| [Screens on the Auto Tournament HUD](#screens-on-the-auto-tournament-hud) | Describe a screen as `key=value` lines: title, text, team rows, buttons. | No |
+| [Your own layout](#your-own-layout) | Write a Panorama layout, put it in your own Workshop addon, and set its texts and classes from your plugin. | Yes |
+
+Start with screens. They cover cards, prompts, menus and buttons, and every look ships in the addon already, so there is nothing to publish.
+
+<Callout title="Players without the addon see nothing" type="warn">
+  A player who hasn't downloaded the addon yet sees no HUD at all, and nothing is logged. `available()` only says whether this server can draw custom HUDs, not whether a player has the addon, so keep a chat or center-HTML version too.
+</Callout>
+
+## Get the interface
+
+```c
+#include "readyup/hud_iface.h"
+
+const ru_hud_v1* hud = api->get_interface(api->self, RU_HUD_IFACE_NAME, RU_HUD_IFACE_VERSION);
+if (hud && hud->available()) {
+  /* draw */
+}
+```
+
+Look it up again in every callback: `hud.so` can reload. Members were added in minor versions (`screen` in 1.1, `menu` and `register_menu` in 1.2, `set_capture` in 1.3), so check `struct_size` before you use one. The [API reference](/cs2/ready-up/sdk/api-reference#interfaces) has the rules every interface follows.
+
+## Screens on the Auto Tournament HUD
+
+`screen(slot, spec, on_click, user)` shows a whole screen to one player (slot 0-63). The spec is `key=value` lines separated by newlines:
+
+```c
+static void OnClick(void* user, int slot, const char* command) {
+  /* command is the button's command, e.g. ".sponsor" */
+}
+
+hud->screen(slot,
+            "id=sponsor\n"
+            "where=card\n"
+            "kind=Tonight's sponsor\n"
+            "title=Example Energy\n"
+            "sub=Free drinks at the bar\n"
+            "btn=Got it|green||.sponsor\n"
+            "mouse=b",
+            OnClick, NULL);
+```
+
+Call it as often as you like. The same spec costs nothing, the same `id` updates in place (good for countdowns), a new `id` plays the leave and enter animations, and `""` hides the screen. A click calls `on_click` on the game thread with that button's command.
+
+### Try it without code
+
+On a server, as an admin:
+
+- `.dev` in chat lists every built-in screen to click through.
+- `.ru hudkit tour` steps through them; `.ru hudkit demo <screen>` shows one.
+- `ru hudkit screen <slot> <spec>` shows your own spec, with `;` between lines:
+
+```text
+ru hudkit screen 0 id=test;where=card;title=Hello;sub=From the console;btn=OK|green||.r;mouse=on
+```
+
+### Spec keys
+
+| Key | What it does |
+| --- | --- |
+| `id=` | The screen's identity. A new id animates in; the same id updates in place. |
+| `where=` | `card` (right side, above the weapons) or `mid` (centre of the lower half, the default). |
+| `color=` | Accent: `acc` (default), `live`, `warn`, `ban`, `muted`, `ct`, `t`. |
+| `kind=` | Small coloured label above the title. |
+| `title=` | The title. A screen needs a `title` or a `kind` to show. |
+| `sub=` | Grey line under the title. |
+| `timer=` / `counter=` | Top right / bottom right, e.g. `timer=20`, `counter=1 / 3 used`. |
+| `hint=` | Small grey line at the bottom. |
+| `teams=` | Two team rows: `CT\|3\|5\|T\|2\|5` (name, ready count, dots 0-5). |
+| `confirm=` | Two chips: `Team A\|1\|Team B\|0` (1 = READY, 0 = WAITING). |
+| `vs=` | Two names around "vs" in their side colours: `Team A\|ct\|Team B\|t`. |
+| `cmd=` | A typed-command chip, `Timeout\|.tac`. Up to 3. |
+| `line=` | An info row, `Format\|Best of 3`. Up to 5. A value that starts with `.` is boxed as a command. |
+| `btn=` | A button: `label\|tone\|state\|command`. Up to 24. Tones: `green` `ct` `t` `warn` `danger` `ghost`. States: `picked` `off` `pulse`. |
+| `cols=` / `bw=` | Buttons per row (default: all, at most 4) / button width `s` `m` `l` `xl`. |
+| `close=` | A close button: `label\|command` (empty command just hides). |
+| `mouse=` | `off` (default), `b` (cursor while the buy menu is open), `on`. |
+| `chips=1` | Mid-round: draw buttons as typed commands, never take the cursor. |
+| `size=mini` | Card only: a one-line pill. |
+| `enter=` / `exit=` | How it arrives and leaves: `open` `flip` `alert` `slide` `slide-left` `pop` `zoom` `fade` `rise` `drop` `none`, and `fade` `close` `slide` `slide-left` `shrink` `drop` `rise` `flip` `none`. |
+| `cls=` / `cls.<part>=` | Utility classes on the panel or one part (below). |
+| `wash=0` `pixels=0` `blur=0` | Turn off the colour wash, the moving pixels or the blur. |
+
+Unknown keys are ignored.
+
+### Utility classes
+
+Every look the HUD can have ships in the addon once, so a new combination needs no publish.
+
+- **On the panel** (`cls=`): motion `speed-fast` `speed-slow` `delay-1..3` `flash` `flash-twice` `no-flash`; glass `glass-1..3`; surface `bg-soft` `bg-solid` `bg-clear` `edge` `round-s` `round-l` `no-line` `no-brand` `no-wash` `no-px`; size `w-280` `w-340` `w-420` `w-520` `w-640` `w-760` `w-fit` `pad-s` `pad-l`; place `at-right` `at-low` `at-center` `at-top` `at-left`.
+- **On one part** (`cls.title=`, parts `brand kind title sub hint timer counter teams confirm lines cmds buttons close flow b0..b7`): text `text-xs` … `text-2xl` `bold` `normal` `upper` `mono` `left` `center` `right`; colour `tc-ink` `tc-dim` `tc-faint` `tc-acc` `tc-live` `tc-warn` `tc-ban` `tc-ct` `tc-t`; `breathe` `blink` `hide`; buttons `pulse` `glow` `btn-s` `btn-l`.
+
+Example: `enter=drop;exit=rise;cls=at-top edge glass-3;cls.title=text-2xl tc-live`.
+
+### Menus
+
+`menu(slot, owner, spec, on_click, user)` draws a menu over whatever `screen` shows. The latest menu wins, and the screen comes back when the last menu closes. `owner` is your plugin's short name; `""` closes your menu, and slot `RU_HUD_ALL` with `""` closes it for everyone (do that on unload).
+
+To appear under `.menu`, register with `register_menu(owner, priority, active, open, user)`. `.menu` asks providers from the highest priority down whether their menu fits the player right now, and opens the first that says yes. In use: match 0, mapvote 10, movement 20, practice 30. Pass `NULL` callbacks on unload.
+
+`screen` and `menu` manage the cursor themselves: they take it for `mouse=on` (or while the buy menu is open for `mouse=b`) and give it back on a click, a new id, `""` or a disconnect.
+
+## Your own layout
+
+When the built-in screens aren't enough, for example a full scoreboard or a sponsor overlay with your own art, ship a layout of your own.
+
+1. Write the layout (`.xml`) and styles (`.css`) and build them into a CS2 Workshop addon with Counter-Strike 2 Workshop Tools. The [HUD addon's README](https://github.com/Auto-Tournament/ready-up/blob/master/hud/README.md) shows the build and publish steps we use for ours.
+2. Publish it as **Unlisted** or **Public**. Servers can't download private or friends-only items.
+3. Add its ID to `workshop_addons` in `cfg/ReadyUp/addons.cfg` so the server mounts it and players download it ([Workshop addons](/cs2/ready-up/plugins)).
+4. From your plugin, open it by its **source** path and set texts and classes:
+
+```c
+int h = hud->open("panorama/layout/custom_game/my_board.xml");
+if (h > 0) {
+  hud->set_text(h, RU_HUD_ALL, "board_title", "text", "Grand final");
+  hud->set_class(h, slot, "board", "hidden", 0);
+}
+```
+
+| Function | What it does |
+| --- | --- |
+| `open(layout)` | Creates the entity for that layout (again after a map change). Returns a handle above 0. Callers asking for the same layout share one entity. |
+| `set_text(h, slot, panel_id, var, value)` | Sets dialog variable `var` on a panel, for one slot or `RU_HUD_ALL`. |
+| `set_class(h, slot, panel_id, cls, on)` | Turns a CSS class on a panel on or off. |
+| `clear_slot(h, slot)` | Forgets everything set for a slot. Call it on disconnect: slots are reused. |
+| `set_capture(h, slot, on)` | Gives the player a cursor on your layout, for hover and clicks. Give it back when done and on disconnect. |
+
+`hud.so` keeps what you set and pushes it again when it has to recreate the entity or a player takes a slot, so just say what each player should see.
+
+### Rules for layouts
+
+CS2 is strict, and most mistakes render nothing and log nothing:
+
+- Use the source path with its extension, `panorama/layout/custom_game/<name>.xml`. Not the bare name and not the compiled `.vxml_c`.
+- Only `Panel`, `Label`, `Image` and `Button`. Any other panel type and the client refuses the whole layout.
+- No `id` on the root panel. Put ids on children.
+- `hittest="false"` on anything that shouldn't take the mouse.
+- No inline `style=""`, and quote `@keyframes` names (`@keyframes 'fade'`).
+- Width and height can't animate. Animate opacity, position (`transform`) and colours with `transition` triggered by a class; `@keyframes` only work for opacity.
+- Images are CSS backgrounds (`background-image: url("s2r://…vtex")`), not `<Image>` with `scaling`. Your own `.vtex` files must be BGRA8888.
+- Panorama caches layouts for the whole game session. Restart CS2 after a change, and republish the addon before players see it.
+
+The Workshop takes a while to process an update before servers can download it. If `steamcmd +login anonymous +workshop_download_item 730 <id> +quit` says "Access Denied", Steam isn't done yet.
