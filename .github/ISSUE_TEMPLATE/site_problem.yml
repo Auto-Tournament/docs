@@ -1,0 +1,25 @@
+name: Site problem
+description: The docs site itself is broken, such as search, layout or the language switcher
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you did, what you expected, and what happened instead. Drag screenshots in here.
+    validations:
+      required: true
+  - type: input
+    id: page
+    attributes:
+      label: Page
+      placeholder: https://docs.autotournament.gg/…
+    validations:
+      required: true
+  - type: input
+    id: browser
+    attributes:
+      label: Browser and device
+      placeholder: Firefox 140 on Windows 11, Safari on iPhone
+    validations:
+      required: true

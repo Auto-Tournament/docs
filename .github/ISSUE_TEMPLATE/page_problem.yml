@@ -1,0 +1,43 @@
+name: Page problem
+description: A page on docs.autotournament.gg is missing, wrong or unclear
+labels: [documentation]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        For a problem in the software itself, use the repository it belongs to. The links are on the previous page.
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What kind of problem?
+      options:
+        - Missing
+        - Wrong or out of date
+        - Unclear
+        - Broken link or image
+        - A command or example does not work
+        - Typo
+        - A translation is wrong
+    validations:
+      required: true
+  - type: input
+    id: page
+    attributes:
+      label: Page
+      description: The address of the page.
+      placeholder: https://docs.autotournament.gg/getting-started/install
+    validations:
+      required: true
+  - type: textarea
+    id: wrong
+    attributes:
+      label: What is wrong
+      placeholder: |
+        Step 3 says …, but on my machine …
+    validations:
+      required: true
+  - type: textarea
+    id: fix
+    attributes:
+      label: What it should say
+      description: Optional, if you know. You can also edit the MDX file in `content/docs` and open a pull request.
