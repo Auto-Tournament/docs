@@ -8,9 +8,7 @@ icon: House
 
 Auto Tournament runs tournaments on game servers that you own. You create the teams and the bracket. Auto Tournament picks a free server, loads each match, runs the map veto in the browser, and moves the bracket forward when a match ends.
 
-Today it supports Counter-Strike 2 (CS2). The project was called **MatchZy Auto Tournament** (MAT) before. You will still see the old name in the Docker image, the GitHub repository and some log lines. Those keep the old name until version 3.0. Coming from 2.x? See [Upgrading to 3.0](/guides/upgrading-to-3).
-
-{/* TODO 3.0: Before 3.0 ships, rewrite this paragraph for the 3.0 release: which names changed and which stayed. */}
+Counter-Strike 2 (CS2) runs on servers with [Ready Up](/cs2/ready-up), our own plugin. Any other game can run too, with the captains reporting the score. The project was called **MatchZy Auto Tournament** (MAT) up to version 2.4. The old Docker image name, `sivertio/matchzy-auto-tournament`, still gets every release. Coming from 2.x? See [Upgrading to 3.0](/guides/upgrading-to-3).
 
 ## Who it is for
 
@@ -23,13 +21,19 @@ You host everything yourself. Auto Tournament is one Docker image plus a Postgre
 ## What it does
 
 - Single elimination, double elimination, round robin, Swiss and shuffle tournaments.
+- Team sign-up and check-in.
 - Map veto for best of 1, 3 and 5, done on a web page for each team.
-- Finds a free server, loads the match, and frees the server when the match ends.
-- Live scores and server status in the browser.
+- Creates, starts and updates servers on your machines with [CS2 Server Manager](/cs2/server-manager), loads each match on a free one, and frees it when the match ends.
+- A match room for each match, with the live score, server status and connect info.
+- [Highlights](/guides/highlights): clips and reels of each player's best plays, recorded from the demos.
+- Demo recording and download, with stats and a 2D replay.
+- Skins that players pick on the site and see on your servers.
 - Player ratings and leaderboards.
-- Demo recording, uploaded to Auto Tournament for download.
-- An HTTP API with API tokens, for bots and scripts.
+- A [Discord bot](/modules/discord) with channels for each tournament and team.
+- 30 languages.
+- An HTTP API with API tokens, for bots and scripts, and an [AI connection](/guides/ai) for Claude and other MCP clients.
 - A simulation mode for testing a tournament with bots.
+- [Matchmaking](/guides/matchmaking), still experimental.
 
 ## Start here
 
@@ -39,7 +43,7 @@ You host everything yourself. Auto Tournament is one Docker image plus a Postgre
   <Card title="Connect a CS2 server" href="/getting-started/connect-server" description="Add your first game server." />
   <Card title="Run a first tournament" href="/getting-started/first-tournament" description="Create teams, a bracket and start it." />
   <Card title="Tournament formats" href="/guides/tournament-formats" description="How each format works and its limits." />
-  <Card title="Modules" href="/modules" description="Game modules and format modules, now and in 3.0." />
+  <Card title="Modules" href="/modules" description="Game modules, game packs and how to add a game." />
   <Card title="Troubleshooting" href="/reference/troubleshooting" description="Fixes for the most common problems." />
 </Cards>
 
