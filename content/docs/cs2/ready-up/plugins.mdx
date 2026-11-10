@@ -8,14 +8,14 @@ Ready Up is a core plus plugins. The core loads into CS2 and owns every engine c
 
 ## Which plugins to install
 
-Most servers want the **Essentials** bundle: core, essentials, match, fleet and practice. Add single plugins with the installer, for example `bash install.sh whitelist`.
+Most servers want the **Essentials** bundle: core, essentials, match, fleet, practice, map vote, HUD and addons. Add single plugins with the installer, for example `bash install.sh whitelist`.
 
 | Server | Plugins |
 | --- | --- |
 | Scrims, pickups and Auto Tournament matches | The Essentials bundle. |
 | Tournament match server with Valve's rules | Core, essentials and match (fleet if you use the platform). Use [esports mode](/cs2/ready-up/esports-mode). Leave out skins and midas: they do nothing under Valve's rules anyway. |
 | Practice server | Core, essentials and practice, with `always=1` in `practice.cfg`. Add whitelist to keep it private. |
-| Fun or community server | Essentials, plus deathmatch, Midas and addons from the Full bundle. |
+| Fun or community server | Essentials, plus deathmatch, movement, community and Midas from the Full bundle. |
 | Community server with skins | Essentials, plus skins. Read the [ban risk](/cs2/ready-up/skins) first. |
 
 Match plugins do not mix. Never run MatchZy, Get5 or MatchZy Enhanced next to Ready Up's match plugin. See the [FAQ](/cs2/ready-up/faq#running-other-plugins).
@@ -59,6 +59,34 @@ Settings, in `cfg/ReadyUp/practice.cfg` or the `[practice]` section of `readyup.
 ### Fleet
 
 The link to the Auto Tournament platform. It stays idle until you set a platform `url`, so it is safe on a standalone server. See [Fleet mode](/cs2/ready-up/fleet).
+
+### HUD
+
+Draws Ready Up's cards in CS2's own HUD: the ready-up card, the damage card after a round, the leaderboard and menus such as the map vote. Players see it through the Auto Tournament HUD addon, which the addons plugin mounts on every map, so every player downloads it when they join. A player with an older copy of the addon is told it is out of date. Without the addon, the same information comes as center-screen text and chat. Other plugins draw through it; it has no settings of its own.
+
+### Map vote
+
+Map voting for community servers: deathmatch, movement, practice. It stands down while a match is loaded.
+
+- `.rtv` starts a vote once enough players typed it. `.unrtv` takes yours back.
+- `.nominate <map>` puts a map on the next ballot. `.nominate` alone lists the pool.
+- `.maps`, `.nextmap` and `.timeleft`.
+- With a time limit, a vote starts before the time runs out. **Extend** adds time.
+
+Settings are in `cfg/ReadyUp/mapvote.cfg`, read again on every map and with `ru mapvote reload`:
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `maps` | empty | The pool: map names and `workshop/<id>/<name>`, comma separated. Empty means the Active Duty maps on a defuse map; on any other map voting stays off until you list maps. A pool the platform gave the server wins over this. |
+| `rtv_ratio`, `rtv_min_players` | `0.6`, `1` | Share of the players who must type `.rtv`, and the minimum count. |
+| `rtv_delay_seconds` | `60` | No `.rtv` in the first seconds of a map. |
+| `vote_options`, `vote_seconds` | `6`, `20` | Maps on a ballot, and how long a vote runs. |
+| `map_time_minutes` | `30` | Minutes per map. `0` means no limit: votes only by `.rtv`. |
+| `vote_before_end_seconds` | `120` | When the vote starts before the time runs out. |
+| `extend_minutes`, `max_extends` | `10`, `1` | What **Extend** adds, and how often. |
+| `recent_maps_excluded` | `3` | The last maps played stay off the ballot. |
+
+Admins: `ru mapvote start|cancel|status|reload` and `ru mapvote change <map>`.
 
 ### Whitelist
 
@@ -144,9 +172,49 @@ Settings are in `cfg/ReadyUp/deathmatch.cfg`. Every line ships commented out wit
 | `weapon_round_restrict_buy` | `0` | `1`: nobody can buy other guns during a weapon round. |
 | `restore_game_type`, `restore_game_mode` | `0`, `1` | What `.ru dm off` goes back to. `0` and `1` is competitive, `0` and `2` is wingman. |
 
+### Movement
+
+Surf, bhop and kz on community servers: the mode's physics, a run timer between the map's start and end zones, personal bests and the map's top times. Only in the Full bundle. It stands down while a match is loaded.
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `mode` | `auto` | `auto` picks the mode from the map name (`surf_`, `bhop_`, `kz_`, `xc_`, `bkz_`, `kzpro_`). Or `surf`, `bhop`, `kz`, `off`. |
+| `finish_chat` | `records` | Who sees a finished run in chat. `records`: the runner, and everyone on a new server record. `self`: only the runner. `all`: everyone. |
+| `home_map` | `3073875025` | The map the server goes back to when it is empty and the map has no movement mode. A map name or a Workshop ID; empty means stay. |
+
+### Community
+
+The classic community-server commands. Only in the Full bundle.
+
+- `.rank`: your points, kills, deaths, K/D and headshots on this server.
+- `.top`: the server's top 10.
+- `.speclist`: who is spectating you.
+- `.kick <name> [reason]`: for admins.
+
+Stats count while no match is loaded, since a match has its own stats on the platform. They are kept in `plugins/community/stats.json`.
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `enabled` | `1` | `0` turns it all off. |
+| `count_in_matches` | `0` | `1` counts kills and deaths in matches too. |
+| `min_kills_to_rank` | `10` | Kills a player needs before `.rank` gives a rank. |
+
+### TV
+
+Keeps the server's GOTV settings the same for a whole series. Only in the Full bundle. It leaves GOTV alone until you set a key in `cfg/ReadyUp/tv.cfg`. `ru tv set <key> <value>` wins over the file, and a platform match's broadcast settings win over both for that match.
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `delay_seconds` | `105` | GOTV delay (0 to 960). Never lower than a match asks for. |
+| `allow_insecure_observers` | `0` | `1` lets observers with an insecure client, such as HLAE, watch over GOTV. The game port stays VAC-secured. |
+| `max_clients` | `8` | GOTV viewers (0 to 255). |
+| `relay_text_chat`, `relay_voice` | `1`, `1` | Relay chat and voice to GOTV. |
+| `casters` | empty | Steam64 IDs that may join the game port as spectators. Outside a match this needs the whitelist plugin. |
+| `clients_poll_seconds` | `60` | How often the GOTV viewer count is read for the platform. |
+
 ### Addons
 
-Steam Workshop addons without Metamod. The server downloads the addons you list and mounts them on every map change. Only in the Full bundle. It is idle until you list an addon.
+Steam Workshop addons without Metamod. The server downloads the addons you list and mounts them on every map change. It is in both bundles, because it also mounts the HUD addon every player needs. Otherwise it is idle until you list an addon.
 
 1. Make sure the item is **Public** or **Unlisted** on the Workshop. A hidden item cannot be downloaded.
 2. Put its ID in `cfg/ReadyUp/addons.cfg`. The file is read again every 5 seconds.
