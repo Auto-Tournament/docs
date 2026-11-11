@@ -1,53 +1,29 @@
 ---
-title: Matchmaking (experimental)
-description: Players find a 5v5 match on their own, without an admin.
+title: Matchmaking
+description: Players find a match on their own, without an admin.
 icon: Swords
 ---
 
-import { Step, Steps } from 'fumadocs-ui/components/steps';
-
-Players click **Find match**, wait in a queue, accept, and play a CS2 match on a free server. Nobody has to set anything up per match. Matchmaking is experimental: it is off by default and only admins can use it until you open it to players.
-
-<Callout type="warn">
-  Matchmaking is new. Try it with friends before you open it to everyone.
-</Callout>
+Players click **Find match**, wait in a queue, accept, and play a CS2 match on a free server: 5v5, 2v2 (Wingman) or 1v1. Nobody has to set anything up per match. It's on from the start, for every signed-in player.
 
 ## What you need
 
 - The CS2 module, with the **Active Duty** map pool (Maps). Matches are played on a random map from it.
 - At least one [Ready Up](/cs2/ready-up) server the platform can start, for example on a machine linked with [CS2 Server Manager](/cs2/server-manager). Tournament matches always get a free server first.
-- Ten players searching at the same time.
+- Enough players searching at the same time: ten for 5v5, four for 2v2, two for 1v1.
 
-## Turn it on
+## Who can play
 
-<Steps>
-
-<Step>
-
-### Switch the feature on
-
-**Settings → Experimental → Matchmaking**. Admins now see **Play** in the top bar.
-
-</Step>
-
-<Step>
-
-### Open it to players
-
-Under the same switch, turn on **Open to players**. Every signed-in player now sees **Play**. Turn on **Leaderboard visible to everyone** if visitors who are not signed in should see the leaderboard.
-
-</Step>
-
-</Steps>
+**Settings → Matchmaking**. **Open to players** is on by default: every signed-in player sees **Play**. Turn it off and only admins can find matches, which is handy while you try it with friends. Turn on **Leaderboard visible to everyone** if visitors who aren't signed in should see the leaderboard. The search window below is set there too.
 
 ## How a match is found
 
-1. A player picks **Find match**, alone or as a party. A party leader shares the invite link; up to 5 players, always on the same team.
+1. A player picks **Find match**, alone or as a party. A party leader shares the invite link; up to a full team, always on the same side.
 2. A bar at the bottom of every page shows the search and how long it has run.
-3. When ten players fit together, everyone gets **Match found** with a sound and has 20 seconds to accept.
-4. When all ten accept, the match is created and gets a server. The match room shows both teams, the map and how to join.
+3. When the players for a full match fit together, everyone gets **Match found** with a sound and has 20 seconds to accept.
+4. When everyone accepts, the match is created and gets a server. The match room shows both teams, the map and how to join.
 
-Players are matched with others near their rating. The allowed gap starts at ±100 and grows by 50 every 30 seconds, up to 400. After 5 minutes anyone is matched, so a small community still gets games. Teams are split so the total rating is as even as possible.
+Players are matched with others near their rating. By default the allowed gap starts at ±100 and grows by 50 every 30 seconds, up to 400. After 5 minutes anyone is matched, so a small community still gets games. Teams are split so the total rating is as even as possible.
 
 ## Ratings, XP and levels
 
