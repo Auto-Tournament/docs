@@ -27,7 +27,7 @@ const products = [
     description: 'Release notes for each version of the Auto Tournament platform.',
     docs: '/',
     intro:
-      'Versions before 3.0 were released as **MatchZy Auto Tournament** (MAT). Their notes are under [Earlier versions](#earlier-versions). **3.0 is in beta**: the `3.0.0-beta.N` releases below are the 3.0 notes until 3.0.0 ships. See [Upgrading to 3.0](/guides/upgrading-to-3).',
+      'Versions before 3.0 were released as **MatchZy Auto Tournament** (MAT). Their notes are under [Earlier versions](#earlier-versions). The `3.0.0-beta.N` releases below are the betas before 3.0.0. See [Upgrading to 3.0](/guides/upgrading-to-3).',
     earlier: 'platform-2.x.md',
   },
   {
