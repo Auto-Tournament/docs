@@ -25,7 +25,7 @@ A scrim needs no match config. Anyone on the server can play.
 2. Each player on CT or T types `.r`. The ready panel shows who is ready.
 3. When everyone on CT and T is ready, a 5 second countdown starts.
 4. With `scrim_knife=1` (the default), a knife round is played. The winners pick a side. See [Knife round](#knife-round).
-5. Ready Up runs `ReadyUp/live.cfg`, restarts the game, and the scrim is live on the next round start.
+5. Ready Up applies the live rules, restarts the game, and the scrim is live on the next round start.
 
 In a scrim, CT is team 1 and T is team 2. There is no whitelist and no team lock. Scrims are not reported to Auto Tournament.
 
@@ -64,7 +64,7 @@ When every roster player is connected and ready, the match goes live. If the map
 
 With `ru_warmup_enable 0` there is no ready-up for matches at all: no warmup rules, no panel and no knife round. The match goes live on the next round start. Use that only when something else starts the match.
 
-The `cvars` from the match config are applied after `live.cfg`, so they win over it.
+The `cvars` from the match config replace Ready Up's own live rules for the same cvars.
 
 ### Match config
 
@@ -92,11 +92,11 @@ The response can be the config itself, or a wrapper `{ id, slug, config }`.
 
 ## Knife round
 
-1. Ready Up runs `ReadyUp/knife.cfg` and restarts the game. Players have knives only.
+1. Ready Up applies the knife rules and restarts the game. Players have knives only.
 2. The team that kills the other team wins. If the round ends another way, for example on time, the winner is the team with more players alive, then the team with more health left, then a coin flip.
 3. Any player on the winning team types `.stay` or `.switch` (or `.ct` / `.t`). An admin can pick for them with `.ru match side`.
 4. The winners have `knifeDecisionSeconds` in a match, or `knife_pick_seconds` in a scrim, both 60 by default. If no one picks, the team stays. If the winning team has only bots, it stays after 3 seconds.
-5. Ready Up swaps teams if needed, runs `ReadyUp/live.cfg` and restarts. The match is live on the next round start.
+5. Ready Up swaps teams if needed, applies the live rules and restarts. The match is live on the next round start.
 
 The knife round works from the server log alone. It uses engine events when they are available.
 
@@ -112,7 +112,7 @@ There are three kinds of pause. They only work during a live map of a loaded mat
 | Halftime pause | CS2, under [Valve's rules](/cs2/ready-up/esports-mode) | At halftime | Both teams `.unpause`, or an admin. Not counted. |
 | Short-handed pause | CS2, when `sv_matchpause_auto_5v5` is on | A round start with fewer than 5 players on a side | Both teams `.unpause`, or an admin. Not counted. |
 
-- **Tactical timeouts** are CS2's own timeouts for the caller's side. Their number and length are `mp_team_timeout_max` and `mp_team_timeout_time`, from `live.cfg` or the match `cvars`.
+- **Tactical timeouts** are CS2's own timeouts for the caller's side. Their number and length are `mp_team_timeout_max` and `mp_team_timeout_time`, from the live rules or the match `cvars`.
 - **Technical pauses** use CS2's `mp_pause_match`, so they start at the next freeze time. Each team gets `max_tech_pauses_per_team` per map (3 by default). With `both_teams_unpause_required=0`, the team that paused can end it alone.
 - An admin can call a pause for a team with `.ru match tech team1` or `.ru match tac team2`. That team's limits apply.
 
