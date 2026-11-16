@@ -27,7 +27,7 @@ Ready Up ships as single components and two bundles. Every zip has the same layo
 | `ready-up-essentials` | Bundle: core, essentials, match, fleet and practice. Use this one. |
 | `ready-up-full` | Bundle: everything in Essentials, plus skins, whitelist, midas, deathmatch, addons, hello, and the offline gamedata checkers `readyup_sigcheck` and `readyup_hookcheck`. |
 | `ready-up-core` | The core: `libserver.so`, `engine-surface.json`, `readyup.cfg.example`, the `gameinfo.gi` patcher and the tools. Always installed. |
-| `ready-up-match` | The match flow, and the mode configs in `readyup/cfg-templates/ReadyUp/`. |
+| `ready-up-match` | The match flow, with its mode rules built in. |
 | `ready-up-essentials-plugin` | The essentials plugin alone: admins and map commands. Not the same as the `ready-up-essentials` bundle. |
 | `ready-up-practice` | Practice mode and its tools. |
 | `ready-up-fleet` | The link to the Auto Tournament platform, and a `fleet.cfg` with every line commented out. See [Fleet mode](/cs2/ready-up/fleet). |
@@ -171,7 +171,7 @@ The patcher is safe to run more than once. It fixes a misplaced or duplicated li
 If you do not have them yet:
 
 - copy `readyup/bin/linuxsteamrt64/readyup.cfg.example` to `readyup.cfg` in the same folder,
-- copy `readyup/cfg-templates/ReadyUp/*.cfg` to `game/csgo/cfg/ReadyUp/`.
+- copy the plugin settings files `readyup/cfg-templates/ReadyUp/*.cfg` to `game/csgo/cfg/ReadyUp/`.
 
 </Step>
 

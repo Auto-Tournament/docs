@@ -32,8 +32,8 @@ The match config wins over `readyup.cfg`. In fleet mode, the platform sends the 
 
 | | Default | Valve |
 | --- | --- | --- |
-| Go-live config | `cfg/ReadyUp/live.cfg` | `cfg/ReadyUp/esports_live.cfg`: Valve's `gamemode_competitive` and `gamemode_competitive_tmm`, then Valve's exceptions. It runs even with `ru_cfg_exec_enable 0`. |
-| Your own changes | `live_override.cfg` | `esports_override.cfg` |
+| Go-live rules | the live rules | the esports_live rules: Valve's `gamemode_competitive` and `gamemode_competitive_tmm`, then Valve's exceptions. They apply even with `ru_cfg_exec_enable 0`. |
+| Your own changes | the match `cvars` | the match `cvars` and `overrides` |
 | Knife round | Allowed (`map_sides: "knife"`) | Refused. A match config with a `knife` side does not load. Sides come from the veto. |
 | Overtime | `maxOvertimes` and the damage tiebreak apply | Unlimited overtime. `maxOvertimes` and `damageTiebreak` are ignored, with a note at load. |
 | Technical pauses | 3 per team, 300 seconds | 1 per team, 120 seconds |
@@ -104,5 +104,5 @@ An unknown key, a wrong type or a value out of range refuses the whole match, wi
 
 - It does not make Ready Up allowed at a Major. Valve's rulebook only allows server mods with Valve's written approval. That is up to the organizer.
 - Some rules are not server settings: client settings, PC lockdown, map pool, rosters and coach communication. Those stay with the organizer and the platform.
-- Seven cvars in Valve's list do not exist on current CS2 builds (for example `sv_occlude_players`). `esports_live.cfg` keeps them, and the server answers `Unknown command`. That is expected.
+- Seven cvars in Valve's list do not exist on current CS2 builds (for example `sv_occlude_players`). The esports_live rules keep them, and the server answers `Unknown command`. That is expected.
 - `tv_broadcast` stays `0` unless the match sets `tv_broadcast_url`.

@@ -150,7 +150,7 @@ These are the values for scrims, and the fallback for matches whose config leave
 | `stop_command_no_damage` | `0` | Only allow `.stop` while no player has damaged an opponent this round. |
 | `stop_vote_seconds` | `30` | Time the other team has to agree to a `.stop`. |
 
-Tactical timeouts (`.tac`) use CS2's own timeouts. Their number and length are `mp_team_timeout_max` and `mp_team_timeout_time`, set in `live.cfg` or the match `cvars`.
+Tactical timeouts (`.tac`) use CS2's own timeouts. Their number and length are `mp_team_timeout_max` and `mp_team_timeout_time`, set by the live rules or the match `cvars`.
 
 ### Esports mode
 
@@ -193,44 +193,38 @@ Read by the fleet plugin (`fleet.so`) from the `[fleet]` section, or from `game/
 | `spool_max_msgs` | `50000` | Most messages kept on disk while offline. |
 | `spool_max_mb` | `64` | Most megabytes kept on disk while offline. |
 
-## Mode configs
+## Mode rules
 
-`cfg/ReadyUp/*.cfg` are normal CS2 config files with server settings for each mode. The packages have them in `readyup/cfg-templates/ReadyUp/`. The installer copies missing ones to `game/csgo/cfg/ReadyUp/`. Edit the copies there.
+Ready Up's server settings for each mode are built into the match plugin. Up to Ready Up 0.2.16 they were the `cfg/ReadyUp/*.cfg` files. There are no mode configs to edit any more.
 
-| File | Runs when |
+| Rules | Applied when |
 | --- | --- |
-| `warmup.cfg` | Warmup rules apply (scrim or match warmup). |
-| `idle.cfg` | The server goes idle, or practice ends. It runs `warmup.cfg`. |
-| `knife.cfg` | The knife round starts. |
-| `live.cfg` | The match goes live. |
-| `live_override.cfg` | At the end of `live.cfg`. Put your own changes here. |
-| `esports_live.cfg` | The match goes live under `ruleset=valve`, instead of `live.cfg`. See [Esports mode](/cs2/ready-up/esports-mode). |
-| `esports_override.cfg` | At the end of `esports_live.cfg`. Put your own changes here. |
-| `prac.cfg` | Practice mode starts. It keeps the bomb, for plant practice. |
+| warmup | Warmup rules apply (scrim or match warmup). |
+| idle | The server goes idle, or practice ends. It starts with the warmup rules. |
+| knife | The knife round starts. |
+| live | The match goes live. |
+| esports_live | The match goes live under `ruleset=valve`, instead of live. See [Esports mode](/cs2/ready-up/esports-mode). |
+| live_wingman | A wingman match goes live, instead of live. |
+| prac | Practice mode starts. It keeps the bomb, for plant practice. |
 
-The same folder holds the plugin settings files `practice.cfg`, `midas.cfg` and `fleet.cfg`. Those are Ready Up settings, not CS2 configs.
+To change one of these settings for a match, put the cvar in the match's `cvars`. A cvar the match sets replaces Ready Up's own line for it.
 
-`live.cfg`, `knife.cfg` and `prac.cfg` start from the MatchZy defaults.
+The live, knife and prac rules start from the MatchZy defaults. The warmup rules never turn on CS2's own warmup, because its WARMUP text covers the ready panel. Ready Up makes its own warmup instead: players respawn, rounds don't end, you can buy anywhere, nothing drops on death, and there's no bomb. They also set `sv_hibernate_when_empty 0`, because a hibernating server runs no frames and Ready Up does its work in frames.
 
-Two rules for `warmup.cfg`:
+`cfg/ReadyUp/` still holds the plugin settings files `practice.cfg`, `midas.cfg` and `fleet.cfg`. Those are Ready Up settings, not CS2 configs.
 
-- Do not add `mp_warmup_start`. Ready Up does not use CS2's own warmup, because its WARMUP text covers the ready panel. Ready Up makes its own warmup instead: players respawn, rounds do not end, you can buy anywhere, nothing drops on death, and there is no bomb.
-- It sets `sv_hibernate_when_empty 0`. Keep that. A hibernating server runs no frames, and Ready Up does its work in frames.
+### When the rules apply
 
-### When the files run
+By default Ready Up applies:
 
-By default Ready Up runs:
+- the knife rules for the knife round,
+- the live rules when a scrim goes live, and after the knife side pick,
+- the prac rules when practice turns on, and the idle rules when it turns off,
+- the esports_live rules instead of the live rules under `ruleset=valve`, always.
 
-- `knife.cfg` for the knife round,
-- `live.cfg` when a scrim goes live, and after the knife side pick,
-- `prac.cfg` when practice turns on, and `idle.cfg` when it turns off,
-- `esports_live.cfg` instead of `live.cfg` under `ruleset=valve`, always.
+For warmup, it sets the warmup settings itself. A match without a knife round goes live with its own settings, without the full live rules.
 
-For warmup, it sets the warmup settings itself. A match without a knife round goes live with its own settings, without `live.cfg`.
-
-The `cvars` of a loaded match are applied after `live.cfg`, so they always win over it.
-
-To run the mode files on every mode change, as MatchZy does, turn on cfg exec in the console:
+To apply the full rules on every mode change, as MatchZy does, turn this on in the console:
 
 ```text
 ru_cfg_exec_enable 1
