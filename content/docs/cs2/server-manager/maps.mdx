@@ -6,7 +6,19 @@ icon: Image
 
 import { Step, Steps } from 'fumadocs-ui/components/steps';
 
-`csm` can pull the map preview images out of the CS2 game files. You need this only if you want the images for your own site or tool. Auto Tournament does not need it.
+## What Auto Tournament gets from csm
+
+A machine linked to Auto Tournament sends the platform what it needs from the CS2 game files, read from the CS2 version its servers run:
+
+- each map's radar for the 2D replay, at start and every 6 hours;
+- map pictures, map icons and skin pictures, the first time a page needs each one;
+- the map list (with the Active Duty pool) and the skin catalog, built again after every CS2 update.
+
+The platform keeps a copy of each, so a page loads it from the platform after the first time. None of it is published anywhere else. Without a linked machine the platform has no map or skin pictures and no skin catalog, and uses the map list it ships with.
+
+## Extracting the images yourself
+
+`csm` can also write the map preview images to a folder. You need this only if you want the images for your own site or tool.
 
 You need a finished install, so `~/master-install` exists.
 
@@ -62,5 +74,3 @@ The command reads `pak01_dir.vpk` from `master-install` and writes two folders i
 - `map_thumbnails/`: for each map, a PNG, a full-size WEBP, and a WEBP that is 1280 pixels wide, for example `de_mirage.png`, `de_mirage.webp` and `de_mirage_thumb.webp`. Maps with more than one screenshot also get `de_mirage_1.webp`, `de_mirage_1_thumb.webp` and so on.
 
 Images that did not change are not written again. Run it after a CS2 update to get new maps.
-
-The `csm` repository also has a ready set of images in [map_thumbnails](https://github.com/Auto-Tournament/cs2-server-manager/tree/main/map_thumbnails).
