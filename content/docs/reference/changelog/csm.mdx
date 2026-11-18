@@ -7,6 +7,34 @@ description: Release notes for each version of CS2 Server Manager (csm).
 
 CS2 Server Manager (`csm`) runs several CS2 servers on one Linux machine. Newest first. Each entry is the [GitHub release](https://github.com/Auto-Tournament/cs2-server-manager/releases) for that version. [Docs](/cs2/server-manager).
 
+## v1.29.1
+
+<p className="text-sm text-fd-muted-foreground">2026-11-18 · [Release on GitHub](https://github.com/Auto-Tournament/cs2-server-manager/releases/tag/v1.29.1)</p>
+
+CS2 Server Manager (CSM) release v1.29.1
+
+### Fixed
+- On a host with instances, the map radars, map and skin pictures and the map and skin catalogs now come from the CS2 version the servers run. They came from the install csm was set up with, which an update leaves behind, so a new map like Cobblestone was missing ([#152](https://github.com/Auto-Tournament/cs2-server-manager/pull/152)).
+
+## v1.29.0
+
+<p className="text-sm text-fd-muted-foreground">2026-11-18 · [Release on GitHub](https://github.com/Auto-Tournament/cs2-server-manager/releases/tag/v1.29.0)</p>
+
+CS2 Server Manager (CSM) release v1.29.0
+
+### Added
+- csm builds the map list (`maps.json`) and the skin catalog (`skins.json`) from its own CS2 install, keeps them on the host, and builds them again after a CS2 update. The platform asks csm for them instead of reading them from GitHub ([#150](https://github.com/Auto-Tournament/cs2-server-manager/pull/150)). The platform side ships in the next Auto Tournament release.
+
+## v1.28.0
+
+<p className="text-sm text-fd-muted-foreground">2026-11-18 · [Release on GitHub](https://github.com/Auto-Tournament/cs2-server-manager/releases/tag/v1.28.0)</p>
+
+CS2 Server Manager (CSM) release v1.28.0
+
+### Added
+- csm sends each map's radar from its CS2 install to the platform, so the 2D replay has map images without a worker or a recorder. It sends them at start and every 6 hours, and only the ones that changed ([#146](https://github.com/Auto-Tournament/cs2-server-manager/pull/146)).
+- The platform can ask csm for a map or skin picture. csm reads it from its own CS2 install and uploads it, so the pictures don't have to come from GitHub any more ([#147](https://github.com/Auto-Tournament/cs2-server-manager/pull/147)). The platform side ships in the next Auto Tournament release.
+
 ## v1.27.6
 
 <p className="text-sm text-fd-muted-foreground">2026-11-09 · [Release on GitHub](https://github.com/Auto-Tournament/cs2-server-manager/releases/tag/v1.27.6)</p>
