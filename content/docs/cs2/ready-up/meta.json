@@ -9,6 +9,7 @@
     "plugins",
     "configuration",
     "commands",
+    "chat-messages",
     "scrims-and-matches",
     "without-a-platform",
     "esports-mode",
