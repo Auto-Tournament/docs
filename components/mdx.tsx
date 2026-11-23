@@ -1,9 +1,12 @@
 import defaultMdxComponents from 'fumadocs-ui/mdx';
 import type { MDXComponents } from 'mdx/types';
+import { Chat, ChatLine } from './chat-preview';
 
 export function getMDXComponents(components?: MDXComponents) {
   return {
     ...defaultMdxComponents,
+    Chat,
+    ChatLine,
     ...components,
   } satisfies MDXComponents;
 }

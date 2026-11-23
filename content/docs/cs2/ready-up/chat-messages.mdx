@@ -1,0 +1,182 @@
+---
+title: Chat messages
+description: Every chat line Ready Up sends during a match, when it is sent, and how it looks in game.
+icon: MessagesSquare
+---
+
+Ready Up talks to players in chat. This page lists what it sends during a match and when. The examples use made-up names and numbers.
+
+There are two kinds of lines:
+
+- **Normal lines** start with the rainbow `[Ready Up]` tag. Chat commands such as `.ready` are green.
+- **Important lines** are for things nobody may miss. They start with an empty line, then each sentence sits on its own line behind an orange star.
+
+<Chat>
+  <ChatLine>match loaded. Type .r or .ready to ready up.</ChatLine>
+  <ChatLine important>4-4 after the overtimes, so total damage decides: Team Alpha wins the map (Team Alpha 9120 - 8874 Team Bravo).</ChatLine>
+</Chat>
+
+Players read the text in their own language when the platform sends it, or after they type `.lang`. The examples here are English.
+
+<Callout title="New look for important lines" type="info">
+  The star layout for important lines comes in the release after Ready Up v0.2.19. Up to v0.2.19, an important line is the `[Ready Up]` tag and the text in gold, sent three times.
+</Callout>
+
+## Before the match
+
+When a match is loaded and players join:
+
+<Chat>
+  <ChatLine>match loaded. Type .r or .ready to ready up.</ChatLine>
+  <ChatLine>waiting for (7/10 ready): sivert, alex, kim</ChatLine>
+  <ChatLine>sivert is now READY (8/10 ready).</ChatLine>
+  <ChatLine>sivert is now NOT READY (7/10 ready).</ChatLine>
+</Chat>
+
+| Message | When |
+| --- | --- |
+| match loaded. Type .r or .ready to ready up. | A match is loaded and the server waits in warmup. |
+| waiting for (7/10 ready): … | Repeats in warmup, with the names of the players who are not ready. |
+| … is now READY / NOT READY (8/10 ready). | A player types `.r` or `.unready`. |
+
+In a scrim (no platform match), the warmup line is:
+
+<Chat>
+  <ChatLine>scrim warmup - type .r when ready (3/4 ready). Goes live when everyone on CT/T is ready.</ChatLine>
+  <ChatLine>countdown cancelled (3/4 ready).</ChatLine>
+</Chat>
+
+## Knife round
+
+<Chat>
+  <ChatLine>KNIFE! Winning team picks the side.</ChatLine>
+  <ChatLine>Team Alpha players: type .stay or .switch (.ct / .t) - 30s, then sides stay.</ChatLine>
+  <ChatLine>Team Alpha: .stay or .switch - 10s left, then sides stay.</ChatLine>
+</Chat>
+
+| Message | When |
+| --- | --- |
+| KNIFE! Winning team picks the side. | The knife round starts. |
+| … type .stay or .switch … | The knife round is won. The winners have the time shown to pick. |
+| … - 10s left, then sides stay. | A reminder before the pick runs out. |
+| only bots on the winning side - keeping sides. | Bots won the knife round. Sides stay. |
+
+## Live
+
+<Chat>
+  <ChatLine>LIVE! Good luck, have fun.</ChatLine>
+</Chat>
+
+Sent when the first live round starts.
+
+## Pauses
+
+<Chat>
+  <ChatLine>match paused - Team Bravo is missing a player. To go on now, both teams type .up.</ChatLine>
+  <ChatLine>Team Alpha wants to unpause (waiting for the other team).</ChatLine>
+  <ChatLine>unpause accepted.</ChatLine>
+  <ChatLine>technical pause ends in 30s.</ChatLine>
+</Chat>
+
+| Message | When |
+| --- | --- |
+| match paused - … is missing a player. … | A player left during a 5v5 and the game paused at freeze time. |
+| both teams are full again - live in 5 seconds. | The missing player is back. |
+| the wait for the missing player is over - unpaused. | The wait ran out. |
+| the game is paused. To go on, both teams type .up. | The game is paused by other means. |
+| … wants to unpause (waiting for the other team). | One team typed `.up`. |
+| waiting for … (they paused) to unpause. | The other team tried to unpause first. |
+| unpause accepted. | Both teams typed `.up`. |
+| technical pause ends in 30s. / technical pause time is up - unpaused. | A technical pause is running out. |
+| halftime pause. To start the second half, both teams type .up. | Esports mode: the halftime pause. |
+| an admin unpaused - no more automatic pauses this map. | An admin unpaused during a missing-player pause. |
+
+## Overtime
+
+At the start of each overtime, as an important line and in the middle of the screen:
+
+<Chat>
+  <ChatLine important>OVERTIME 1: 6 rounds, first to 4 wins it. Up to 3 overtimes (2 more after this). Still tied after it: the team with more total damage wins the map.</ChatLine>
+</Chat>
+
+In the last overtime the middle sentence is "This is the last overtime." The last sentence depends on the match: a draw, more damage wins, or more damage wins and equal damage goes to the next round.
+
+When the overtimes run out and damage decides, also as an important line:
+
+<Chat>
+  <ChatLine important>4-4 after the overtimes, so total damage decides: Team Alpha wins the map (Team Alpha 9120 - 8874 Team Bravo).</ChatLine>
+</Chat>
+
+## Surrender and round restore votes
+
+<Chat>
+  <ChatLine>sivert votes to surrender for Team Alpha (1/3, 30s). Teammates: type .gg to agree.</ChatLine>
+  <ChatLine>Team Alpha surrendered (.gg vote passed).</ChatLine>
+  <ChatLine>sivert (Team Alpha) wants to restore this round. Team Bravo: type .stop within 15s to agree.</ChatLine>
+  <ChatLine>both teams agreed: round 12 restored. Live in 3 seconds.</ChatLine>
+</Chat>
+
+| Message | When |
+| --- | --- |
+| … votes to surrender … / … surrendered (.gg vote passed). | A player types `.gg` and the team agrees. |
+| …'s surrender vote failed. | Not enough teammates agreed in time. |
+| … wants to restore this round. … | A player types `.stop` before damage was dealt in the round. |
+| both teams agreed: round … restored. … | The other team typed `.stop` too. |
+| .stop expired (the other team did not confirm). | The other team did not agree in time. |
+
+## A team leaves
+
+<Chat>
+  <ChatLine>Team Bravo has no players on the server. They forfeit in 300s unless someone reconnects.</ChatLine>
+  <ChatLine>Team Bravo is back. Forfeit cancelled.</ChatLine>
+  <ChatLine>Team Bravo did not come back and forfeits the match.</ChatLine>
+</Chat>
+
+## Tournament admin actions
+
+Sent when an admin acts from the platform, or the server moves:
+
+<Chat>
+  <ChatLine>unpaused by a tournament admin.</ChatLine>
+  <ChatLine>round 12 is restored when the next round starts.</ChatLine>
+  <ChatLine>match moved here and restored at round 12. Live in 3 seconds.</ChatLine>
+  <ChatLine>Paused: server lost contact with the tournament platform</ChatLine>
+  <ChatLine>the match was ended by a tournament admin.</ChatLine>
+</Chat>
+
+| Message | When |
+| --- | --- |
+| unpaused by a tournament admin. | An admin unpaused from the platform. |
+| round … is restored at the start of the next round … | An admin restored a round. |
+| match moved here and restored at round … | The match moved to this server after a failure. |
+| Paused: server lost contact with the tournament platform | The server lost the platform during a live match. |
+| the match was ended by a tournament admin. | An admin ended the match. |
+| This server was assigned a tournament match. Thanks for playing! | A scrim server was given a tournament match. |
+
+The platform can also send its own messages, normal or important.
+
+## After the match
+
+<Chat>
+  <ChatLine>Team Alpha won the series 2-1.</ChatLine>
+  <ChatLine>go back to the platform to view your next match.</ChatLine>
+  <ChatLine>all players will be disconnected in 30s to prepare the server for the next match.</ChatLine>
+</Chat>
+
+| Message | When |
+| --- | --- |
+| … won the series 2-1. / … won the series by forfeit. / the series ended in a draw. | The last map ends. |
+| go back to the platform to view your next match. | After the result. |
+| all players will be disconnected in 30s … | Before the server is cleared for the next match. |
+
+## Replies to one player
+
+Answers to a command go only to the player who typed it, for example:
+
+<Chat>
+  <ChatLine>join CT or T first.</ChatLine>
+  <ChatLine>you are not on this match's roster.</ChatLine>
+  <ChatLine>.gg only works while the map is live.</ChatLine>
+</Chat>
+
+See [Commands](/cs2/ready-up/commands) for what each command does.
