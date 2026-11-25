@@ -8,19 +8,29 @@ Ready Up talks to players in chat. This page lists what it sends during a match 
 
 There are two kinds of lines:
 
-- **Normal lines** start with the rainbow `[Ready Up]` tag. Chat commands such as `.ready` are green.
-- **Important lines** are for things nobody may miss. They start with an empty line, then each sentence sits on its own line behind an orange star.
+- **Match events** start with the light red `[Ready Up]` tag. Chat commands such as `.ready` are green.
+- **Tips** sit behind a light red star, one sentence per line.
 
 <Chat>
   <ChatLine>match loaded. Type .r or .ready to ready up.</ChatLine>
-  <ChatLine important>4-4 after the overtimes, so total damage decides: Team Alpha wins the map (Team Alpha 9120 - 8874 Team Bravo).</ChatLine>
+  <ChatLine tip>Need a pause, an admin or to forfeit? Type .menu in chat.</ChatLine>
 </Chat>
 
 Players read the text in their own language when the platform sends it, or after they type `.lang`. The examples here are English.
 
-<Callout title="New look for important lines" type="info">
-  The star layout for important lines comes in the release after Ready Up v0.2.19. Up to v0.2.19, an important line is the `[Ready Up]` tag and the text in gold, sent three times.
+<Callout title="With the HUD, the screen comes first" type="info">
+  On servers with the Auto Tournament HUD, the ready count, the knife pick, the go-live card and the menus are on screen. The ready-up lines below (who is ready, who Ready Up waits for) then only go to players who use chat instead: they typed `.hud`, or picked **Chat only** under **In-game HUD** in their account settings. Everything else in chat goes to everyone. This is new in Ready Up v0.2.27. The light red tag and star came in v0.2.24; before that the tag was in rainbow colors and important lines were gold.
 </Callout>
+
+## Tips
+
+In warmup, once a minute:
+
+<Chat>
+  <ChatLine tip>Hold E to ready up. Need a pause, an admin or to forfeit? Type .menu in chat.</ChatLine>
+</Chat>
+
+"Hold E to ready up." is only there with the HUD, in a match warmup.
 
 ## Before the match
 
@@ -93,18 +103,18 @@ Sent when the first live round starts.
 
 ## Overtime
 
-At the start of each overtime, as an important line and in the middle of the screen:
+At the start of each overtime (on servers without the HUD, also in the middle of the screen):
 
 <Chat>
-  <ChatLine important>OVERTIME 1: 6 rounds, first to 4 wins it. Up to 3 overtimes (2 more after this). Still tied after it: the team with more total damage wins the map.</ChatLine>
+  <ChatLine>OVERTIME 1: 6 rounds, first to 4 wins it. Up to 3 overtimes (2 more after this). Still tied after it: the team with more total damage wins the map.</ChatLine>
 </Chat>
 
 In the last overtime the middle sentence is "This is the last overtime." The last sentence depends on the match: a draw, more damage wins, or more damage wins and equal damage goes to the next round.
 
-When the overtimes run out and damage decides, also as an important line:
+When the overtimes run out and damage decides:
 
 <Chat>
-  <ChatLine important>4-4 after the overtimes, so total damage decides: Team Alpha wins the map (Team Alpha 9120 - 8874 Team Bravo).</ChatLine>
+  <ChatLine>4-4 after the overtimes, so total damage decides: Team Alpha wins the map (Team Alpha 9120 - 8874 Team Bravo).</ChatLine>
 </Chat>
 
 ## Surrender and round restore votes
@@ -153,7 +163,7 @@ Sent when an admin acts from the platform, or the server moves:
 | the match was ended by a tournament admin. | An admin ended the match. |
 | This server was assigned a tournament match. Thanks for playing! | A scrim server was given a tournament match. |
 
-The platform can also send its own messages, normal or important.
+The platform can also send its own messages, as match events or tips.
 
 ## After the match
 
