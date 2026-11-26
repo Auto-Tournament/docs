@@ -46,9 +46,21 @@ function text(children: ReactNode): string {
  * One chat line.
  * - default: a match event: the light red [Ready Up] tag, then the text (commands in green).
  * - `tip` (or the older `important`): one line per sentence behind a light red star.
+ * - `plain`: no tag, for lines under a tagged one (the damage report rows).
  */
-export function ChatLine({ children, important, tip }: { children?: ReactNode; important?: boolean; tip?: boolean }) {
+export function ChatLine({
+  children,
+  important,
+  tip,
+  plain,
+}: {
+  children?: ReactNode;
+  important?: boolean;
+  tip?: boolean;
+  plain?: boolean;
+}) {
   const t = text(children).trim();
+  if (plain) return <div>{t}</div>;
   if (tip || important) {
     const sentences = t.split(/(?<=[.!?])\s+/).filter(Boolean);
     return (

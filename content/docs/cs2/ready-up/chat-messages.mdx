@@ -79,6 +79,18 @@ In a scrim (no platform match), the warmup line is:
 
 Sent when the first live round starts.
 
+## Damage report
+
+When the next round starts, each player sees what they dealt to and took from each enemy in the round that just ended. Damage done after the round timer runs out counts too. On servers with the HUD this is a card on screen. Without it, or for players who picked chat, it comes as chat lines:
+
+<Chat>
+  <ChatLine>Damage report:</ChatLine>
+  <ChatLine plain>Given: 100 in 3 | Taken: 27 in 1 — Bravo_Kim (0 hp)</ChatLine>
+  <ChatLine plain>Given: 0 in 0 | Taken: 0 in 0 — Bravo_Lee (100 hp)</ChatLine>
+</Chat>
+
+"100 in 3" is 100 damage in 3 hits, written the way CS2's own damage report writes it (v0.2.28).
+
 ## Pauses
 
 <Chat>
@@ -167,6 +179,16 @@ The platform can also send its own messages, as match events or tips.
 
 ## After the match
 
+At the end of each map:
+
+<Chat>
+  <ChatLine>Team Alpha wins the map 13-7</ChatLine>
+</Chat>
+
+A drawn map reads "Map drawn 15-15". This line is new in v0.2.29; the HUD shows the result on screen as well.
+
+At the end of the series:
+
 <Chat>
   <ChatLine>Team Alpha won the series 2-1.</ChatLine>
   <ChatLine>go back to the platform to view your next match.</ChatLine>
@@ -175,13 +197,14 @@ The platform can also send its own messages, as match events or tips.
 
 | Message | When |
 | --- | --- |
+| … wins the map 13-7 / Map drawn 15-15 | A map ends. |
 | … won the series 2-1. / … won the series by forfeit. / the series ended in a draw. | The last map ends. |
 | go back to the platform to view your next match. | After the result. |
 | all players will be disconnected in 30s … | Before the server is cleared for the next match. |
 
 ## Replies to one player
 
-Answers to a command go only to the player who typed it, for example:
+Answers to a command go only to the player who typed it, with the same `[Ready Up]` tag, for example:
 
 <Chat>
   <ChatLine>join CT or T first.</ChatLine>
