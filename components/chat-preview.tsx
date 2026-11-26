@@ -10,25 +10,12 @@ const C = {
   lightBlue: '#99ccff',
   purple: '#be6bff',
   white: '#f2f2f2',
+  // CS2's light red (chat color 0x0F): the [Ready Up] tag and the tip star since v0.2.24.
+  lightRed: '#eb4b4b',
 };
 
-const RAINBOW = [C.red, C.orange, C.yellow, C.green, C.lightBlue, C.purple];
-
 function ReadyUpTag() {
-  let n = 0;
-  return (
-    <span>
-      {'[Ready Up]'.split('').map((ch, i) =>
-        ch === ' ' ? (
-          ' '
-        ) : (
-          <span key={i} style={{ color: RAINBOW[n++ % RAINBOW.length] }}>
-            {ch}
-          </span>
-        )
-      )}
-    </span>
-  );
+  return <span style={{ color: C.lightRed }}>[Ready Up]</span>;
 }
 
 // `.ready`, `.pause`: chat commands are green, the way Ready Up highlights them.
@@ -57,20 +44,31 @@ function text(children: ReactNode): string {
 
 /**
  * One chat line.
- * - default: the rainbow [Ready Up] tag, then the text (commands in green).
- * - `important`: a block for lines that must not be missed: an empty line, then one line per
- *   sentence behind an orange star.
+ * - default: a match event: the light red [Ready Up] tag, then the text (commands in green).
+ * - `tip` (or the older `important`): one line per sentence behind a light red star.
+ * - `plain`: no tag, for lines under a tagged one (the damage report rows).
  */
-export function ChatLine({ children, important }: { children?: ReactNode; important?: boolean }) {
+export function ChatLine({
+  children,
+  important,
+  tip,
+  plain,
+}: {
+  children?: ReactNode;
+  important?: boolean;
+  tip?: boolean;
+  plain?: boolean;
+}) {
   const t = text(children).trim();
-  if (important) {
+  if (plain) return <div>{t}</div>;
+  if (tip || important) {
     const sentences = t.split(/(?<=[.!?])\s+/).filter(Boolean);
     return (
       <>
         <div style={{ height: '1.4em' }} />
         {sentences.map((s, i) => (
           <div key={i}>
-            <span style={{ color: C.orange }}>★</span> <Highlight text={s} />
+            <span style={{ color: C.lightRed }}>★</span> <Highlight text={s} />
           </div>
         ))}
       </>
